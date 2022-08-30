@@ -1,0 +1,575 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>DebugxLog</name>
+    </assembly>
+    <members>
+        <member name="T:DebugxLog.Tools.ActionHandler`1">
+            <summary>
+            事件处理器
+            提供了绑定，解绑，调用等方法。
+            没有提供Clear，因为每个人都应当管理自己需要绑定和解绑的委托。此处理器就是为了屏蔽action=null等较危险的操作权限
+            </summary>
+            <typeparam name="T"></typeparam>
+        </member>
+        <member name="M:DebugxLog.Tools.ActionHandler`1.Bind(System.Action{`0},System.Boolean)">
+            <summary>
+            绑定委托
+            </summary>
+            <param name="action"></param>
+            <param name="preventDuplicate"></param>
+        </member>
+        <member name="M:DebugxLog.Tools.ActionHandler`1.Unbind(System.Action{`0})">
+            <summary>
+            解绑委托
+            </summary>
+            <param name="action"></param>
+        </member>
+        <member name="M:DebugxLog.Tools.ActionHandler`1.Invoke(`0)">
+            <summary>
+            调用
+            </summary>
+            <param name="obj"></param>
+        </member>
+        <member name="M:DebugxLog.Tools.DebugxTools.ContainsDelegate(System.Delegate,System.Delegate)">
+            <summary>
+            确认委托是否已经包含
+            </summary>
+            <param name="main"></param>
+            <param name="other"></param>
+            <returns></returns>
+        </member>
+        <member name="T:DebugxLog.Tools.LogOutput">
+            <summary>
+            输出Log到本地txt文件工具类
+            </summary>
+        </member>
+        <member name="F:DebugxLog.Tools.LogOutput.enableLogStackTrace">
+            <summary>
+            输出Log类型的堆栈跟踪
+            </summary>
+        </member>
+        <member name="F:DebugxLog.Tools.LogOutput.enableWarningStackTrace">
+            <summary>
+            输出Warning类型的堆栈跟踪
+            </summary>
+        </member>
+        <member name="F:DebugxLog.Tools.LogOutput.enableErrorStackTrace">
+            <summary>
+            输出错误类型的堆栈跟踪
+            </summary>
+        </member>
+        <member name="F:DebugxLog.Tools.LogOutput.revordAllNonDebugxLogs">
+            <summary>
+            记录所有非Debugx打印的Log
+            </summary>
+        </member>
+        <member name="F:DebugxLog.Tools.LogOutput.directoryPathCover">
+            <summary>
+            Log输出文件夹重写
+            </summary>
+        </member>
+        <member name="P:DebugxLog.Tools.LogOutput.DirectoryPath">
+            <summary>
+            输出文件夹路径
+            </summary>
+        </member>
+        <member name="M:DebugxLog.Tools.LogOutput.Init">
+            <summary>
+            初始化
+            </summary>
+        </member>
+        <member name="M:DebugxLog.Tools.LogOutput.OnDestroy">
+            <summary>
+            当销毁时，应用程序结束时
+            </summary>
+        </member>
+        <member name="T:DebugxBurst">
+            <summary>
+            用于Burst多线程代码中的Debug工具类
+            </summary>
+        </member>
+        <member name="M:DebugxBurst.LogNom(System.Object,System.Boolean,System.Boolean)">
+            <summary>
+            普通打印Log
+            必须在Entities.ForEach().WithoutBurst().Run()时才能工作
+            </summary>
+            <param name="message">打印内容</param>
+            <param name="showTime">显示时间</param>
+            <param name="showNetTag">显示网络标记，Server或者Client。此功能依赖项目，需要项目通过SetServerCheck方法来设置</param>
+        </member>
+        <member name="M:DebugxBurst.LogNomWarning(System.Object,System.Boolean,System.Boolean)">
+            <summary>
+            普通打印LogWarning
+            必须在Entities.ForEach().WithoutBurst().Run()时才能工作
+            </summary>
+            <param name="message">打印内容</param>
+            <param name="showTime">显示时间</param>
+            <param name="showNetTag">显示网络标记，Server或者Client。此功能依赖项目，需要项目通过SetServerCheck方法来设置</param>
+        </member>
+        <member name="M:DebugxBurst.LogNomError(System.Object,System.Boolean,System.Boolean)">
+            <summary>
+            普通打印LogError
+            必须在Entities.ForEach().WithoutBurst().Run()时才能工作
+            </summary>
+            <param name="message">打印内容</param>
+            <param name="showTime">显示时间</param>
+            <param name="showNetTag">显示网络标记，Server或者Client。此功能依赖项目，需要项目通过SetServerCheck方法来设置</param>
+        </member>
+        <member name="M:DebugxBurst.LogMst(System.Object,System.Boolean,System.Boolean)">
+            <summary>
+            高级打印Log
+            必须在Entities.ForEach().WithoutBurst().Run()时才能工作
+            </summary>
+            <param name="message">打印内容</param>
+            <param name="showTime">显示时间</param>
+            <param name="showNetTag">显示网络标记，Server或者Client。此功能依赖项目，需要项目通过SetServerCheck方法来设置</param>
+        </member>
+        <member name="M:DebugxBurst.LogMstWarning(System.Object,System.Boolean,System.Boolean)">
+            <summary>
+            高级打印LogWarning
+            必须在Entities.ForEach().WithoutBurst().Run()时才能工作
+            </summary>
+            <param name="message">打印内容</param>
+            <param name="showTime">显示时间</param>
+            <param name="showNetTag">显示网络标记，Server或者Client。此功能依赖项目，需要项目通过SetServerCheck方法来设置</param>
+        </member>
+        <member name="M:DebugxBurst.LogMstError(System.Object,System.Boolean,System.Boolean)">
+            <summary>
+            高级打印LogError
+            必须在Entities.ForEach().WithoutBurst().Run()时才能工作
+            </summary>
+            <param name="message">打印内容</param>
+            <param name="showTime">显示时间</param>
+            <param name="showNetTag">显示网络标记，Server或者Client。此功能依赖项目，需要项目通过SetServerCheck方法来设置</param>
+        </member>
+        <member name="M:DebugxBurst.Log(System.Int32,System.Object,System.Boolean,System.Boolean)">
+            <summary>
+            成员打印Log
+            必须在Entities.ForEach().WithoutBurst().Run()时才能工作
+            </summary>
+            <param name="key">DebugxMemberInfo中配置的key</param>
+            <param name="message">打印内容</param>
+            <param name="showTime">显示时间</param>
+            <param name="showNetTag">显示网络标记，Server或者Client。此功能依赖项目，需要项目通过SetServerCheck方法来设置</param>
+        </member>
+        <member name="M:DebugxBurst.LogWarning(System.Int32,System.Object,System.Boolean,System.Boolean)">
+            <summary>
+            成员打印LogWarning
+            必须在Entities.ForEach().WithoutBurst().Run()时才能工作
+            </summary>
+            <param name="key">DebugxMemberInfo中配置的key</param>
+            <param name="message">打印内容</param>
+            <param name="showTime">显示时间</param>
+            <param name="showNetTag">显示网络标记，Server或者Client。此功能依赖项目，需要项目通过SetServerCheck方法来设置</param>
+        </member>
+        <member name="M:DebugxBurst.LogError(System.Int32,System.Object,System.Boolean,System.Boolean)">
+            <summary>
+            成员打印LogError
+            必须在Entities.ForEach().WithoutBurst().Run()时才能工作
+            </summary>
+            <param name="key">DebugxMemberInfo中配置的key</param>
+            <param name="message">打印内容</param>
+            <param name="showTime">显示时间</param>
+            <param name="showNetTag">显示网络标记，Server或者Client。此功能依赖项目，需要项目通过SetServerCheck方法来设置</param>
+        </member>
+        <member name="M:DebugxBurst.LogInBurst(System.String)">
+            <summary>
+            在Burst多线程中打印Log
+            必须在Entities.ForEach().WithoutBurst().Run()时才能工作
+            不支持调试成员配置信息功能。没有运行时开关，因为Burst多线程内使用的bool值必须是只读的。
+            </summary>
+            <param name="message">打印内容</param>
+        </member>
+        <member name="M:DebugxBurst.LogInBurstWarning(System.String)">
+            <summary>
+            在Burst多线程中打印LogWarning
+            必须在Entities.ForEach().WithoutBurst().Run()时才能工作
+            不支持调试成员配置信息功能。没有运行时开关，因为Burst多线程内使用的bool值必须是只读的。
+            </summary>
+            <param name="message">打印内容</param>
+        </member>
+        <member name="M:DebugxBurst.LogInBurstError(System.String)">
+            <summary>
+            在Burst多线程中打印LogInBurstError
+            必须在Entities.ForEach().WithoutBurst().Run()时才能工作
+            不支持调试成员配置信息功能。没有运行时开关，因为Burst多线程内使用的bool值必须是只读的。
+            </summary>
+            <param name="message">打印内容</param>
+        </member>
+        <member name="T:DebugxMemberConfig">
+            <summary>
+            Debugx调试配置
+            推荐使用编辑器工具编辑，也可以直接编辑.asset文件
+            </summary>
+        </member>
+        <member name="F:DebugxMemberConfig.normalInfo">
+            <summary>
+            普通Log配置
+            </summary>
+        </member>
+        <member name="F:DebugxMemberConfig.masterInfo">
+            <summary>
+            高级Log配置
+            </summary>
+        </member>
+        <member name="F:DebugxMemberConfig.debugxMemberInfos">
+            <summary>
+            调试成员信息列表
+            </summary>
+        </member>
+        <member name="M:DebugxMemberConfig.#ctor">
+            <summary>
+            默认构造函数
+            </summary>
+        </member>
+        <member name="M:DebugxMemberConfig.DefaultDebugxMemberInfoLimit(DebugxMemberConfig)">
+            <summary>
+            默认Log成员信息限制
+            </summary>
+            <param name="config"></param>
+        </member>
+        <member name="T:DebugxMemberInfo">
+            <summary>
+            Debugx调试成员信息
+            用于配置的数据
+            </summary>
+        </member>
+        <member name="F:DebugxMemberInfo.signature">
+            <summary>
+            使用者签名
+            </summary>
+        </member>
+        <member name="F:DebugxMemberInfo.logSignature">
+            <summary>
+            使用者签名是否打印在Log中
+            </summary>
+        </member>
+        <member name="F:DebugxMemberInfo.key">
+            <summary>
+            此成员信息密钥,不要重复
+            </summary>
+        </member>
+        <member name="F:DebugxMemberInfo.header">
+            <summary>
+            头部信息，在打印Log会打印在头部
+            </summary>
+        </member>
+        <member name="F:DebugxMemberInfo.color">
+            <summary>
+            打印Log颜色
+            </summary>
+        </member>
+        <member name="F:DebugxMemberInfo.enableCached">
+            <summary>
+            是否开启，缓存数据
+            </summary>
+        </member>
+        <member name="F:DebugxMemberInfo.fadeAreaOpenCached">
+            <summary>
+            编辑器窗口，隐藏区域是否开启
+            </summary>
+        </member>
+        <member name="T:DebugxMemberInfo_Internal">
+            <summary>
+            运行时成员信息
+            </summary>
+        </member>
+        <member name="F:DebugxMemberInfo_Internal.signature">
+            <summary>
+            使用者签名
+            </summary>
+        </member>
+        <member name="F:DebugxMemberInfo_Internal.logSignature">
+            <summary>
+            使用者签名是否打印在Log中
+            </summary>
+        </member>
+        <member name="F:DebugxMemberInfo_Internal.header">
+            <summary>
+            头部信息，在打印Log会打印在头部
+            </summary>
+        </member>
+        <member name="F:DebugxMemberInfo_Internal.color">
+            <summary>
+            打印Log颜色的RGB十六进制数
+            </summary>
+        </member>
+        <member name="F:DebugxMemberInfo_Internal.haveSignature">
+            <summary>
+            是否有签名
+            </summary>
+        </member>
+        <member name="F:DebugxMemberInfo_Internal.haveHeader">
+            <summary>
+            是否有头部信息
+            </summary>
+        </member>
+        <member name="P:DebugxMemberInfo_Internal.LogSignature">
+            <summary>
+            打印签名
+            </summary>
+        </member>
+        <member name="M:DebugxMemberInfo_Internal.#ctor(DebugxMemberInfo)">
+            <summary>
+            通过DebugxMemberInfo配置数据构造
+            </summary>
+            <param name="mInfo"></param>
+        </member>
+        <member name="M:DebugxMemberInfo_Internal.#ctor(System.String,UnityEngine.Color)">
+            <summary>
+            快速构造简单成员信息
+            </summary>
+            <param name="signature">使用者签名</param>
+            <param name="color">颜色</param>
+        </member>
+        <member name="T:Debugx">
+            <summary>
+            Debug工具类
+            </summary>
+        </member>
+        <member name="F:Debugx.OnDebugxMemberConfigValidate">
+            <summary>
+            当DebugxMemberConfig的数据变化时
+            </summary>
+        </member>
+        <member name="F:Debugx.enableLog">
+            <summary>
+            Log总开关
+            </summary>
+        </member>
+        <member name="F:Debugx.enableLogMember">
+            <summary>
+            成员Log总开关
+            </summary>
+        </member>
+        <member name="P:Debugx.EnableLogNormal">
+            <summary>
+            普通Log开关
+            </summary>
+        </member>
+        <member name="P:Debugx.EnableLogMaster">
+            <summary>
+            最高优先级Log开关
+            </summary>
+        </member>
+        <member name="P:Debugx.LogMasterOnly">
+            <summary>
+            仅显示最高优先级Log
+            </summary>
+        </member>
+        <member name="P:Debugx.LogThisKeyMemberOnly">
+            <summary>
+            仅打印此Key的Log
+            0为关闭，设置其他Key时，只有此Key对应的成员信息确实存在，才会只打印此Key的成员Log
+            必须关闭logMasterOnly后才能设置此值
+            </summary>
+        </member>
+        <member name="P:Debugx.DebugxMemberConfigSetValid">
+            <summary>
+            当前调试成员配置有效
+            </summary>
+        </member>
+        <member name="F:Debugx.debugxTag">
+            <summary>
+            Debugx打印的内容标识
+            不允许带有任何正则表达式的特殊含义符号
+            修改时需要同事修改LogOutput的正则表达式
+            </summary>
+        </member>
+        <member name="F:Debugx.normalInfoSignature">
+            <summary>
+            默认成员，普通成员签名
+            </summary>
+        </member>
+        <member name="F:Debugx.normalInfoKey">
+            <summary>
+            默认成员，普通成员密钥
+            </summary>
+        </member>
+        <member name="P:Debugx.NormalInfoColor">
+            <summary>
+            默认成员，普通成员颜色
+            </summary>
+        </member>
+        <member name="F:Debugx.masterInfoSignature">
+            <summary>
+            默认成员，高级成员签名
+            </summary>
+        </member>
+        <member name="F:Debugx.masterInfoKey">
+            <summary>
+            默认成员，高级成员密钥
+            </summary>
+        </member>
+        <member name="P:Debugx.MasterInfoColor">
+            <summary>
+            默认成员，高级成员颜色
+            </summary>
+        </member>
+        <member name="M:Debugx.Init(DebugxMemberConfig)">
+            <summary>
+            设置DebugxInfo信息，在项目初始化时设置
+            </summary>
+            <param name="config"></param>
+        </member>
+        <member name="M:Debugx.ClearDebugxMemberConfig">
+            <summary>
+            清空调试成员配置
+            </summary>
+        </member>
+        <member name="M:Debugx.CheckConfigValid">
+            <summary>
+            确认成员配置是否可用，否则使用默认配置
+            主要为了保证在没有InitDebugxMemberInfo()时，LogNom和LogMst的可用性
+            </summary>
+        </member>
+        <member name="M:Debugx.SetServerCheck(System.Func{System.Boolean})">
+            <summary>
+            设置确认是否是服务器的方法
+            由项目调用设置，那么Logx系列方法的showNetTag参数设置为true后，才能打印网络标记
+            </summary>
+            <param name="serverCheckFunc"></param>
+        </member>
+        <member name="M:Debugx.SetMemberEnable(System.Int32,System.Boolean)">
+            <summary>
+            设置成员开关
+            </summary>
+            <param name="key"></param>
+            <param name="enable"></param>
+        </member>
+        <member name="M:Debugx.KeyValid(System.Int32)">
+            <summary>
+            Key是否合法
+            </summary>
+            <param name="key"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Debugx.ContainsMemberKey(System.Int32)">
+            <summary>
+            确认成员Key是否包含
+            在程序运行时和非运行时都可用
+            </summary>
+            <param name="key"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Debugx.LogNom(System.Object,System.Boolean,System.Boolean)">
+            <summary>
+            普通打印Log
+            </summary>
+            <param name="message">打印内容</param>
+            <param name="showTime">显示时间</param>
+            <param name="showNetTag">显示网络标记，Server或者Client。此功能依赖项目，需要项目通过SetServerCheck方法来设置</param>
+        </member>
+        <member name="M:Debugx.LogNomWarning(System.Object,System.Boolean,System.Boolean)">
+            <summary>
+            普通打印LogWarning
+            </summary>
+            <param name="message">打印内容</param>
+            <param name="showTime">显示时间</param>
+            <param name="showNetTag">显示网络标记，Server或者Client。此功能依赖项目，需要项目通过SetServerCheck方法来设置</param>
+        </member>
+        <member name="M:Debugx.LogNomError(System.Object,System.Boolean,System.Boolean)">
+            <summary>
+            普通打印LogError
+            </summary>
+            <param name="message">打印内容</param>
+            <param name="showTime">显示时间</param>
+            <param name="showNetTag">显示网络标记，Server或者Client。此功能依赖项目，需要项目通过SetServerCheck方法来设置</param>
+        </member>
+        <member name="M:Debugx.LogMst(System.Object,System.Boolean,System.Boolean)">
+            <summary>
+            高级打印Log
+            </summary>
+            <param name="message">打印内容</param>
+            <param name="showTime">显示时间</param>
+            <param name="showNetTag">显示网络标记，Server或者Client。此功能依赖项目，需要项目通过SetServerCheck方法来设置</param>
+        </member>
+        <member name="M:Debugx.LogMstWarning(System.Object,System.Boolean,System.Boolean)">
+            <summary>
+            高级打印LogWarning
+            </summary>
+            <param name="message">打印内容</param>
+            <param name="showTime">显示时间</param>
+            <param name="showNetTag">显示网络标记，Server或者Client。此功能依赖项目，需要项目通过SetServerCheck方法来设置</param>
+        </member>
+        <member name="M:Debugx.LogMstError(System.Object,System.Boolean,System.Boolean)">
+            <summary>
+            高级打印LogError
+            </summary>
+            <param name="message">打印内容</param>
+            <param name="showTime">显示时间</param>
+            <param name="showNetTag">显示网络标记，Server或者Client。此功能依赖项目，需要项目通过SetServerCheck方法来设置</param>
+        </member>
+        <member name="M:Debugx.LogAdm(System.Object,System.Boolean,System.Boolean)">
+            <summary>
+            管理打印Log
+            插件开发者使用，所有人理论上都不可使用此方法。
+            </summary>
+            <param name="message">打印内容</param>
+            <param name="showTime">显示时间</param>
+            <param name="showNetTag">显示网络标记，Server或者Client。此功能依赖项目，需要项目通过SetServerCheck方法来设置</param>
+        </member>
+        <member name="M:Debugx.LogAdmWarning(System.Object,System.Boolean,System.Boolean)">
+            <summary>
+            管理打印LogWarning
+            插件开发者使用，所有人理论上都不可使用此方法。
+            </summary>
+            <param name="message">打印内容</param>
+            <param name="showTime">显示时间</param>
+            <param name="showNetTag">显示网络标记，Server或者Client。此功能依赖项目，需要项目通过SetServerCheck方法来设置</param>
+        </member>
+        <member name="M:Debugx.LogAdmError(System.Object,System.Boolean,System.Boolean)">
+            <summary>
+            管理打印LogError
+            插件开发者使用，所有人理论上都不可使用此方法。
+            </summary>
+            <param name="message">打印内容</param>
+            <param name="showTime">显示时间</param>
+            <param name="showNetTag">显示网络标记，Server或者Client。此功能依赖项目，需要项目通过SetServerCheck方法来设置</param>
+        </member>
+        <member name="M:Debugx.Log(System.Int32,System.Object,System.Boolean,System.Boolean)">
+            <summary>
+            成员打印Log
+            </summary>
+            <param name="key">DebugxMemberInfo中配置的key</param>
+            <param name="message">打印内容</param>
+            <param name="showTime">显示时间</param>
+            <param name="showNetTag">显示网络标记，Server或者Client。此功能依赖项目，需要项目通过SetServerCheck方法来设置</param>
+        </member>
+        <member name="M:Debugx.LogWarning(System.Int32,System.Object,System.Boolean,System.Boolean)">
+            <summary>
+            成员打印LogWarning
+            </summary>
+            <param name="key">DebugxMemberInfo中配置的key</param>
+            <param name="message">打印内容</param>
+            <param name="showTime">显示时间</param>
+            <param name="showNetTag">显示网络标记，Server或者Client。此功能依赖项目，需要项目通过SetServerCheck方法来设置</param>
+        </member>
+        <member name="M:Debugx.LogError(System.Int32,System.Object,System.Boolean,System.Boolean)">
+            <summary>
+            成员打印LogError
+            </summary>
+            <param name="key">DebugxMemberInfo中配置的key</param>
+            <param name="message">打印内容</param>
+            <param name="showTime">显示时间</param>
+            <param name="showNetTag">显示网络标记，Server或者Client。此功能依赖项目，需要项目通过SetServerCheck方法来设置</param>
+        </member>
+        <member name="M:Debugx.CheckLogThisKeyMemberOnly(System.Int32)">
+            <summary>
+            确认是否开启了仅显示某个Key的成员
+            true=允许通过 false=返回，不允许打印
+            </summary>
+        </member>
+        <member name="M:Debugx.LogCreator(UnityEngine.LogType,System.Int32,System.Object,System.Boolean,System.Boolean)">
+            <summary>
+            Log扩展打印方法
+            </summary>
+            <param name="type">类型</param>
+            <param name="key">DebugxMemberInfo中配置的key</param>
+            <param name="message">打印内容</param>
+            <param name="showTime">显示时间</param>
+            <param name="showNetTag">显示网络标记，Server或者Client。此功能依赖项目，需要项目通过SetServerCheck方法来设置</param>
+        </member>
+    </members>
+</doc>

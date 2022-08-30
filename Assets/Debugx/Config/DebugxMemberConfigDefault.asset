@@ -1,0 +1,66 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -2061671088, guid: 8559197c08e1faf48a9ac4f226fbacdc, type: 3}
+  m_Name: DebugxMemberConfigDefault
+  m_EditorClassIdentifier: 
+  normalInfo:
+    signature: Normal
+    logSignature: 1
+    key: -1
+    header: 
+    color: {r: 1, g: 1, b: 1, a: 1}
+    enableCached: 1
+    fadeAreaOpenCached: 1
+  masterInfo:
+    signature: Master
+    logSignature: 1
+    key: -2
+    header: 
+    color: {r: 1, g: 0.627, b: 0.627, a: 1}
+    enableCached: 1
+    fadeAreaOpenCached: 1
+  debugxMemberInfos:
+  - signature: WinhooFeng
+    logSignature: 1
+    key: 1
+    header: 
+    color: {r: 0.7843, g: 0.941, b: 1, a: 1}
+    enableCached: 1
+    fadeAreaOpenCached: 0
+  - signature: Menber2
+    logSignature: 1
+    key: 2
+    header: 
+    color: {r: 1, g: 1, b: 1, a: 1}
+    enableCached: 1
+    fadeAreaOpenCached: 1
+  - signature: Menber3
+    logSignature: 1
+    key: 3
+    header: 
+    color: {r: 1, g: 1, b: 1, a: 1}
+    enableCached: 1
+    fadeAreaOpenCached: 1
+  - signature: Menber4
+    logSignature: 1
+    key: 4
+    header: 
+    color: {r: 1, g: 1, b: 1, a: 1}
+    enableCached: 1
+    fadeAreaOpenCached: 1
+  - signature: Menber5
+    logSignature: 1
+    key: 5
+    header: 
+    color: {r: 1, g: 1, b: 1, a: 1}
+    enableCached: 1
+    fadeAreaOpenCached: 1
