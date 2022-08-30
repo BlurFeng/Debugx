@@ -27,7 +27,7 @@ namespace DebugxU3D
             SerializedProperty enableLogStackTrace = serializedObject.FindProperty("enableLogStackTrace");
             SerializedProperty enableWarningStackTrace = serializedObject.FindProperty("enableWarningStackTrace");
             SerializedProperty enableErrorStackTrace = serializedObject.FindProperty("enableErrorStackTrace");
-            SerializedProperty revordAllNonDebugxLogs = serializedObject.FindProperty("revordAllNonDebugxLogs");
+            SerializedProperty recordAllNonDebugxLogs = serializedObject.FindProperty("recordAllNonDebugxLogs");
 
             SerializedProperty enableAwakeTestLog = serializedObject.FindProperty("enableAwakeTestLog");
             SerializedProperty enableUpdateTestLog = serializedObject.FindProperty("enableUpdateTestLog");
@@ -54,7 +54,7 @@ namespace DebugxU3D
             EditorGUILayout.PropertyField(enableLogStackTrace, new GUIContent("EnableLogStackTrace", "输出Log类型的堆栈跟踪"));
             EditorGUILayout.PropertyField(enableWarningStackTrace, new GUIContent("EnableWarningStackTrace", "输出Warning类型的堆栈跟踪"));
             EditorGUILayout.PropertyField(enableErrorStackTrace, new GUIContent("EnableErrorStackTrace", "输出错误类型的堆栈跟踪"));
-            EditorGUILayout.PropertyField(revordAllNonDebugxLogs, new GUIContent("RevordAllNonDebugxLogs", "记录所有非Debugx打印的Log"));
+            EditorGUILayout.PropertyField(recordAllNonDebugxLogs, new GUIContent("RecordAllNonDebugxLogs", "记录所有非Debugx打印的Log"));
 
             EditorGUILayout.LabelField("编辑器时配置", EditorStyle.Get.TitleStyle_3);
             EditorGUILayout.PropertyField(enableAwakeTestLog, new GUIContent("EnableAwakeTestLog", "打开Awake中测试用的Log打印"));

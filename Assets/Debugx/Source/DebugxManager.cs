@@ -98,7 +98,7 @@ namespace DebugxU3D
         public bool enableErrorStackTrace = true;
 
         [HideInInspector]
-        public bool revordAllNonDebugxLogs = false;
+        public bool recordAllNonDebugxLogs = false;
 
 #if UNITY_EDITOR
         [HideInInspector]
@@ -244,7 +244,7 @@ namespace DebugxU3D
             LogOutput.enableLogStackTrace = enableLogStackTrace;
             LogOutput.enableWarningStackTrace = enableWarningStackTrace;
             LogOutput.enableErrorStackTrace = enableErrorStackTrace;
-            LogOutput.revordAllNonDebugxLogs = revordAllNonDebugxLogs;
+            LogOutput.recordAllNonDebugxLogs = recordAllNonDebugxLogs;
         }
 
 #if UNITY_EDITOR

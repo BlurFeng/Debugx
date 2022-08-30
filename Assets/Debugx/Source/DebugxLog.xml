@@ -59,7 +59,7 @@
             输出错误类型的堆栈跟踪
             </summary>
         </member>
-        <member name="F:DebugxLog.Tools.LogOutput.revordAllNonDebugxLogs">
+        <member name="F:DebugxLog.Tools.LogOutput.recordAllNonDebugxLogs">
             <summary>
             记录所有非Debugx打印的Log
             </summary>
