@@ -32,8 +32,8 @@ namespace DebugxLog.Tools
         public static bool recordAllNonDebugxLogs = false;
 
         private static bool init;
-        private const string fileName = "DebugxOutputLog";
-        private const string fileNameFull = "DebugxOutputLog.log";
+        private const string fileName = "DebugxLog";
+        private const string fileNameFull = "DebugxLog.log";
         private const string fileType = ".log";
         /// <summary>
         /// Log输出文件夹重写
