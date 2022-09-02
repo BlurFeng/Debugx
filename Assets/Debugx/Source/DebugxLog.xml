@@ -84,6 +84,55 @@
             当销毁时，应用程序结束时
             </summary>
         </member>
+        <member name="F:DebugxLog.Tools.LogOutput.drawLogToScreen">
+            <summary>
+            将Log绘制到屏幕
+            </summary>
+        </member>
+        <member name="F:DebugxLog.Tools.LogOutput.restrictDrawLogCount">
+            <summary>  
+            限制绘制Log数量
+            </summary>  
+        </member>
+        <member name="F:DebugxLog.Tools.LogOutput.maxDrawLogs">
+            <summary>  
+            绘制Log最大数量
+            </summary>  
+        </member>
+        <member name="M:DebugxLog.Tools.LogOutput.DrawGUI">
+            <summary>
+            绘制GUI
+            </summary>
+        </member>
+        <member name="M:DebugxLog.Tools.LogOutput.DrawConsoleWindow(System.Int32)">
+            <summary>  
+            Displays a window that lists the recorded logs.  
+            </summary>  
+            <param name="windowID">Window ID.</param>  
+        </member>
+        <member name="M:DebugxLog.Tools.LogOutput.DrawLogsList">
+            <summary>  
+            Displays a scrollable list of logs.  
+            </summary>  
+        </member>
+        <member name="M:DebugxLog.Tools.LogOutput.DrawToolbar">
+            <summary>  
+            Displays options for filtering and changing the logs list.  
+            </summary>  
+        </member>
+        <member name="M:DebugxLog.Tools.LogOutput.HandleDrawLogs(System.String,System.String,UnityEngine.LogType)">
+            <summary>  
+            Records a log from the log callback.  
+            </summary>  
+            <param name="message">Message.</param>  
+            <param name="stackTrace">Trace of where the message came from.</param>  
+            <param name="type">Type of message (error, exception, warning, assert).</param>  
+        </member>
+        <member name="M:DebugxLog.Tools.LogOutput.TrimExcessLogs">
+            <summary>  
+            Removes old logs that exceed the maximum number allowed.  
+            </summary>  
+        </member>
         <member name="T:DebugxBurst">
             <summary>
             用于Burst多线程代码中的Debug工具类
@@ -275,6 +324,16 @@
             运行时成员信息
             </summary>
         </member>
+        <member name="F:DebugxMemberInfo_Internal.key">
+            <summary>
+            调试成员密钥
+            </summary>
+        </member>
+        <member name="F:DebugxMemberInfo_Internal.enable">
+            <summary>
+            是否开启
+            </summary>
+        </member>
         <member name="F:DebugxMemberInfo_Internal.signature">
             <summary>
             使用者签名
@@ -316,7 +375,7 @@
             </summary>
             <param name="mInfo"></param>
         </member>
-        <member name="M:DebugxMemberInfo_Internal.#ctor(System.String,UnityEngine.Color)">
+        <member name="M:DebugxMemberInfo_Internal.#ctor(System.Int32,System.String,UnityEngine.Color)">
             <summary>
             快速构造简单成员信息
             </summary>

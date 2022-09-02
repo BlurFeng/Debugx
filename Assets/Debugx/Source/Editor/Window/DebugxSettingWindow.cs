@@ -4,11 +4,11 @@ using UnityEditor;
 
 namespace DebugxU3D
 {
-    public class DebugxMemberWindow : EditorWindow
+    public class DebugxSettingWindow : EditorWindow
     {
         private static EditorWindow window;
 
-        private DebugxMemberConfig Config => DebugxMemberWindowConfig.Current.AutoSave ? DebugxMemberWindowConfig.Current.debugxMemberConfigDefault : configCopy;
+        private DebugxMemberConfig Config => DebugxSettingWindowConfig.Current.AutoSave ? DebugxSettingWindowConfig.Current.debugxMemberConfigSet : configCopy;
         private DebugxMemberConfig configCopy;//配置复制，在非自动保存时缓存修改内容
 
         private readonly List<FadeArea> memberInfosFadeAreaPool = new();
@@ -19,32 +19,32 @@ namespace DebugxU3D
         private DebugxMemberConfig debugxMemberConfigOld;
 
 
-        [MenuItem("Tools/Debugx/DebugxMemberWindow", false, 1)]
+        [MenuItem("Tools/Debugx/DebugxSettingWindow", false, 1)]
         public static void ShowWindow()
         {
-            window = EditorWindow.GetWindow(typeof(DebugxMemberWindow));
+            window = EditorWindow.GetWindow(typeof(DebugxSettingWindow));
             window.minSize = new Vector2(460f, 500f);
         }
 
         private void OnEnable()
         {
-            titleContent = new GUIContent("Debugx Member Window");
-            debugxMemberConfigOld = DebugxMemberWindowConfig.Current.debugxMemberConfigDefault;
+            titleContent = new GUIContent("Debugx Setting Window");
+            debugxMemberConfigOld = DebugxSettingWindowConfig.Current.debugxMemberConfigSet;
 
-            DebugxMemberWindowConfig.OnAutoSaveChange += OnAutoSaveChange;
+            DebugxSettingWindowConfig.OnAutoSaveChange += OnAutoSaveChange;
         }
 
         private void OnDisable()
         {
             //确认是否需要保存
-            SaveCheck(DebugxMemberWindowConfig.Current.debugxMemberConfigDefault);
+            SaveCheck(DebugxSettingWindowConfig.Current.debugxMemberConfigSet);
 
-            DebugxMemberWindowConfig.OnAutoSaveChange -= OnAutoSaveChange;
+            DebugxSettingWindowConfig.OnAutoSaveChange -= OnAutoSaveChange;
 
             //标脏当前配置，并保存。主要为了保证FadeAreaOpenCached能被保存下来
             //否则每次FadeAreaOpenCached更新后，重启项目后又恢复旧的数据了。只有直接鼠标点击修改Config文件上的FadeAreaOpenCached才有被确实的标脏和保存
-            EditorUtility.SetDirty(DebugxMemberWindowConfig.Current.debugxMemberConfigDefault);
-            AssetDatabase.SaveAssetIfDirty(DebugxMemberWindowConfig.Current.debugxMemberConfigDefault);
+            EditorUtility.SetDirty(DebugxSettingWindowConfig.Current.debugxMemberConfigSet);
+            AssetDatabase.SaveAssetIfDirty(DebugxSettingWindowConfig.Current.debugxMemberConfigSet);
         }
 
         private void OnGUI()
@@ -57,49 +57,65 @@ namespace DebugxU3D
             }
 
             EditorGUILayout.Space();
-            EditorGUILayout.LabelField("调试成员信息编辑器", EditorStyle.Get.TitleStyle_1);
+            EditorGUILayout.LabelField("Debugx设置窗口", EditorStyle.Get.TitleStyle_1);
             EditorGUILayout.Space();
 
+            EditorGUILayout.LabelField("编辑器设置", EditorStyle.Get.TitleStyle_2);
+            EditorGUI.BeginChangeCheck();
+            var configOldInitOnEditorLoad = DebugxSettingWindowConfig.Current.debugxMemberConfigSet;
+            DebugxSettingWindowConfig.Current.debugxMemberConfigInitOnEditorLoad =
+                EditorGUILayout.ObjectField(
+                    new GUIContent("ConfigInitOnEditorLoad", "在编辑器启动时加载的调试成员配置。"),
+                    DebugxSettingWindowConfig.Current.debugxMemberConfigInitOnEditorLoad,
+                    typeof(DebugxMemberConfig), false) as DebugxMemberConfig;
+            if (EditorGUI.EndChangeCheck() || DebugxSettingWindowConfig.Current.debugxMemberConfigInitOnEditorLoad == null)
+            {
+                if(DebugxSettingWindowConfig.Current.debugxMemberConfigInitOnEditorLoad == null)
+                    DebugxSettingWindowConfig.Current.debugxMemberConfigInitOnEditorLoad = configOldInitOnEditorLoad;
+            }
+
+            EditorGUILayout.Space();
+            EditorGUILayout.LabelField("编辑调试成员配置", EditorStyle.Get.TitleStyle_2);
             //调试成员配置文件
             EditorGUI.BeginChangeCheck();
-            var configOld = DebugxMemberWindowConfig.Current.debugxMemberConfigDefault;
-            DebugxMemberWindowConfig.Current.debugxMemberConfigDefault = 
+            var configOld = DebugxSettingWindowConfig.Current.debugxMemberConfigSet;
+            DebugxSettingWindowConfig.Current.debugxMemberConfigSet = 
                 EditorGUILayout.ObjectField(
                     new GUIContent("Config", "默认调试成员配置文件"), 
-                    DebugxMemberWindowConfig.Current.debugxMemberConfigDefault, 
+                    DebugxSettingWindowConfig.Current.debugxMemberConfigSet, 
                     typeof(DebugxMemberConfig), false) as DebugxMemberConfig;
-            if (EditorGUI.EndChangeCheck())
+            if (EditorGUI.EndChangeCheck() || DebugxSettingWindowConfig.Current.debugxMemberConfigSet == null)
             {
-                if(debugxMemberConfigOld != DebugxMemberWindowConfig.Current.debugxMemberConfigDefault)
+                if(debugxMemberConfigOld != DebugxSettingWindowConfig.Current.debugxMemberConfigSet)
                 {
                     if(debugxMemberConfigOld != null)
                     {
                         EditorUtility.SetDirty(debugxMemberConfigOld);
                         AssetDatabase.SaveAssetIfDirty(debugxMemberConfigOld);
                     }
-                    debugxMemberConfigOld = DebugxMemberWindowConfig.Current.debugxMemberConfigDefault;
+                    debugxMemberConfigOld = DebugxSettingWindowConfig.Current.debugxMemberConfigSet;
                 }
 
                 //不允许为空
-                if(DebugxMemberWindowConfig.Current.debugxMemberConfigDefault == null)
-                    DebugxMemberWindowConfig.Current.debugxMemberConfigDefault = configOld;
+                if(DebugxSettingWindowConfig.Current.debugxMemberConfigSet == null)
+                    DebugxSettingWindowConfig.Current.debugxMemberConfigSet = configOld;
                 //更换了调试成员配置资源文件
                 else
                 {
                     SaveCheck(configOld);
-                    configCopy = ScriptableObject.Instantiate(DebugxMemberWindowConfig.Current.debugxMemberConfigDefault);
+                    configCopy = ScriptableObject.Instantiate(DebugxSettingWindowConfig.Current.debugxMemberConfigSet);
                 }
             }
 
-            DebugxMemberWindowConfig.Current.AutoSave = EditorGUILayout.Toggle(new GUIContent("AutoSave", "自动保存"), DebugxMemberWindowConfig.Current.AutoSave);
+            DebugxSettingWindowConfig.Current.AutoSave = EditorGUILayout.Toggle(new GUIContent("AutoSave", "自动保存"), DebugxSettingWindowConfig.Current.AutoSave);
 
             //保存和回退按钮
             EditorGUILayout.BeginHorizontal();
             EditorGUI.BeginDisabledGroup(!isDirty);
-            if (GUILayoutx.ButtonGreen("Save")) Save(DebugxMemberWindowConfig.Current.debugxMemberConfigDefault);
+            if (GUILayoutx.ButtonGreen("Save")) Save(DebugxSettingWindowConfig.Current.debugxMemberConfigSet);
             if (GUILayoutx.ButtonRed("Revert")) 
                 if (EditorUtility.DisplayDialog("回退修改", "确定要回退修改的内容吗？", "确定", "取消")) 
-                    Revert(DebugxMemberWindowConfig.Current.debugxMemberConfigDefault);
+                    Revert(DebugxSettingWindowConfig.Current.debugxMemberConfigSet);
             EditorGUI.EndDisabledGroup();
             EditorGUILayout.EndHorizontal();
 
@@ -119,8 +135,8 @@ namespace DebugxU3D
             anyDataChange = anyDataChange ? anyDataChange : anyDataChangeTemp;//将开关FadeArea的操作排除
             faTemp.Header("普通Log");
             EditorGUI.BeginChangeCheck();
-            DebugxMemberWindowConfig.Current.debugxMemberConfigDefault.normalInfo.fadeAreaOpenCached = faTemp.BeginFade();
-            if(DebugxMemberWindowConfig.Current.debugxMemberConfigDefault.normalInfo.fadeAreaOpenCached)
+            DebugxSettingWindowConfig.Current.debugxMemberConfigSet.normalInfo.fadeAreaOpenCached = faTemp.BeginFade();
+            if(DebugxSettingWindowConfig.Current.debugxMemberConfigSet.normalInfo.fadeAreaOpenCached)
                 DrawMemberInfo(ref Config.normalInfo, true, true);
             faTemp.End();
 
@@ -130,8 +146,8 @@ namespace DebugxU3D
             anyDataChange = anyDataChange ? anyDataChange : anyDataChangeTemp;//将开关FadeArea的操作排除
             faTemp.Header("高级Log");
             EditorGUI.BeginChangeCheck();
-            DebugxMemberWindowConfig.Current.debugxMemberConfigDefault.masterInfo.fadeAreaOpenCached = faTemp.BeginFade();
-            if (DebugxMemberWindowConfig.Current.debugxMemberConfigDefault.masterInfo.fadeAreaOpenCached)
+            DebugxSettingWindowConfig.Current.debugxMemberConfigSet.masterInfo.fadeAreaOpenCached = faTemp.BeginFade();
+            if (DebugxSettingWindowConfig.Current.debugxMemberConfigSet.masterInfo.fadeAreaOpenCached)
                 DrawMemberInfo(ref Config.masterInfo, true, true);
             faTemp.End();
 
@@ -189,8 +205,8 @@ namespace DebugxU3D
                     }
 
                     //更新数据
-                    if(DebugxMemberWindowConfig.Current.debugxMemberConfigDefault.debugxMemberInfos != null && i < DebugxMemberWindowConfig.Current.debugxMemberConfigDefault.debugxMemberInfos.Length)
-                        DebugxMemberWindowConfig.Current.debugxMemberConfigDefault.debugxMemberInfos[i].fadeAreaOpenCached = mInfo.fadeAreaOpenCached;//FadeArea的开关状态直接改变不需要保存确认
+                    if(DebugxSettingWindowConfig.Current.debugxMemberConfigSet.debugxMemberInfos != null && i < DebugxSettingWindowConfig.Current.debugxMemberConfigSet.debugxMemberInfos.Length)
+                        DebugxSettingWindowConfig.Current.debugxMemberConfigSet.debugxMemberInfos[i].fadeAreaOpenCached = mInfo.fadeAreaOpenCached;//FadeArea的开关状态直接改变不需要保存确认
 
                     Config.debugxMemberInfos[i] = mInfo;
 
@@ -214,7 +230,7 @@ namespace DebugxU3D
             if (anyDataChange)
             {
                 
-                if (DebugxMemberWindowConfig.Current.AutoSave)
+                if (DebugxSettingWindowConfig.Current.AutoSave)
                 {
                     DebugxManager.Instance.OnDebugxMemberConfigChange(Config);
                 }
@@ -275,9 +291,12 @@ namespace DebugxU3D
             memberInfosFadeAreaPool.Clear();
             memberInfoKeyDic.Clear();
 
-            if (DebugxMemberWindowConfig.Current.debugxMemberConfigDefault == null)
-                DebugxMemberWindowConfig.Current.debugxMemberConfigDefault = DebugxEditorLibrary.DebugxMemberConfigDefault;
-            configCopy = ScriptableObject.Instantiate(DebugxMemberWindowConfig.Current.debugxMemberConfigDefault);
+            if (DebugxSettingWindowConfig.Current.debugxMemberConfigSet == null)
+                DebugxSettingWindowConfig.Current.debugxMemberConfigSet = DebugxEditorLibrary.DebugxMemberConfigDefault;
+            configCopy = ScriptableObject.Instantiate(DebugxSettingWindowConfig.Current.debugxMemberConfigSet);
+
+            if (DebugxSettingWindowConfig.Current.debugxMemberConfigInitOnEditorLoad == null)
+                DebugxSettingWindowConfig.Current.debugxMemberConfigInitOnEditorLoad = DebugxEditorLibrary.DebugxMemberConfigDefault;
 
             //此方法内调用到了GUI.skin.button，GUI类必须在OnGUI才能调用，不能在OnEnable
             //确认FadeArea是否足够
@@ -371,11 +390,11 @@ namespace DebugxU3D
         {
             if (enable)
             {
-                SaveCheck(DebugxMemberWindowConfig.Current.debugxMemberConfigDefault);
+                SaveCheck(DebugxSettingWindowConfig.Current.debugxMemberConfigSet);
             }
             else
             {
-                configCopy = ScriptableObject.Instantiate(DebugxMemberWindowConfig.Current.debugxMemberConfigDefault);
+                configCopy = ScriptableObject.Instantiate(DebugxSettingWindowConfig.Current.debugxMemberConfigSet);
             }
         }
 

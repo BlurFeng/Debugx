@@ -28,6 +28,9 @@ namespace DebugxU3D
             SerializedProperty enableWarningStackTrace = serializedObject.FindProperty("enableWarningStackTrace");
             SerializedProperty enableErrorStackTrace = serializedObject.FindProperty("enableErrorStackTrace");
             SerializedProperty recordAllNonDebugxLogs = serializedObject.FindProperty("recordAllNonDebugxLogs");
+            SerializedProperty drawLogToScreen = serializedObject.FindProperty("drawLogToScreen");
+            SerializedProperty restrictDrawLogCount = serializedObject.FindProperty("restrictDrawLogCount");
+            SerializedProperty maxDrawLogs = serializedObject.FindProperty("maxDrawLogs");
 
             SerializedProperty enableAwakeTestLog = serializedObject.FindProperty("enableAwakeTestLog");
             SerializedProperty enableUpdateTestLog = serializedObject.FindProperty("enableUpdateTestLog");
@@ -55,6 +58,12 @@ namespace DebugxU3D
             EditorGUILayout.PropertyField(enableWarningStackTrace, new GUIContent("EnableWarningStackTrace", "输出Warning类型的堆栈跟踪"));
             EditorGUILayout.PropertyField(enableErrorStackTrace, new GUIContent("EnableErrorStackTrace", "输出错误类型的堆栈跟踪"));
             EditorGUILayout.PropertyField(recordAllNonDebugxLogs, new GUIContent("RecordAllNonDebugxLogs", "记录所有非Debugx打印的Log"));
+            EditorGUILayout.PropertyField(drawLogToScreen, new GUIContent("DrawLogToScreen", "绘制Log到屏幕"));
+            if(drawLogToScreen.boolValue)
+            {
+                EditorGUILayout.PropertyField(restrictDrawLogCount, new GUIContent("RestrictDrawLogCount", "限制绘制Log数量"));
+                EditorGUILayout.PropertyField(maxDrawLogs, new GUIContent("MaxDrawLogs", "绘制Log最大数量"));
+            }
 
             EditorGUILayout.LabelField("编辑器时配置", EditorStyle.Get.TitleStyle_3);
             EditorGUILayout.PropertyField(enableAwakeTestLog, new GUIContent("EnableAwakeTestLog", "打开Awake中测试用的Log打印"));

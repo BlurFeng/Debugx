@@ -1,28 +1,35 @@
 ﻿#region AuthorInfo
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-// Author: WinhooFeng
-// Time: 20220829
-// Version: 1.1.0.0
-// Description:
-// The debug log is managed according to its members.use macro "DEBUG_X" open the functional.
-// 此插件用于以成员的方式管理调试日志。使用宏"DEBUG_X"来开启功能。
+/// Author: WinhooFeng
+/// Time: 20220829
+/// Version: 1.1.0.0
+/// Description:
+/// The debug log is managed according to its members.use macro "DEBUG_X" open the functional.
+/// 此插件用于以成员的方式管理调试日志。使用宏"DEBUG_X"来开启功能。
+/// 版本号使用规范 大版本前后不兼容.新功能.小功能或功能更新.bug修复
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-// Update log:
-// 1.0.0.0
-// 创建插件。成员数据的配置功能，打印Log功能。
+/// Update log:
+/// 1.0.0.0
+/// 创建插件。成员数据的配置功能，打印Log功能。
 ////////////////////
-// 1.1.0.0
-// 新增类LogOutput，用于到处Log数据到本地txt文件。
-// 新增AdminInfo成员用于管理者打印，此成员不受开关影响。
-// 默认成员配置文件中增加Winhoo成员。
-// 修复在Window中移除一个成员时，移除的对应FadeArea不正确的问题。
-// 创建新成员时，设置默认signature且设置logSignature=true。
-// 通过 Tools/Debugx/CreateDebugxManager 创建Manager时，配置当前debugxMemberConfig为DebugxEditorLibrary.DebugxMemberConfigDefault。
-// 增加logThisKeyMemberOnly参数，用于设置仅打印某个Key的成员Log。LogAdm不受影响，LogMasterOnly为设置logThisKeyMemberOnly为MasterKey的快速开关。
-// DebugxManager的Inspector界面更新。
-// 新增ActionHandler类，用于创建Action事件。
-// 新增DebugxTools类，提供一些可用的工具方法
-// 修复一些Bug。
+/// 1.1.0.0
+/// 新增类LogOutput，用于到处Log数据到本地txt文件。
+/// 新增AdminInfo成员用于管理者打印，此成员不受开关影响。
+/// 默认成员配置文件中增加Winhoo成员。
+/// 修复在Window中移除一个成员时，移除的对应FadeArea不正确的问题。
+/// 创建新成员时，设置默认signature且设置logSignature=true。
+/// 通过 Tools/Debugx/CreateDebugxManager 创建Manager时，配置当前debugxMemberConfig为DebugxEditorLibrary.DebugxMemberConfigDefault。
+/// 增加logThisKeyMemberOnly参数，用于设置仅打印某个Key的成员Log。LogAdm不受影响，LogMasterOnly为设置logThisKeyMemberOnly为MasterKey的快速开关。
+/// DebugxManager的Inspector界面更新。
+/// 新增ActionHandler类，用于创建Action事件。
+/// 新增DebugxTools类，提供一些可用的工具方法
+/// 修复一些Bug。
+////////////////////
+/// 1.1.1.0
+/// 新增功能，在Editor编辑器启动时，初始化调试成员配置到Debux，保证在编辑器非游玩时也能使用Debux.Log()
+/// DebugxMemberWindow改名为DebugxSettingWindow，调整窗口内容，优化代码。
+/// Debugx.dll中修改Dictionary为List。为了DOTS等某些情况下，不支持Dictionary的情况。
+/// LogOutput类，新增绘制Log到屏幕功能，在DebugxManager上设置是否绘制。
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 #endregion
 
@@ -100,6 +107,15 @@ namespace DebugxU3D
         [HideInInspector]
         public bool recordAllNonDebugxLogs = false;
 
+        [HideInInspector]
+        public bool drawLogToScreen = false;
+
+        [HideInInspector]
+        public bool restrictDrawLogCount = false;
+
+        [HideInInspector]
+        public int maxDrawLogs = 100;
+
 #if UNITY_EDITOR
         [HideInInspector]
         public bool enableAwakeTestLog = true;
@@ -120,6 +136,8 @@ namespace DebugxU3D
 #if !DEBUG_X
             return;
 #else
+            Debugx.LogAdm("DebugxManager --- Awake");
+
             DontDestroyOnLoad(this);
 
             RefreshDebugxDataCommon();
@@ -131,24 +149,21 @@ namespace DebugxU3D
                 //编辑器时重写Log输出路径到项目Logs文件夹下
                 string directoryPathCover = Application.dataPath;
                 directoryPathCover = directoryPathCover.Replace("Assets", "Logs");
-                Debugx.LogAdm($"DirectoryPathCover: {directoryPathCover}");
+                Debugx.LogAdm($"DebugxManager --- DirectoryPathCover: {directoryPathCover}");
                 LogOutput.directoryPathCover = directoryPathCover;
 #endif
                 //默认输出路径一般为C:\Users\Winhoo\AppData\Local\Unity\Editor
                 LogOutput.Init();
             }
 
-            Debugx.LogAdm("DebugxManager: Awake");
 
             if (debugxMemberConfig != null)
                 Debugx.Init(debugxMemberConfig);
             else
             {
                 Debugx.CheckConfigValid();
-                Debugx.LogMst($"DebugxManager: debugxMemberConfig is null.The default configuration will be used. 没有设置调试成员配置，将使用默认配置。");
+                Debugx.LogAdm($"DebugxManager --- debugxMemberConfig is null.The default configuration will be used. 没有设置调试成员配置。");
             }
-
-
 
 #if UNITY_EDITOR
 
@@ -191,6 +206,11 @@ namespace DebugxU3D
 #else
             LogOutput.OnDestroy();
 #endif
+        }
+
+        private void OnGUI()
+        {
+            LogOutput.DrawGUI();
         }
 
         /// <summary>
@@ -245,6 +265,9 @@ namespace DebugxU3D
             LogOutput.enableWarningStackTrace = enableWarningStackTrace;
             LogOutput.enableErrorStackTrace = enableErrorStackTrace;
             LogOutput.recordAllNonDebugxLogs = recordAllNonDebugxLogs;
+            LogOutput.drawLogToScreen = drawLogToScreen;
+            LogOutput.restrictDrawLogCount = restrictDrawLogCount;
+            LogOutput.maxDrawLogs = maxDrawLogs;
         }
 
 #if UNITY_EDITOR

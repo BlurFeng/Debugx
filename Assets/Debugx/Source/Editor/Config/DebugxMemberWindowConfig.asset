@@ -9,7 +9,8 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 697530a913a44994a99d9d69eb38e559, type: 3}
+  m_Script: {fileID: 11500000, guid: cb3dacf54ddd0054dbad2e941b8a40a0, type: 3}
   m_Name: DebugxMemberWindowConfig
   m_EditorClassIdentifier: 
-  debugxMemberConfigDefault: {fileID: 0}
+  debugxMemberConfigSet: {fileID: 11400000, guid: 1976887b32f9d1c429fe9aaa5c59a047, type: 2}
+  debugxMemberConfigInitOnEditorLoad: {fileID: 11400000, guid: 1976887b32f9d1c429fe9aaa5c59a047, type: 2}

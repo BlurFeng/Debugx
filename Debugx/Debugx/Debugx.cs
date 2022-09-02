@@ -1,28 +1,35 @@
 ﻿#region AuthorInfo
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-// Author: WinhooFeng
-// Time: 20220829
-// Version: 1.1.0.0
-// Description:
-// The debug log is managed according to its members.use macro "DEBUG_X" open the functional.
-// 此插件用于以成员的方式管理调试日志。使用宏"DEBUG_X"来开启功能。
+/// Author: WinhooFeng
+/// Time: 20220829
+/// Version: 1.1.0.0
+/// Description:
+/// The debug log is managed according to its members.use macro "DEBUG_X" open the functional.
+/// 此插件用于以成员的方式管理调试日志。使用宏"DEBUG_X"来开启功能。
+/// 版本号使用规范 大版本前后不兼容.新功能.小功能或功能更新.bug修复
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-// Update log:
-// 1.0.0.0
-// 创建插件。成员数据的配置功能，打印Log功能。
+/// Update log:
+/// 1.0.0.0
+/// 创建插件。成员数据的配置功能，打印Log功能。
 ////////////////////
-// 1.1.0.0
-// 新增类LogOutput，用于到处Log数据到本地txt文件。
-// 新增AdminInfo成员用于管理者打印，此成员不受开关影响。
-// 默认成员配置文件中增加Winhoo成员。
-// 修复在Window中移除一个成员时，移除的对应FadeArea不正确的问题。
-// 创建新成员时，设置默认signature且设置logSignature=true。
-// 通过 Tools/Debugx/CreateDebugxManager 创建Manager时，配置当前debugxMemberConfig为DebugxEditorLibrary.DebugxMemberConfigDefault。
-// 增加logThisKeyMemberOnly参数，用于设置仅打印某个Key的成员Log。LogAdm不受影响，LogMasterOnly为设置logThisKeyMemberOnly为MasterKey的快速开关。
-// DebugxManager的Inspector界面更新。
-// 新增ActionHandler类，用于创建Action事件。
-// 新增DebugxTools类，提供一些可用的工具方法
-// 修复一些Bug。
+/// 1.1.0.0
+/// 新增类LogOutput，用于到处Log数据到本地txt文件。
+/// 新增AdminInfo成员用于管理者打印，此成员不受开关影响。
+/// 默认成员配置文件中增加Winhoo成员。
+/// 修复在Window中移除一个成员时，移除的对应FadeArea不正确的问题。
+/// 创建新成员时，设置默认signature且设置logSignature=true。
+/// 通过 Tools/Debugx/CreateDebugxManager 创建Manager时，配置当前debugxMemberConfig为DebugxEditorLibrary.DebugxMemberConfigDefault。
+/// 增加logThisKeyMemberOnly参数，用于设置仅打印某个Key的成员Log。LogAdm不受影响，LogMasterOnly为设置logThisKeyMemberOnly为MasterKey的快速开关。
+/// DebugxManager的Inspector界面更新。
+/// 新增ActionHandler类，用于创建Action事件。
+/// 新增DebugxTools类，提供一些可用的工具方法
+/// 修复一些Bug。
+////////////////////
+/// 1.1.1.0
+/// 新增功能，在Editor编辑器启动时，初始化调试成员配置到Debux，保证在编辑器非游玩时也能使用Debux.Log()
+/// DebugxMemberWindow改名为DebugxSettingWindow，调整窗口内容，优化代码。
+/// Debugx.dll中修改Dictionary为List。为了DOTS等某些情况下，不支持Dictionary的情况。
+/// LogOutput类，新增绘制Log到屏幕功能，在DebugxManager上设置是否绘制。
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 #endregion
 
@@ -192,6 +199,16 @@ public struct DebugxMemberInfo
 public struct DebugxMemberInfo_Internal
 {
     /// <summary>
+    /// 调试成员密钥
+    /// </summary>
+    public int key;
+
+    /// <summary>
+    /// 是否开启
+    /// </summary>
+    public bool enable;
+
+    /// <summary>
     /// 使用者签名
     /// </summary>
     public string signature;
@@ -232,6 +249,8 @@ public struct DebugxMemberInfo_Internal
     /// <param name="mInfo"></param>
     public DebugxMemberInfo_Internal(DebugxMemberInfo mInfo)
     {
+        key = mInfo.key;
+        enable = mInfo.enableCached;
         signature = mInfo.signature;
         logSignature = mInfo.logSignature;
         header = mInfo.header;
@@ -241,13 +260,28 @@ public struct DebugxMemberInfo_Internal
         haveHeader = !string.IsNullOrEmpty(header);
     }
 
+    public DebugxMemberInfo_Internal(DebugxMemberInfo_Internal info, bool enable)
+    {
+        key = info.key;
+        this.enable = enable;
+        signature = info.signature;
+        logSignature = info.logSignature;
+        header = info.header;
+        color = info.color;
+
+        haveSignature = info.haveSignature;
+        haveHeader = info.haveHeader;
+    }
+
     /// <summary>
     /// 快速构造简单成员信息
     /// </summary>
     /// <param name="signature">使用者签名</param>
     /// <param name="color">颜色</param>
-    public DebugxMemberInfo_Internal(string signature, Color color)
+    public DebugxMemberInfo_Internal(int key, string signature, Color color)
     {
+        this.key = key;
+        enable = true;
         this.signature = signature;
         this.logSignature = true;
         header = string.Empty;
@@ -359,8 +393,7 @@ public class Debugx
     }
     private static int m_logThisKeyMemberOnly = 0;
 
-    private readonly static Dictionary<int, DebugxMemberInfo_Internal> debugxMemberInfoDic = new Dictionary<int, DebugxMemberInfo_Internal>();
-    private readonly static Dictionary<int, bool> debugxMemberEnableDic = new Dictionary<int, bool>();
+    private static readonly List<DebugxMemberInfo_Internal> debugxMemberInfos = new List<DebugxMemberInfo_Internal>();
     private static Func<bool> serverCheckDelegate;
     private readonly static StringBuilder logxSb = new StringBuilder();
 
@@ -419,17 +452,15 @@ public class Debugx
     public static void Init(DebugxMemberConfig config)
     {
         //管理者成员
-        adminInfo = new DebugxMemberInfo_Internal("Admin", new Color(0.7843f, 0.941f, 1f, 1f));
+        adminInfo = new DebugxMemberInfo_Internal(0, "Admin", new Color(0.7843f, 0.941f, 1f, 1f));
 
         ClearDebugxMemberConfig();
         if (config == null) return;
         debugxMemberConfigSet = config;
 
         //添加普通和高级成员信息
-        debugxMemberInfoDic.Add(normalInfoKey, new DebugxMemberInfo_Internal(config.normalInfo));
-        debugxMemberEnableDic.Add(normalInfoKey, config.normalInfo.enableCached);
-        debugxMemberInfoDic.Add(masterInfoKey, new DebugxMemberInfo_Internal(config.masterInfo));
-        debugxMemberEnableDic.Add(masterInfoKey, config.masterInfo.enableCached);
+        debugxMemberInfos.Add(new DebugxMemberInfo_Internal(config.normalInfo));
+        debugxMemberInfos.Add(new DebugxMemberInfo_Internal(config.masterInfo));
 
         //添加自动以成员信息
         if(config.debugxMemberInfos != null && config.debugxMemberInfos.Length > 0)
@@ -437,8 +468,7 @@ public class Debugx
             for (int i = 0; i < config.debugxMemberInfos.Length; i++)
             {
                 var info = config.debugxMemberInfos[i];
-                debugxMemberInfoDic.Add(info.key, new DebugxMemberInfo_Internal(info));
-                debugxMemberEnableDic.Add(info.key, info.enableCached);
+                debugxMemberInfos.Add(new DebugxMemberInfo_Internal(info));
             }
         }
     }
@@ -450,8 +480,7 @@ public class Debugx
     public static void ClearDebugxMemberConfig()
     {
         debugxMemberConfigSet = null;
-        debugxMemberInfoDic.Clear();
-        debugxMemberEnableDic.Clear();
+        debugxMemberInfos.Clear();
     }
 
     /// <summary>
@@ -465,8 +494,8 @@ public class Debugx
             if (!initDefaultDebugxMemberInfo)
             {
                 initDefaultDebugxMemberInfo = true;
-                normalMemberInfoDefault = new DebugxMemberInfo_Internal(normalInfoSignature, NormalInfoColor);
-                masterMemberInfoDefault = new DebugxMemberInfo_Internal(masterInfoSignature, MasterInfoColor);
+                normalMemberInfoDefault = new DebugxMemberInfo_Internal(normalInfoKey, normalInfoSignature, NormalInfoColor);
+                masterMemberInfoDefault = new DebugxMemberInfo_Internal(masterInfoKey, masterInfoSignature, MasterInfoColor);
             }
 
             return false;
@@ -496,13 +525,25 @@ public class Debugx
     [Conditional("DEBUG_X")]
     public static void SetMemberEnable(int key, bool enable)
     {
-        if (debugxMemberEnableDic == null) return;
-        if (!debugxMemberEnableDic.ContainsKey(key))
+        if (debugxMemberInfos == null) return;
+
+        int index = -1;
+        for (int i = 0; i < debugxMemberInfos.Count; i++)
+        {
+            if (debugxMemberInfos[i].key == key)
+            {
+                index = i;
+                break;
+            }
+        }
+
+        if (index < 0)
         {
             LogAdmWarning($"Debugx.SetMemberEnable: cant find memberInfo by key:{key}. 无法找到Key为{key}的成员信息。");
             return;
         }
-        debugxMemberEnableDic[key] = enable;
+
+        debugxMemberInfos[index] = new DebugxMemberInfo_Internal(debugxMemberInfos[index], enable);
     }
 
     /// <summary>
@@ -523,8 +564,10 @@ public class Debugx
     /// <returns></returns>
     public static bool ContainsMemberKey(int key)
     {
-        if (debugxMemberInfoDic != null)
-            return debugxMemberInfoDic.ContainsKey(key);
+        if (GetMemberInfo(key, out DebugxMemberInfo_Internal memberInfo))
+        {
+            return true;
+        }    
         else if (debugxMemberConfigSet != null && debugxMemberConfigSet.debugxMemberInfos != null)
         {
             for (int i = 0; i < debugxMemberConfigSet.debugxMemberInfos.Length; i++)
@@ -534,6 +577,27 @@ public class Debugx
             }
         }
 
+        return false;
+    }
+
+    private static bool GetMemberInfo(int key, out DebugxMemberInfo_Internal memberInfo)
+    {
+        if (debugxMemberInfos == null || debugxMemberInfos.Count == 0)
+        {
+            memberInfo = new DebugxMemberInfo_Internal();
+            return false;
+        }
+
+        for (int i = 0; i < debugxMemberInfos.Count; i++)
+        {
+            if(debugxMemberInfos[i].key == key)
+            {
+                memberInfo = debugxMemberInfos[i];
+                return true;
+            }
+        }
+
+        memberInfo = new DebugxMemberInfo_Internal();
         return false;
     }
 
@@ -722,7 +786,7 @@ public class Debugx
     /// </summary>
     private static bool CheckLogThisKeyMemberOnly(int key)
     {
-        return LogThisKeyMemberOnly == 0 || !debugxMemberInfoDic.ContainsKey(LogThisKeyMemberOnly) || LogThisKeyMemberOnly == key;
+        return LogThisKeyMemberOnly == 0 || !ContainsMemberKey(LogThisKeyMemberOnly) || LogThisKeyMemberOnly == key;
     }
 
     /// <summary>
@@ -735,12 +799,12 @@ public class Debugx
     /// <param name="showNetTag">显示网络标记，Server或者Client。此功能依赖项目，需要项目通过SetServerCheck方法来设置</param>
     private static void LogCreator(LogType type, int key, object message, bool showTime = false, bool showNetTag = true)
     {
-        if(debugxMemberInfoDic == null)
+        if(debugxMemberInfos == null)
         {
             LogAdmWarning($"Debugx.LogCreator: The initial configuration is not performed. 未初始化配置。");
             return;
         }
-        if (!debugxMemberInfoDic.ContainsKey(key))
+        if (!GetMemberInfo(key, out DebugxMemberInfo_Internal memberInfo))
         {
             LogAdmWarning($"Debugx.LogCreator: cant find memberInfo by key:{key}. 无法找到Key为{key}的成员信息。");
             return;
@@ -749,10 +813,9 @@ public class Debugx
         //设置了仅打印某个Key成员Log
         if (!CheckLogThisKeyMemberOnly(key)) return;
 
-        if (debugxMemberEnableDic == null || !debugxMemberEnableDic.ContainsKey(key) || !debugxMemberEnableDic[key]) return;//此成员未打开
+        if (!memberInfo.enable) return;//此成员未打开
 
-        DebugxMemberInfo_Internal info = debugxMemberInfoDic[key];
-        LogCreator(type, info, message, showTime, showNetTag);
+        LogCreator(type, memberInfo, message, showTime, showNetTag);
     }
 
     private static void LogCreator(LogType type, DebugxMemberInfo_Internal info, object message, bool showTime = false, bool showNetTag = true)

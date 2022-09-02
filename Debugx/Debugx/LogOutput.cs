@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -162,7 +163,185 @@ namespace DebugxLog.Tools
 
                     logBuilder.Length = 0;
                 }
+
+                HandleDrawLogs(message, stackTrace, type);
             }
         }
+
+        #region Draw Logs 绘制Logs
+
+        private struct DrawLogInfo
+        {
+            public string message;
+            public string stackTrace;
+            public LogType type;
+        }
+
+        /// <summary>
+        /// 将Log绘制到屏幕
+        /// </summary>
+        public static bool drawLogToScreen = false;
+
+        /// <summary>  
+        /// 限制绘制Log数量
+        /// </summary>  
+        public static bool restrictDrawLogCount = false;
+
+        /// <summary>  
+        /// 绘制Log最大数量
+        /// </summary>  
+        public static int maxDrawLogs = 1000;
+
+
+        private static readonly List<DrawLogInfo> drawLogs = new List<DrawLogInfo>();
+        private static Vector2 scrollPosition;
+        private static bool collapse;//折叠或打开整个界面
+        private static bool collapseRepetition;//折叠重复信息
+
+        //窗口设置
+        private const int margin = 10;
+        private static readonly Rect titleBarRect = new Rect(0, 0, 1000, 20);
+        private static Rect windowRect;
+
+        /// <summary>
+        /// 绘制GUI
+        /// </summary>
+        public static void DrawGUI()
+        {
+            if (!drawLogToScreen)
+            {
+                return;
+            }
+
+            windowRect = collapse? new Rect(10,10, Screen.width * 0.4f - (margin * 5), 40f) : new Rect(10, 10, Screen.width * 0.4f - (margin * 5), Screen.height * 0.3f - (margin * 6));
+            windowRect = GUILayout.Window(19940223, windowRect, DrawConsoleWindow, "Debugx Logs");
+        }
+
+        private static Color GetLogColor(LogType logType)
+        {
+            switch (logType)
+            {
+                case LogType.Error:
+                    return Color.red;
+                case LogType.Assert:
+                    return Color.white;
+                case LogType.Warning:
+                    return Color.yellow;
+                case LogType.Log:
+                    return Color.white;
+                case LogType.Exception:
+                    return Color.red;
+            }
+
+            return Color.white;
+        }
+
+        /// <summary>  
+        /// Displays a window that lists the recorded logs.  
+        /// </summary>  
+        /// <param name="windowID">Window ID.</param>  
+        private static void DrawConsoleWindow(int windowID)
+        {
+            DrawToolbar();
+            if(!collapse)
+                DrawLogsList();
+
+            // Allow the window to be dragged by its title bar.  
+            GUI.DragWindow(titleBarRect);
+        }
+
+        /// <summary>  
+        /// Displays a scrollable list of logs.  
+        /// </summary>  
+        private static void DrawLogsList()
+        {
+            scrollPosition = GUILayout.BeginScrollView(scrollPosition, false, true);
+
+            // Iterate through the recorded logs.  
+            for (var i = 0; i < drawLogs.Count; i++)
+            {
+                var log = drawLogs[i];
+                //  Destroy(logs[i - 1]);
+                // Combine identical messages if collapse option is chosen.  
+                if (collapseRepetition && i > 0)
+                {
+                    var previousMessage = drawLogs[i - 1].message;
+
+                    if (log.message == previousMessage)
+                    {
+                        continue;
+                    }
+                }
+
+                GUI.contentColor = GetLogColor(log.type);
+                GUILayout.Label(log.message);
+            }
+
+            GUILayout.EndScrollView();
+
+            // Ensure GUI colour is reset before drawing other components.  
+            GUI.contentColor = Color.white;
+        }
+
+        /// <summary>  
+        /// Displays options for filtering and changing the logs list.  
+        /// </summary>  
+        private static void DrawToolbar()
+        {
+            GUILayout.BeginHorizontal();
+
+            if (GUILayout.Button(collapse ? "Open" : "Collapse"))
+            {
+                collapse = !collapse;
+            }
+            if (GUILayout.Button("Clear"))
+            {
+                drawLogs.Clear();
+            }
+
+            collapseRepetition = GUILayout.Toggle(collapseRepetition, "Collapse", GUILayout.ExpandWidth(false));  
+
+            GUILayout.EndHorizontal();
+        }
+
+        /// <summary>  
+        /// Records a log from the log callback.  
+        /// </summary>  
+        /// <param name="message">Message.</param>  
+        /// <param name="stackTrace">Trace of where the message came from.</param>  
+        /// <param name="type">Type of message (error, exception, warning, assert).</param>  
+        private static void HandleDrawLogs(string message, string stackTrace, LogType type)
+        {
+            drawLogs.Add(new DrawLogInfo
+            {
+                message = message,
+                stackTrace = stackTrace,
+                type = type,
+            });
+
+            TrimExcessLogs();
+        }
+
+        /// <summary>  
+        /// Removes old logs that exceed the maximum number allowed.  
+        /// </summary>  
+        private static void TrimExcessLogs()
+        {
+            if (!restrictDrawLogCount)
+            {
+                return;
+            }
+
+            var amountToRemove = Mathf.Max(drawLogs.Count - maxDrawLogs, 0);
+
+            if (amountToRemove == 0)
+            {
+                return;
+            }
+
+            drawLogs.RemoveRange(0, amountToRemove);
+        }
+
+        #endregion
     }
 }
