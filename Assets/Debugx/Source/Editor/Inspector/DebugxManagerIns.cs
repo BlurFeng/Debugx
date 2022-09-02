@@ -95,8 +95,11 @@ namespace DebugxU3D
                 //应用属性修改
                 serializedObject.ApplyModifiedProperties();
 
-                EditorUtility.SetDirty(DebugxManager.Instance.debugxMemberConfig);
-                AssetDatabase.SaveAssetIfDirty(DebugxManager.Instance.debugxMemberConfig);
+                if(DebugxManager.Instance.debugxMemberConfig != null)
+                {
+                    EditorUtility.SetDirty(DebugxManager.Instance.debugxMemberConfig);
+                    AssetDatabase.SaveAssetIfDirty(DebugxManager.Instance.debugxMemberConfig);
+                }
             }
         }
     }
