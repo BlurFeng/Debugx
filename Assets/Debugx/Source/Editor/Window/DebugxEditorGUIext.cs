@@ -43,7 +43,17 @@ namespace DebugxU3D
 		{
 			GUI.color = colors.Pop();
 		}
-	}
+
+		/// <summary>
+		/// 结束改变确认
+		/// </summary>
+		/// <param name="change">是否改变缓存值，只会讲此值从false改为true</param>
+		public static void EndChangeCheck(ref bool change)
+		{
+            bool changeTemp = EditorGUI.EndChangeCheck();
+			change = change ? change : changeTemp;
+        }
+    }
 
 	/// <summary>
 	/// Editor helper for hiding and showing a group of GUI elements.

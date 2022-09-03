@@ -123,7 +123,7 @@ namespace DebugxU3D
             EditorGUILayout.Space();
 
             //确认是否修改任何参数
-            bool anyDataChange = false, anyDataChangeTemp = false;
+            bool anyDataChange = false;
             EditorGUI.BeginChangeCheck();
 
             EditorGUILayout.LabelField("默认Log配置", EditorStyle.Get.TitleStyle_2);
@@ -131,8 +131,7 @@ namespace DebugxU3D
 
             faTemp = memberInfosFadeAreaPool[0];
             faTemp.Begin();
-            anyDataChangeTemp = EditorGUI.EndChangeCheck();
-            anyDataChange = anyDataChange ? anyDataChange : anyDataChangeTemp;//将开关FadeArea的操作排除
+            GUIUtilityx.EndChangeCheck(ref anyDataChange);//将开关FadeArea的操作排除isDirty判断
             faTemp.Header("普通Log");
             EditorGUI.BeginChangeCheck();
             DebugxSettingWindowConfig.Current.debugxMemberConfigSet.normalInfo.fadeAreaOpenCached = faTemp.BeginFade();
@@ -142,8 +141,7 @@ namespace DebugxU3D
 
             faTemp = memberInfosFadeAreaPool[1];
             faTemp.Begin();
-            anyDataChangeTemp = EditorGUI.EndChangeCheck();
-            anyDataChange = anyDataChange ? anyDataChange : anyDataChangeTemp;//将开关FadeArea的操作排除
+            GUIUtilityx.EndChangeCheck(ref anyDataChange);//将开关FadeArea的操作排除isDirty判断
             faTemp.Header("高级Log");
             EditorGUI.BeginChangeCheck();
             DebugxSettingWindowConfig.Current.debugxMemberConfigSet.masterInfo.fadeAreaOpenCached = faTemp.BeginFade();
@@ -177,7 +175,9 @@ namespace DebugxU3D
             EditorGUILayout.EndHorizontal();
             EditorGUILayout.Space();
 
+            GUIUtilityx.EndChangeCheck(ref anyDataChange);//将移动scrollViewPos的操作排除isDirty判断
             scrollViewPos = EditorGUILayout.BeginScrollView(scrollViewPos);
+            EditorGUI.BeginChangeCheck();
             if (Config && Config.debugxMemberInfos != null)
             {
                 int removeIndex = -1;
@@ -189,7 +189,7 @@ namespace DebugxU3D
 
                     faTemp.Begin();
                     GUILayout.BeginHorizontal();
-                    anyDataChange = anyDataChange ? anyDataChange : EditorGUI.EndChangeCheck();//将开关FadeArea的操作排除
+                    GUIUtilityx.EndChangeCheck(ref anyDataChange);//将开关FadeArea的操作排除isDirty判断
                     faTemp.Header(string.IsNullOrEmpty(mInfo.signature) ? $"Member {mInfo.key}": mInfo.signature, 320);
                     EditorGUI.BeginChangeCheck();
                     if (GUILayout.Button("删除成员", GUILayout.MinWidth(100)))
