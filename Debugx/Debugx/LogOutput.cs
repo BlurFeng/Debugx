@@ -12,39 +12,26 @@ namespace DebugxLog.Tools
     /// </summary>
     public class LogOutput
     {
-        /// <summary>
-        /// 输出Log类型的堆栈跟踪
-        /// </summary>
-        public static bool enableLogStackTrace = false;
+        private static DebugxProjectSettings Settings => DebugxProjectSettings.Instance;
+        private static bool Enable => Settings.logOutput;
+        private static bool LogStackTrace => Settings.enableLogStackTrace;
+        private static bool WarningStackTrace => Settings.enableWarningStackTrace;
+        private static bool ErrorStackTrace => Settings.enableErrorStackTrace;
+        private static bool RecordAllNonDebugxLogs => Settings.recordAllNonDebugxLogs;
 
-        /// <summary>
-        /// 输出Warning类型的堆栈跟踪
-        /// </summary>
-        public static bool enableWarningStackTrace = false;
-
-        /// <summary>
-        /// 输出错误类型的堆栈跟踪
-        /// </summary>
-        public static bool enableErrorStackTrace = true;
-
-        /// <summary>
-        /// 记录所有非Debugx打印的Log
-        /// </summary>
-        public static bool recordAllNonDebugxLogs = false;
-
-        private static bool init;
         private const string fileName = "DebugxLog";
         private const string fileNameFull = "DebugxLog.log";
         private const string fileType = ".log";
         /// <summary>
         /// Log输出文件夹重写
+        /// 在调用RecordStart前设置此字段以重写Log输出文件夹
         /// </summary>
         public static string directoryPathCover;
         private static string directoryPath;
         /// <summary>
         /// 输出文件夹路径
         /// </summary>
-        private static string DirectoryPath
+        public static string DirectoryPath
         {
             get
             {
@@ -54,38 +41,26 @@ namespace DebugxLog.Tools
             }
         }
         private static string savePath;
-        private static System.Object locker = new System.Object();
+        private static readonly System.Object locker = new System.Object();
         private static readonly StringBuilder logBuilder = new StringBuilder();
 
         //用于裁剪color代码的正则表达式
-        private static Regex regex_messageCut = new Regex(@"<color=#([\S.]{6})>|</color>|\[Debugx\]");
-        private static Regex regex_RecordMessageTag = new Regex(@"\[Debugx\]");
+        private static readonly Regex regex_messageCut = new Regex(@"<color=#([\S.]{6})>|</color>|\[Debugx\]");
+        private static readonly Regex regex_RecordMessageTag = new Regex(@"\[Debugx\]");
 
         /// <summary>
-        /// 初始化
+        /// 记录开始
         /// </summary>
-        public static void Init()
+        public static void RecordStart()
         {
-            if (init) return;
-            init = true;
+            if (!Enable) return;
 
             System.IO.DirectoryInfo dir = new DirectoryInfo(Application.consoleLogPath);
             directoryPath = dir.Parent.FullName;
             savePath = string.Format("{0}/{1}", DirectoryPath, fileNameFull);
 
-            //#if UNITY_EDITOR
-            //            System.IO.DirectoryInfo dir = new DirectoryInfo(Application.dataPath);
-            //            savePath = string.Format("{0}/{1}", dir.Parent.FullName, fileName);
-            //#elif UNITY_STANDALONE_WIN
-                          //输出到C盘用户文件夹下
-            //#elif UNITY_ANDROID
-            //            savePath = string.Format("{0}/Log/{1}", Application.persistentDataPath, fileName);
-            //#elif UNITY_IPHONE
-            //            savePath = string.Format("{0}/{1}", Application.persistentDataPath, fileName);
-            //#elif UNITY_STANDALONE_WIN
-            //            savePath = string.Format("{0}/{1}", Application.dataPath, fileName);
-            //#endif
-            
+            //PC目录为：C:\Users\UserName\AppData\LocalLow\DefaultCompany\ProjectName
+
             FileInfo fileInfo = new FileInfo(savePath);
 
             //创建文件夹
@@ -106,11 +81,11 @@ namespace DebugxLog.Tools
         }
 
         /// <summary>
-        /// 当销毁时，应用程序结束时
+        /// 记录结束
         /// </summary>
-        public static void OnDestroy()
+        public static void RecordOver()
         {
-            if (!init) return;
+            if (!Enable) return;
 
             FileInfo fileInfo = new FileInfo(savePath);
             if(fileInfo != null)
@@ -133,7 +108,7 @@ namespace DebugxLog.Tools
 
         private static void LogCallBack(string message, string stackTrace, LogType type)
         {
-            if (!recordAllNonDebugxLogs && !regex_RecordMessageTag.IsMatch(message)) return;
+            if (!RecordAllNonDebugxLogs && !regex_RecordMessageTag.IsMatch(message)) return;
 
             lock (locker)
             {
@@ -145,9 +120,9 @@ namespace DebugxLog.Tools
                 logBuilder.Append(log);
 
                 //是否记录对战跟踪
-                if(type == LogType.Log && enableLogStackTrace 
-                    ||type == LogType.Warning && enableWarningStackTrace
-                    || type == LogType.Error && enableErrorStackTrace)
+                if(type == LogType.Log && LogStackTrace 
+                    ||type == LogType.Warning && WarningStackTrace
+                    || type == LogType.Error && ErrorStackTrace)
                 {
                     logBuilder.Append(stackTrace);
                     logBuilder.Append("\n");
@@ -177,20 +152,9 @@ namespace DebugxLog.Tools
             public LogType type;
         }
 
-        /// <summary>
-        /// 将Log绘制到屏幕
-        /// </summary>
-        public static bool drawLogToScreen = false;
-
-        /// <summary>  
-        /// 限制绘制Log数量
-        /// </summary>  
-        public static bool restrictDrawLogCount = false;
-
-        /// <summary>  
-        /// 绘制Log最大数量
-        /// </summary>  
-        public static int maxDrawLogs = 1000;
+        private static bool DrawLogToScreen => Settings.drawLogToScreen;
+        private static bool RestrictDrawLogCount => Settings.restrictDrawLogCount;
+        private static int MaxDrawLogs => Settings.maxDrawLogs;
 
 
         private static readonly List<DrawLogInfo> drawLogs = new List<DrawLogInfo>();
@@ -208,7 +172,7 @@ namespace DebugxLog.Tools
         /// </summary>
         public static void DrawGUI()
         {
-            if (!drawLogToScreen)
+            if (!DrawLogToScreen)
             {
                 return;
             }
@@ -299,7 +263,7 @@ namespace DebugxLog.Tools
                 drawLogs.Clear();
             }
 
-            collapseRepetition = GUILayout.Toggle(collapseRepetition, "Collapse", GUILayout.ExpandWidth(false));  
+            collapseRepetition = GUILayout.Toggle(collapseRepetition, "Collapse Repetition", GUILayout.ExpandWidth(false));  
 
             GUILayout.EndHorizontal();
         }
@@ -327,12 +291,12 @@ namespace DebugxLog.Tools
         /// </summary>  
         private static void TrimExcessLogs()
         {
-            if (!restrictDrawLogCount)
+            if (!RestrictDrawLogCount)
             {
                 return;
             }
 
-            var amountToRemove = Mathf.Max(drawLogs.Count - maxDrawLogs, 0);
+            var amountToRemove = Mathf.Max(drawLogs.Count - MaxDrawLogs, 0);
 
             if (amountToRemove == 0)
             {

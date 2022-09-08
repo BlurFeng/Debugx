@@ -4,13 +4,12 @@ using System.IO;
 using UnityEditor;
 using UnityEngine;
 
-namespace DebugxU3D
+namespace DebugxLog
 {
     public class DebugxEditorLibrary
     {
         public static string Name { get; private set; } = "DebugxEditorLibrary";
 
-        private static string m_RootPath;
         /// <summary>
         /// Debugx文件夹根节点
         /// </summary>
@@ -18,12 +17,12 @@ namespace DebugxU3D
         {
             get
             {
-                if (m_RootPath == null)
+                if (DebugxStaticData.rootPath == null)
                 {
-                    m_RootPath = GetAssetsPathBySelfFolder(Name).Replace(("/Source/Editor"), "");
+                    DebugxStaticData.rootPath = GetAssetsPathBySelfFolder(Name).Replace(("/Source/Editor"), "");
                 }
 
-                return m_RootPath;
+                return DebugxStaticData.rootPath;
             }
         }
 
@@ -35,10 +34,7 @@ namespace DebugxU3D
         {
             get
             {
-                if (m_EditorConfigPath == null)
-                {
-                    m_EditorConfigPath = RootPath + "/Source/Editor/Config";
-                }
+                m_EditorConfigPath ??= RootPath + "/Source/Editor/Config";
 
                 //确认文件夹是否存在，否则创建
                 if (!Directory.Exists(m_EditorConfigPath))
@@ -48,54 +44,28 @@ namespace DebugxU3D
             }
         }
 
-        private static string m_onfigPath;
+        
         /// <summary>
         /// 配置存储文件夹
         /// </summary>
-        public static string ConfigPath
+        public static string ResourcesPath
         {
             get
             {
-                if (m_onfigPath == null)
-                {
-                    m_onfigPath = RootPath + "/Config";
-                }
+                DebugxStaticData.resourcesPath ??= RootPath + "/Resources";
 
                 //确认文件夹是否存在，否则创建
-                if (!Directory.Exists(m_onfigPath))
-                    Directory.CreateDirectory(m_onfigPath);
+                if (!Directory.Exists(DebugxStaticData.resourcesPath))
+                    Directory.CreateDirectory(DebugxStaticData.resourcesPath);
 
-                return m_onfigPath;
+                return DebugxStaticData.resourcesPath;
             }
         }
 
-        private static DebugxMemberConfig m_DebugxMemberConfigDefault;
-        /// <summary>
-        /// 默认调试成员配置文件
-        /// </summary>
-        public static DebugxMemberConfig DebugxMemberConfigDefault
+        //确认Debugx项目设置资源存在
+        public static void ExcuteInEditorLoad() 
         {
-            get
-            {
-                if (m_DebugxMemberConfigDefault == null)
-                {
-                    m_DebugxMemberConfigDefault = GetConfigDefault<DebugxMemberConfig>($"{ConfigPath}/DebugxMemberConfigDefault.asset", out bool createNew);
-                    if(createNew)
-                    {
-                        m_DebugxMemberConfigDefault.debugxMemberInfos = new DebugxMemberInfo[1]
-                        {
-                            new DebugxMemberInfo()
-                            { signature = "WinhooFeng", logSignature = true, key = 1, color = new Color(0.7843f, 0.941f, 1f, 1f), enableCached = true }
-                        };
-
-                        EditorUtility.SetDirty(m_DebugxMemberConfigDefault);
-                        AssetDatabase.SaveAssetIfDirty(m_DebugxMemberConfigDefault);
-                        //AssetDatabase.SaveAssets();
-                    }
-                }
-
-                return m_DebugxMemberConfigDefault;
-            }
+            var s = ResourcesPath;//确认文件夹路径
         }
 
         /// <summary>
@@ -154,7 +124,6 @@ namespace DebugxU3D
                 createNew = true;
                 config = ScriptableObject.CreateInstance(typeof(T)) as T;
                 AssetDatabase.CreateAsset(config, path);
-                AssetDatabase.SaveAssets();
             }
 
             return config;

@@ -1,9 +1,13 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Configuration;
+using Unity.VisualScripting;
+using Unity.VisualScripting.YamlDotNet.Core.Tokens;
 using UnityEditor;
 using UnityEngine;
+using SettingsProvider = UnityEditor.SettingsProvider;
 
-namespace DebugxU3D
+namespace DebugxLog
 {
 	public static class GUILayoutx
 	{
@@ -24,7 +28,28 @@ namespace DebugxU3D
 
 			return press;
 		}
-	}
+
+		public static bool Toggle(string label, string tooltip, bool value, float width = 250f)
+		{
+            EditorGUILayout.BeginHorizontal();
+            EditorGUILayout.LabelField(new GUIContent(label, tooltip), GUILayout.Width(width));
+            bool change = EditorGUILayout.Toggle(value);
+            EditorGUILayout.EndHorizontal();
+
+			return change;
+        }
+
+		public static int IntField(string label, string tooltip, int value, float width = 250f)
+		{
+            EditorGUILayout.BeginHorizontal();
+            EditorGUILayout.LabelField(new GUIContent(label, tooltip), GUILayout.Width(width));
+            int change = EditorGUILayout.IntField(value);
+            EditorGUILayout.EndHorizontal();
+
+            return change;
+        }
+
+    }
 
 	//GUI扩展工具
 	//有从AstarPathfindingProject插件拿过来的GUI绘制类
@@ -69,22 +94,25 @@ namespace DebugxU3D
 		Rect lastRect;
 		float value;
 		float lastUpdate;
-		GUIStyle labelStyle;
-		GUIStyle areaStyle;
+        readonly GUIStyle labelStyle;
+        readonly GUIStyle areaStyle;
 		bool visible;
-		EditorWindow editorWindow;
+		readonly EditorWindow editorWindow;
+        readonly SettingsProvider settingsProvider;
+		readonly bool immediately;
+        public float beginSpace = 1.5f;
 
-		/// <summary>
-		/// Is this area open.
-		/// This is not the same as if any contents are visible, use <see cref="BeginFade"/> for that.
-		/// </summary>
-		public bool open;
+        /// <summary>
+        /// Is this area open.
+        /// This is not the same as if any contents are visible, use <see cref="BeginFade"/> for that.
+        /// </summary>
+        public bool open;
 
 		/// <summary>Animate dropdowns when they open and close</summary>
 		public static bool fancyEffects = true;
 		const float animationSpeed = 100f;
 
-		public FadeArea(EditorWindow editor, bool open, GUIStyle areaStyle, GUIStyle labelStyle = null)
+		public FadeArea(EditorWindow editor, bool open, GUIStyle areaStyle, GUIStyle labelStyle = null, float beginSpace = 1.5f, bool immediately = false)
 		{
 			this.editorWindow = editor;
 
@@ -92,9 +120,23 @@ namespace DebugxU3D
 			this.labelStyle = labelStyle;
 			visible = this.open = open;
 			value = open ? 1 : 0;
-		}
+			this.beginSpace = beginSpace;
+            this.immediately = immediately;
+        }
 
-		void Tick()
+        public FadeArea(SettingsProvider settingsProvider, bool open, GUIStyle areaStyle, GUIStyle labelStyle = null, float beginSpace = 1.5f, bool immediately = false)
+        {
+			this.settingsProvider = settingsProvider;
+
+            this.areaStyle = areaStyle;
+            this.labelStyle = labelStyle;
+            visible = this.open = open;
+            value = open ? 1 : 0;
+            this.beginSpace = beginSpace;
+            this.immediately = immediately;
+        }
+
+        void Tick()
 		{
 			if (Event.current.type == EventType.Repaint)
 			{
@@ -117,7 +159,9 @@ namespace DebugxU3D
 				{
 					value += deltaTime * animationSpeed * Mathf.Sign(targetValue - value);
 					value = Mathf.Clamp01(value);
-					editorWindow.Repaint();
+
+                    settingsProvider?.Repaint();
+                    editorWindow?.Repaint();
 
 					if (!fancyEffects)
 					{
@@ -131,9 +175,9 @@ namespace DebugxU3D
 			}
 		}
 
-		public void Begin()
+        public void Begin()
 		{
-			if (areaStyle != null)
+            if (areaStyle != null)
 			{
 				lastRect = EditorGUILayout.BeginVertical(areaStyle);
 			}
@@ -141,9 +185,11 @@ namespace DebugxU3D
 			{
 				lastRect = EditorGUILayout.BeginVertical();
 			}
-		}
 
-		public void HeaderLabel(string label)
+            EditorGUILayout.Space(beginSpace);
+        }
+
+        public void HeaderLabel(string label)
 		{
 			GUILayout.Label(label, labelStyle);
 		}
@@ -173,9 +219,11 @@ namespace DebugxU3D
 			if (press)
 			{
 				open = !open;
-				editorWindow.Repaint();
+                settingsProvider?.Repaint();
+                editorWindow?.Repaint();
 			}
 			this.open = open;
+			if (immediately) value = open ? 1f : 0f;
 		}
 
 		/// <summary>Hermite spline interpolation</summary>
