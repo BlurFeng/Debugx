@@ -13,82 +13,70 @@ namespace DebugxLog
     {
         private static SettingsProvider settingsProvider;
 
-        private static DebugxSettingsProviderConfig ProviderConfig => DebugxSettingsProviderConfig.Get;
-        private static DebugxProjectSettingsAsset SettingsAsset => ProviderConfig.AutoSave ? DebugxProjectSettingsAsset.Instance : settingsCopy;
-        private static DebugxProjectSettingsAsset SettingsAssetSource => DebugxProjectSettingsAsset.Instance;
-        private static DebugxProjectSettingsAsset settingsCopy;//配置复制，在非自动保存时缓存修改内容
-
+        private static DebugxEditorConfig EditorConfig => DebugxEditorConfig.Get;
+        private static DebugxProjectSettingsAsset SettingsAsset => DebugxProjectSettingsAsset.Instance;
         private static readonly List<FadeArea> memberInfosFadeAreaPool = new();
-        private static FadeArea fa_MemberConfigSetting;
-
-        private static bool OnGUIInit;
-
-        private static bool anyDataChange = false;
+        private static FadeArea faMemberConfigSetting;
+        private static bool isInitGUI;
 
         [SettingsProvider]
-        public static SettingsProvider DebugxDebugxSettingsProvider()
+        public static SettingsProvider DebugxProjectSettingsProviderCreate()
         {
-            settingsProvider = new SettingsProvider("Project/Debugx", SettingsScope.Project)
+            if(settingsProvider == null)
             {
-                label = "Debugx",
-                activateHandler = Enable,
-                guiHandler = Draw,
-                deactivateHandler = Disable,
-            };
+                isInitGUI = false;
+
+                settingsProvider = new SettingsProvider("Project/Debugx", SettingsScope.Project)
+                {
+                    label = "Debugx",
+                    activateHandler = Enable,
+                    guiHandler = Draw,
+                    deactivateHandler = Disable,
+                };
+            }
 
             return settingsProvider;
         }
 
         private static void Enable(string searchContext, VisualElement rootElement)
         {
-            DebugxSettingsProviderConfig.OnAutoSaveChange += OnAutoSaveChange;
         }
 
         private static void Disable()
         {
-            OnGUIInit = false;
-
-            //确认是否需要保存
-            SaveCheck();
-
             //标脏当前配置，并保存。主要为了保证FadeAreaOpenCached能被保存下来
             //否则每次FadeAreaOpenCached更新后，重启项目后又恢复旧的数据了。只有直接鼠标点击修改Config文件上的FadeAreaOpenCached才有被确实的标脏和保存
-            EditorUtility.SetDirty(ProviderConfig);
-            AssetDatabase.SaveAssetIfDirty(ProviderConfig);
-
-            DebugxSettingsProviderConfig.OnAutoSaveChange -= OnAutoSaveChange;
+            EditorUtility.SetDirty(EditorConfig);
+            AssetDatabase.SaveAssetIfDirty(EditorConfig);
         }
 
         private static void Draw(string searchContext)
         {
-            if (!OnGUIInit)
+            if (!isInitGUI)
             {
                 //一些初始化内容调用到GUI类，必须在OnGUI内调用
-                OnGUIInit = true;
+                isInitGUI = true;
                 ResetWindowData();
             }
 
             EditorGUILayout.HelpBox("此处为项目设置，项目设置会影响所有人的项目和打包后的包体软件。\n如果你仅想对自己的项目做一些本地化的设置，请在 Preferences/Debugx 用户设置中配置。", MessageType.Info);
 
-            anyDataChange = false;
+            EditorGUI.BeginDisabledGroup(!EditorConfig.canResetProjectSettings);
+            if (GUILayout.Button("Reset to Default"))
+            {
+                if (EditorUtility.DisplayDialog("Reset to Default", "确认要重置到默认设置吗？\n重置并不会清空Member成员配置，仅将成员配置的部分字段重置。", "Ok", "Cancel"))
+                {
+                    ResetProjectSettings();
+                    DebugxProjectSettingsAsset.Instance.ApplyTo(DebugxProjectSettings.Instance);
+                }
+            }
+            EditorGUI.EndDisabledGroup();
 
             EditorGUILayout.Space();
-            EditorGUILayout.LabelField("Config Settings", EditorStyle.Get.TitleStyle_3);
+            EditorGUILayout.LabelField("Config Settings", GUIStyle.Get.TitleStyle_3);
             EditorGUI.BeginDisabledGroup(true);
             EditorGUILayout.ObjectField("", DebugxProjectSettingsAsset.Instance, typeof(DebugxProjectSettingsAsset), false);
             EditorGUI.EndDisabledGroup();
-
-            //Setting.AutoSave = EditorGUILayout.Toggle(new GUIContent("AutoSave", "自动保存"), Setting.AutoSave);
-
-            ////保存和回退按钮
-            //EditorGUILayout.BeginHorizontal();
-            //EditorGUI.BeginDisabledGroup(!isDirty);
-            //if (GUILayoutx.ButtonGreen("Save")) Save();
-            //if (GUILayoutx.ButtonRed("Revert"))
-            //    if (EditorUtility.DisplayDialog("回退修改", "确定要回退修改的内容吗？", "确定", "取消"))
-            //        Revert();
-            //EditorGUI.EndDisabledGroup();
-            //EditorGUILayout.EndHorizontal();
 
             EditorGUILayout.Space();
 
@@ -96,120 +84,121 @@ namespace DebugxLog
             EditorGUI.BeginChangeCheck();
 
             EditorGUILayout.Space();
-            EditorGUILayout.LabelField("Default", EditorStyle.Get.TitleStyle_2);
+            EditorGUILayout.LabelField("Toggle", GUIStyle.Get.TitleStyle_2);
 
-            SettingsAsset.enableLogDefault = Toggle("EnableLog Default", "Log总开关，默认状态", SettingsAsset.enableLogDefault);
-            SettingsAsset.enableLogMemberDefault = Toggle("EnableLogMember Default", "成员Log总开关，默认状态", SettingsAsset.enableLogMemberDefault);
-            SettingsAsset.logThisKeyMemberOnlyDefault = IntField("LogThisKeyMemberOnly", "仅打印此Key的成员Log，0为关闭", SettingsAsset.logThisKeyMemberOnlyDefault);
+            SettingsAsset.enableLogDefault = Toggle("EnableLog Default", DebugxStaticData.ToolTip_EnableLogDefault, SettingsAsset.enableLogDefault);
+            SettingsAsset.enableLogMemberDefault = Toggle("EnableLogMember Default", DebugxStaticData.ToolTip_EnableLogMemberDefault, SettingsAsset.enableLogMemberDefault);
+            SettingsAsset.logThisKeyMemberOnlyDefault = IntField("LogThisKeyMemberOnly Default", DebugxStaticData.ToolTip_LogThisKeyMemberOnlyDefault, SettingsAsset.logThisKeyMemberOnlyDefault);
 
             //成员配置修改
             DrawMemberConfigSetting();
 
             EditorGUILayout.Space();
-            EditorGUILayout.LabelField("Log Output", EditorStyle.Get.TitleStyle_2);
-            SettingsAsset.logOutput = Toggle("EnbaleLogOutput", "输出Log到本地（启动前设置，运行时设置无效）。编辑器时输出到项目的Logs文件夹下，实机运行时根据平台输出到不同目录下", SettingsAsset.logOutput);
+            EditorGUILayout.LabelField("Log Output", GUIStyle.Get.TitleStyle_2);
+            SettingsAsset.logOutput = Toggle("EnbaleLogOutput", DebugxStaticData.ToolTip_LogOutput, SettingsAsset.logOutput);
             EditorGUI.BeginDisabledGroup(!SettingsAsset.logOutput);
-            SettingsAsset.enableLogStackTrace = Toggle("EnableLogStackTrace", "输出Log类型的堆栈跟踪", SettingsAsset.enableLogStackTrace);
-            SettingsAsset.enableWarningStackTrace = Toggle("EnableWarningStackTrace", "输出Warning类型的堆栈跟踪", SettingsAsset.enableWarningStackTrace);
-            SettingsAsset.enableErrorStackTrace = Toggle("EnableErrorStackTrace", "输出Error类型的堆栈跟踪", SettingsAsset.enableErrorStackTrace);
-            SettingsAsset.recordAllNonDebugxLogs = Toggle("RecordAllNonDebugxLogs", "记录所有非Debugx打印的Log", SettingsAsset.recordAllNonDebugxLogs);
-            SettingsAsset.drawLogToScreen = Toggle("DrawLogToScreen", "绘制Log到屏幕", SettingsAsset.drawLogToScreen);
+            SettingsAsset.enableLogStackTrace = Toggle("EnableLogStackTrace", DebugxStaticData.ToolTip_EnableLogStackTrace, SettingsAsset.enableLogStackTrace);
+            SettingsAsset.enableWarningStackTrace = Toggle("EnableWarningStackTrace", DebugxStaticData.ToolTip_EnableWarningStackTrace, SettingsAsset.enableWarningStackTrace);
+            SettingsAsset.enableErrorStackTrace = Toggle("EnableErrorStackTrace", DebugxStaticData.ToolTip_EnableErrorStackTrace, SettingsAsset.enableErrorStackTrace);
+            SettingsAsset.recordAllNonDebugxLogs = Toggle("RecordAllNonDebugxLogs", DebugxStaticData.ToolTip_RecordAllNonDebugxLogs, SettingsAsset.recordAllNonDebugxLogs);
+            SettingsAsset.drawLogToScreen = Toggle("DrawLogToScreen", DebugxStaticData.ToolTip_DrawLogToScreen, SettingsAsset.drawLogToScreen);
             EditorGUI.BeginDisabledGroup(!SettingsAsset.drawLogToScreen);
-            SettingsAsset.restrictDrawLogCount = Toggle("RestrictDrawLogCount", "限制绘制Log数量", SettingsAsset.restrictDrawLogCount);
-            SettingsAsset.maxDrawLogs = IntField("MaxDrawLogs", "绘制Log最大数量", SettingsAsset.maxDrawLogs);
+            SettingsAsset.restrictDrawLogCount = Toggle("RestrictDrawLogCount", DebugxStaticData.ToolTip_RestrictDrawLogCount, SettingsAsset.restrictDrawLogCount);
+            SettingsAsset.maxDrawLogs = IntField("MaxDrawLogs", DebugxStaticData.ToolTip_MaxDrawLogs, SettingsAsset.maxDrawLogs);
             EditorGUI.EndDisabledGroup();
             EditorGUI.EndDisabledGroup();
 
-            anyDataChange = anyDataChange ? anyDataChange : EditorGUI.EndChangeCheck();
-            if (anyDataChange)
+            if (EditorGUI.EndChangeCheck())
             {
-                if (ProviderConfig.AutoSave)
-                {
-                    //DebugxManager.Instance.OnDebugxConfigChange(Config);
-                    SettingsAsset.ApplyTo(DebugxProjectSettings.Instance);
-                }
-                else
-                {
-                    isDirty = true;//非自动保存时，标脏
-                }
+                SettingsAsset.ApplyTo(DebugxProjectSettings.Instance);
+                EditorConfig.canResetProjectSettings = true;
             }
         }
 
         private static void DrawMemberConfigSetting()
         {
             EditorGUILayout.Space();
-            EditorGUILayout.LabelField("Member", EditorStyle.Get.TitleStyle_2);
+            EditorGUILayout.LabelField("Member Settings", GUIStyle.Get.TitleStyle_2);
 
-            fa_MemberConfigSetting.Begin();
-            GUIUtilityx.EndChangeCheck(ref anyDataChange);//将开关FadeArea的操作排除isDirty判断
-            fa_MemberConfigSetting.Header("成员配置");
-            EditorGUI.BeginChangeCheck();
+            faMemberConfigSetting.Begin();
+            faMemberConfigSetting.Header("Members");
 
-            ProviderConfig.fa_MemberConfigSettingOpen = fa_MemberConfigSetting.BeginFade();
-            if (ProviderConfig.fa_MemberConfigSettingOpen)
+            EditorConfig.faMemberConfigSettingOpen = faMemberConfigSetting.BeginFade();
+            if (EditorConfig.faMemberConfigSettingOpen)
             {
-                EditorGUILayout.LabelField("默认成员配置", EditorStyle.Get.TitleStyle_3);
-
-                FadeArea faTemp = memberInfosFadeAreaPool[0];
-                faTemp.Begin();
-                GUIUtilityx.EndChangeCheck(ref anyDataChange);//将开关FadeArea的操作排除isDirty判断
-                faTemp.Header("普通成员");
-                EditorGUI.BeginChangeCheck();
-                SettingsAssetSource.normalMember.fadeAreaOpenCached = faTemp.BeginFade();
-                if (SettingsAssetSource.normalMember.fadeAreaOpenCached)
-                    DrawMemberInfo(ref SettingsAsset.normalMember, true, true);
-                faTemp.End();
-
-                faTemp = memberInfosFadeAreaPool[1];
-                faTemp.Begin();
-                GUIUtilityx.EndChangeCheck(ref anyDataChange);//将开关FadeArea的操作排除isDirty判断
-                faTemp.Header("高级成员");
-                EditorGUI.BeginChangeCheck();
-                SettingsAssetSource.masterMember.fadeAreaOpenCached = faTemp.BeginFade();
-                if (SettingsAssetSource.masterMember.fadeAreaOpenCached)
-                    DrawMemberInfo(ref SettingsAsset.masterMember, true, true);
-                faTemp.End();
+                EditorGUILayout.BeginHorizontal();
+                if (GUILayout.Button(new GUIContent("Reset Members Part Config", "重置成员设置，仅会重置部分成员的配置到默认值。（重置内容：EnableDefault,LogSignature,fadeAreaOpen）")))
+                {
+                    if (EditorUtility.DisplayDialog("Reset Members Part Config", "确认要重置所有成员的部分设置吗？", "Ok", "Cancel"))
+                    {
+                        ResetProjectSettingsMembers();
+                        DebugxProjectSettingsAsset.Instance.ApplyTo(DebugxProjectSettings.Instance);
+                    }
+                }
+                if (GUILayout.Button(new GUIContent("Reset All Member Color By Editor Skin", "重置所有成员的颜色，根据当前编辑器皮肤。在Dark暗皮肤时Log颜色会变亮，在Light亮皮肤时Log颜色会变暗。")))
+                {
+                    if (EditorUtility.DisplayDialog("Reset All Member Color By Editor Skin", "确认要重置所有成员的颜色吗？", "Ok", "Cancel"))
+                    {
+                        ColorDispenser.ResetAllMemberColorByEditorSkin();
+                    }
+                }
+                EditorGUILayout.EndHorizontal();
 
                 EditorGUILayout.Space();
 
+                //默认成员
+                if (SettingsAsset.defaultMemberAssets != null)
+                {
+                    EditorGUILayout.LabelField("Default", GUIStyle.Get.TitleStyle_3);
+
+                    FadeArea faTemp;
+                    for (int i = 0; i < SettingsAsset.defaultMemberAssets.Length; i++)
+                    {
+                        DebugxMemberInfoAsset mInfo = SettingsAsset.defaultMemberAssets[i];
+
+                        faTemp = memberInfosFadeAreaPool[i];
+                        faTemp.Begin();
+                        faTemp.Header(string.IsNullOrEmpty(mInfo.signature) ? $"Member {mInfo.key}" : mInfo.signature);
+                        SettingsAsset.defaultMemberAssets[i].fadeAreaOpenCached = faTemp.BeginFade();
+                        if (SettingsAsset.defaultMemberAssets[i].fadeAreaOpenCached)
+                            DrawMemberInfo(ref SettingsAsset.defaultMemberAssets[i], true, true);
+                        faTemp.End();
+                    }
+                }
+
+                //自定义成员
+                EditorGUILayout.Space();
                 EditorGUILayout.BeginHorizontal();
-                EditorGUILayout.LabelField("自定义成员配置", EditorStyle.Get.TitleStyle_3);
-                if (GUILayout.Button("添加一个成员"))
+                EditorGUILayout.LabelField("Custom Members", GUIStyle.Get.TitleStyle_3);
+                if (GUILayout.Button("Add Member"))
                 {
                     //创建新成员
-                    DebugxMemberInfoAsset mInfo = new DebugxMemberInfoAsset();
                     GetMemberKey(out int newKey);
-                    mInfo.enableDefault = true;
-                    mInfo.signature = $"Menber{newKey}";
-                    mInfo.logSignature = true;
-                    mInfo.key = newKey;
-                    mInfo.color = Color.white;
-                    mInfo.fadeAreaOpenCached = true;
+                    DebugxMemberInfoAsset mInfo = new DebugxMemberInfoAsset(newKey);
 
                     //添加到数组末尾
-                    List<DebugxMemberInfoAsset> memberInfos = SettingsAsset.customDebugxMemberAssets != null ? new List<DebugxMemberInfoAsset>(SettingsAsset.customDebugxMemberAssets) : new List<DebugxMemberInfoAsset>();
+                    List<DebugxMemberInfoAsset> memberInfos = SettingsAsset.customMemberAssets != null ? new List<DebugxMemberInfoAsset>(SettingsAsset.customMemberAssets) : new List<DebugxMemberInfoAsset>();
                     memberInfos.Add(mInfo);
-                    SettingsAsset.customDebugxMemberAssets = memberInfos.ToArray();
+                    SettingsAsset.customMemberAssets = memberInfos.ToArray();
 
                     OnAddMemberInfo(mInfo);
                 }
                 EditorGUILayout.EndHorizontal();
 
-                if (SettingsAsset && SettingsAsset.customDebugxMemberAssets != null)
+                if (SettingsAsset && SettingsAsset.customMemberAssets != null)
                 {
                     int removeIndex = -1;
 
-                    for (int i = 0; i < SettingsAsset.customDebugxMemberAssets.Length; i++)
+                    FadeArea faTemp;
+                    for (int i = 0; i < SettingsAsset.customMemberAssets.Length; i++)
                     {
-                        faTemp = memberInfosFadeAreaPool[i + 2];
-                        DebugxMemberInfoAsset mInfo = SettingsAsset.customDebugxMemberAssets[i];
+                        faTemp = memberInfosFadeAreaPool[i + SettingsAsset.DefaultMemberAssetsLength];
+                        DebugxMemberInfoAsset mInfo = SettingsAsset.customMemberAssets[i];
 
                         faTemp.Begin();
                         GUILayout.BeginHorizontal();
-                        GUIUtilityx.EndChangeCheck(ref anyDataChange);//将开关FadeArea的操作排除isDirty判断
                         faTemp.Header(string.IsNullOrEmpty(mInfo.signature) ? $"Member {mInfo.key}" : mInfo.signature, 320);
-                        EditorGUI.BeginChangeCheck();
-                        if (GUILayout.Button("删除成员"))
+                        if (GUILayout.Button("Delete Member"))
                         {
                             removeIndex = i;
                         }
@@ -222,10 +211,10 @@ namespace DebugxLog
                         }
 
                         //更新数据
-                        if (SettingsAssetSource.customDebugxMemberAssets != null && i < SettingsAssetSource.customDebugxMemberAssets.Length)
-                            SettingsAssetSource.customDebugxMemberAssets[i].fadeAreaOpenCached = mInfo.fadeAreaOpenCached;//FadeArea的开关状态直接改变不需要保存确认
+                        if (SettingsAsset.customMemberAssets != null && i < SettingsAsset.customMemberAssets.Length)
+                            SettingsAsset.customMemberAssets[i].fadeAreaOpenCached = mInfo.fadeAreaOpenCached;//FadeArea的开关状态直接改变不需要保存确认
 
-                        SettingsAsset.customDebugxMemberAssets[i] = mInfo;
+                        SettingsAsset.customMemberAssets[i] = mInfo;
 
                         faTemp.End();
                     }
@@ -233,15 +222,15 @@ namespace DebugxLog
                     //移除
                     if (removeIndex >= 0)
                     {
-                        OnRemoveMemberInfo(removeIndex, SettingsAsset.customDebugxMemberAssets[removeIndex]);
-                        List<DebugxMemberInfoAsset> mInfos = new List<DebugxMemberInfoAsset>(SettingsAsset.customDebugxMemberAssets);
+                        OnRemoveMemberInfo(removeIndex, SettingsAsset.customMemberAssets[removeIndex]);
+                        List<DebugxMemberInfoAsset> mInfos = new(SettingsAsset.customMemberAssets);
                         mInfos.RemoveAt(removeIndex);
-                        SettingsAsset.customDebugxMemberAssets = mInfos.ToArray();
+                        SettingsAsset.customMemberAssets = mInfos.ToArray();
                     }
                 }
             }
 
-            fa_MemberConfigSetting.End();
+            faMemberConfigSetting.End();
         }
 
         public static void DrawMemberInfo(ref DebugxMemberInfoAsset mInfo, bool lockSignature = false, bool lockKey = false)
@@ -259,7 +248,7 @@ namespace DebugxLog
             //打印密钥
             EditorGUI.BeginDisabledGroup(lockKey);
             EditorGUI.BeginChangeCheck();
-            mInfo.key = EditorGUILayout.IntField(new GUIContent("Key", "成员信息密钥，在效用Debugx.Logx()方法时使用"), mInfo.key);
+            mInfo.key = Mathf.Clamp(EditorGUILayout.IntField(new GUIContent("Key", "成员信息密钥，在效用Debugx.Logx()方法时使用"), mInfo.key), int.MinValue, int.MaxValue);
             if (EditorGUI.EndChangeCheck())
             {
                 RemoveKey(mInfoOld.key);
@@ -288,23 +277,26 @@ namespace DebugxLog
         //重置窗口数据
         private static void ResetWindowData()
         {
-            fa_MemberConfigSetting = new FadeArea(settingsProvider, ProviderConfig.fa_MemberConfigSettingOpen, EditorStyle.Get.AreaStyle_1, EditorStyle.Get.LabelStyle_FadeAreaHeader, 0.8f);
+            //此方法内调用到了GUI.skin.button，GUI类必须在OnGUI才能调用，不能在OnEnable
+
+            faMemberConfigSetting = new FadeArea(settingsProvider, EditorConfig.faMemberConfigSettingOpen, GUIStyle.Get.AreaStyle_1, GUIStyle.Get.LabelStyle_FadeAreaHeader, 0.8f);
 
             memberInfosFadeAreaPool.Clear();
             memberInfoKeyDic.Clear();
 
-            settingsCopy = ScriptableObject.Instantiate(SettingsAssetSource);
-
-            //此方法内调用到了GUI.skin.button，GUI类必须在OnGUI才能调用，不能在OnEnable
-            //确认FadeArea是否足够
-            OnAddMemberInfo(SettingsAsset.normalMember);
-            OnAddMemberInfo(SettingsAsset.masterMember);
-
-            if (SettingsAsset.customDebugxMemberAssets != null)
+            if (SettingsAsset.defaultMemberAssets != null)
             {
-                for (int i = 0; i < SettingsAsset.customDebugxMemberAssets.Length; i++)
+                for (int i = 0; i < SettingsAsset.defaultMemberAssets.Length; i++)
                 {
-                    OnAddMemberInfo(SettingsAsset.customDebugxMemberAssets[i]);
+                    OnAddMemberInfo(SettingsAsset.defaultMemberAssets[i]);
+                }
+            }
+
+            if (SettingsAsset.customMemberAssets != null)
+            {
+                for (int i = 0; i < SettingsAsset.customMemberAssets.Length; i++)
+                {
+                    OnAddMemberInfo(SettingsAsset.customMemberAssets[i]);
                 }
             }
         }
@@ -312,7 +304,7 @@ namespace DebugxLog
         //当添加一个成员信息时
         private static void OnAddMemberInfo(DebugxMemberInfoAsset info)
         {
-            memberInfosFadeAreaPool.Add(new FadeArea(settingsProvider, info.fadeAreaOpenCached, EditorStyle.Get.AreaStyle_1, EditorStyle.Get.LabelStyle_FadeAreaHeader));
+            memberInfosFadeAreaPool.Add(new FadeArea(settingsProvider, info.fadeAreaOpenCached, GUIStyle.Get.AreaStyle_1, GUIStyle.Get.LabelStyle_FadeAreaHeader));
             AddKey(info.key);
         }
 
@@ -321,6 +313,41 @@ namespace DebugxLog
         {
             memberInfosFadeAreaPool.RemoveAt(index + 2);//前面两个时Normal和Master用的
             RemoveKey(info.key);
+        }
+
+        private static void ResetProjectSettings()
+        {
+            if (!EditorConfig.canResetProjectSettings) return;
+
+            SettingsAsset.enableLogDefault = DebugxStaticData.enableLogDefaultSet;
+            SettingsAsset.enableLogMemberDefault = DebugxStaticData.enableLogMemberDefaultSet;
+            SettingsAsset.logThisKeyMemberOnlyDefault = DebugxStaticData.logThisKeyMemberOnlyDefaultSet;
+
+            SettingsAsset.logOutput = DebugxStaticData.logOutputSet;
+            SettingsAsset.enableLogStackTrace = DebugxStaticData.enableLogStackTraceSet;
+            SettingsAsset.enableWarningStackTrace = DebugxStaticData.enableWarningStackTraceSet;
+            SettingsAsset.enableErrorStackTrace = DebugxStaticData.enableErrorStackTraceSet;
+            SettingsAsset.recordAllNonDebugxLogs = DebugxStaticData.recordAllNonDebugxLogsSet;
+            SettingsAsset.drawLogToScreen = DebugxStaticData.drawLogToScreenSet;
+            SettingsAsset.restrictDrawLogCount = DebugxStaticData.restrictDrawLogCountSet;
+            SettingsAsset.maxDrawLogs = DebugxStaticData.maxDrawLogsSet;
+
+            ResetProjectSettingsMembers();
+
+            EditorConfig.canResetProjectSettings = false;
+        }
+
+        private static void ResetProjectSettingsMembers()
+        {
+            for (int i = 0; i < SettingsAsset.defaultMemberAssets.Length; i++)
+            {
+                SettingsAsset.defaultMemberAssets[i].ResetToDefaultPart();
+            }
+
+            for (int i = 0; i < SettingsAsset.customMemberAssets.Length; i++)
+            {
+                SettingsAsset.customMemberAssets[i].ResetToDefaultPart();
+            }
         }
 
         #region MemberInfoKey
@@ -376,61 +403,6 @@ namespace DebugxLog
 
             return true;
         }
-        #endregion
-
-        #region Save Revert
-
-        private static bool isDirty;
-
-        //当自动保存开关变化时
-        private static void OnAutoSaveChange(bool enable)
-        {
-            if (enable)
-            {
-                SaveCheck();
-            }
-            else
-            {
-                settingsCopy = ScriptableObject.Instantiate(SettingsAssetSource);
-            }
-        }
-
-        //确认是否需要存储
-        private static void SaveCheck()
-        {
-            if (isDirty)
-            {
-                if (EditorUtility.DisplayDialog("保存修改内容", "有内容被修改未保存，是否保存？", "保存", "回退"))
-                {
-                    Save();
-                }
-                else
-                {
-                    Revert();
-                }
-            }
-        }
-
-        private static void Save()
-        {
-            if (!isDirty) return;
-            isDirty = false;
-
-            DebugxProjectSettingsAsset.Instance.Copy(settingsCopy);
-            settingsCopy = ScriptableObject.Instantiate(DebugxProjectSettingsAsset.Instance);
-            EditorUtility.SetDirty(DebugxProjectSettingsAsset.Instance);
-            AssetDatabase.SaveAssetIfDirty(DebugxProjectSettingsAsset.Instance);
-            SettingsAsset.ApplyTo(DebugxProjectSettings.Instance);
-        }
-
-        private static void Revert()
-        {
-            if (!isDirty) return;
-            isDirty = false;
-
-            ResetWindowData();
-        }
-
         #endregion
 
         #region GUILayout for Undo

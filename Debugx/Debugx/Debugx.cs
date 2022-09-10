@@ -31,23 +31,24 @@
 // 3.Debugx.dll中修改Dictionary为List。为了DOTS等某些情况下，不支持Dictionary的情况。
 // 4.LogOutput类，新增绘制Log到屏幕功能，在DebugxManager上设置是否绘制。
 ////////////////////
-// 2.0.0.0 20220908
+// 2.0.0.0 202209010
 // 1.DebugxMemberConfig类改名为DebugxProjectSettings，增加更多成员字段；创建对应配置用类DebugxProjectSettingsAsset，用于生成.asset文件在编辑器中配置。
 // 2.设置界面从EditorWindow改为SettingsProvider，在Editor->ProjectSetting->Debugx中设置。设置内容调整。
 // 3.新增界面 PreferencesDebugx 在 Editor->Preferences->Debugx 目录下。可以让不同用户配置本地化的内容，比如一些成员在自己设备的项目中仅想看到自己打印的Log。
 // 4.DebugxManager成员打印开关相关功能转移到新窗口DebugxConsole；DebugxManager在游戏运行时自动创建，不需要再默认创建并保存到场景中。
+// 5.新增ColorDispenser类，用于在Member创建时分配一个颜色。
+// 6.增加配置辅助功能，重置配置，快速设置全部成员开关，根据编辑器皮肤重设成员颜色等。
+// 7.编辑器配置界面，适应Dark和Light编辑器皮肤。
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 #endregion
 
 #define DEBUG_X
 
-using DebugxLog.Tools;
 using System;
 using System.Diagnostics;
 using System.Text;
 using UnityEngine;
 using DebugxLog;
-using UnityEngine.Windows.Speech;
 using System.Collections.Generic;
 
 namespace DebugxLog 
@@ -124,15 +125,14 @@ namespace DebugxLog
         /// </summary>
         /// <param name="key"></param>
         /// <param name="signature">使用者签名</param>
-        /// <param name="color">颜色</param>
-        public DebugxMemberInfo(int key, string signature, Color color)
+        public DebugxMemberInfo(int key, string signature)
         {
             this.key = key;
             enableDefault = true;
             this.signature = signature;
             this.logSignature = true;
             header = string.Empty;
-            this.color = ColorUtility.ToHtmlStringRGB(color);
+            this.color = String.Empty;
             haveSignature = true;
             haveHeader = false;
         }
@@ -158,7 +158,8 @@ namespace DebugxLog
                 if (instance == null)
                 {
                     instance = new DebugxProjectSettings();
-                    ((IDebugxProjectSettingsAsset)Resources.Load<ScriptableObject>(fileName)).ApplyTo(instance);
+                    IDebugxProjectSettingsAsset iDebugxProjectSettingsAsset = (IDebugxProjectSettingsAsset)Resources.Load<ScriptableObject>(fileName);
+                    if(iDebugxProjectSettingsAsset != null) iDebugxProjectSettingsAsset.ApplyTo(instance);
                 }
 
                 return instance;
@@ -174,7 +175,7 @@ namespace DebugxLog
             {
                 if (m_AdminInfo == null)
                 {
-                    m_AdminInfo = new DebugxMemberInfo(0, "Admin", new Color(0.7843f, 0.941f, 1f, 1f));
+                    m_AdminInfo = new DebugxMemberInfo(0, "Admin");
                 }
                 return m_AdminInfo;
             }
@@ -666,7 +667,10 @@ public class Debugx
         if (info.LogSignature)
             logxSb.Append($"[Sig: {info.signature}]");
 
-        logxSb.Append(info.haveHeader ? $" <color=#{info.color}>{info.header} : {message}</color>" : $" <color=#{info.color}>{message}</color>");
+        if(!string.IsNullOrEmpty(info.color))
+            logxSb.Append(info.haveHeader ? $" <color=#{info.color}>{info.header} : {message}</color>" : $" <color=#{info.color}>{message}</color>");
+        else
+            logxSb.Append(info.haveHeader ? $" {info.header} : {message}" : $" {message}");
 
         UnityEngine.Debug.unityLogger.Log(type, logxSb.ToString());
         logxSb.Length = 0;

@@ -1,42 +1,58 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using UnityEditor;
 using UnityEngine;
 
 namespace DebugxLog
 {
-    public class EditorStyle
+    public class GUIStyle
     {
-        private static EditorStyle style = null;
+        private static int editorSkinCached = -1;
+
+        private static GUIStyle style = null;
         /// <summary>
         /// 获取编辑风格示例对象
         /// </summary>
-        public static EditorStyle Get { get { if (style == null) style = new EditorStyle();  return style; } }
+        public static GUIStyle Get 
+        { 
+            get
+            { 
+                if (style == null || editorSkinCached != (EditorGUIUtility.isProSkin ? 1 : 2))
+                {
+                    style = new GUIStyle();
+                    editorSkinCached = EditorGUIUtility.isProSkin ? 1 : 2;
+                }
+
+                return style; 
+            } 
+        }
 
         /// <summary>
         /// 标题风格1级
         /// </summary>
-        public GUIStyle TitleStyle_1 { get; private set; }
+        public UnityEngine.GUIStyle TitleStyle_1 { get; private set; }
 
         /// <summary>
         /// 标题风格2级
         /// </summary>
-        public GUIStyle TitleStyle_2 { get; private set; }
+        public UnityEngine.GUIStyle TitleStyle_2 { get; private set; }
 
         /// <summary>
         /// 标题风格3级
         /// </summary>
-        public GUIStyle TitleStyle_3 { get; private set; }
+        public UnityEngine.GUIStyle TitleStyle_3 { get; private set; }
 
         /// <summary>
         /// 隐藏空间标题
         /// </summary>
-        public GUIStyle AreaStyle_1 { get; private set; }
+        public UnityEngine.GUIStyle AreaStyle_1 { get; private set; }
 
         /// <summary>
         /// 隐藏空间标题
         /// </summary>
-        public GUIStyle LabelStyle_FadeAreaHeader { get; private set; }
+        public UnityEngine.GUIStyle LabelStyle_FadeAreaHeader { get; private set; }
 
+        public Color colorDark { get; private set; } = new(0.1f, 0.1f, 0.1f);
         public Color colorLightGray { get; private set; } = new (0.8f, 0.8f, 0.8f);
 
         private Texture2D m_DarkGreyTex;
@@ -46,10 +62,12 @@ namespace DebugxLog
             {
                 if (m_DarkGreyTex == null)
                 {
+                    bool isDark = EditorGUIUtility.isProSkin;
+
                     m_DarkGreyTex = new Texture2D(32, 32);
-                    Color color = new Color(0.25f, 0.25f, 0.25f);
-                    Color colorLine1 = new Color(0.15f, 0.15f, 0.15f);
-                    Color colorLine2 = new Color(0.19f, 0.19f, 0.19f);
+                    Color color = isDark ? new Color(0.25f, 0.25f, 0.25f) : new Color(0.85f, 0.85f, 0.85f);
+                    Color colorLine1 = isDark ? new Color(0.15f, 0.15f, 0.15f) : new Color(0.65f, 0.65f, 0.65f);
+                    Color colorLine2 = isDark ? new Color(0.19f, 0.19f, 0.19f) : new Color(0.69f, 0.69f, 0.69f);
                     Color colorNone = new Color(1f, 1f, 1f, 0f);
                     int width = m_DarkGreyTex.width;
                     int height = m_DarkGreyTex.height;
@@ -81,48 +99,50 @@ namespace DebugxLog
             }
         }
 
-        public EditorStyle()
+        public GUIStyle()
         {
+            bool isDark = EditorGUIUtility.isProSkin;
+
             //一级标题风格
-            TitleStyle_1 = new GUIStyle
+            TitleStyle_1 = new UnityEngine.GUIStyle
             {
                 fontSize = 16,
                 alignment = TextAnchor.UpperCenter,
                 fontStyle = FontStyle.Bold,
                 normal = new GUIStyleState
                 {
-                    textColor = colorLightGray
+                    textColor = isDark ? colorLightGray : colorDark
                 }
             };
 
             //二级标题风格
-            TitleStyle_2 = new GUIStyle
+            TitleStyle_2 = new UnityEngine.GUIStyle
             {
                 fontSize = 14,
                 alignment = TextAnchor.MiddleLeft,
                 fontStyle = FontStyle.Bold,
                 normal = new GUIStyleState
                 {
-                    textColor = colorLightGray
+                    textColor = isDark ? colorLightGray : colorDark
                 }
             };
 
             //三级标题风格
-            TitleStyle_3 = new GUIStyle
+            TitleStyle_3 = new UnityEngine.GUIStyle
             {
                 fontSize = 12,
                 alignment = TextAnchor.MiddleLeft,
                 fontStyle = FontStyle.Bold,
                 normal = new GUIStyleState
                 {
-                    textColor = colorLightGray
+                    textColor = isDark ? colorLightGray : colorDark
                 }
             };
 
-            LabelStyle_FadeAreaHeader = GUI.skin.label;
+            LabelStyle_FadeAreaHeader = new UnityEngine.GUIStyle(GUI.skin.label);
             LabelStyle_FadeAreaHeader.fontStyle = FontStyle.Bold;
 
-            AreaStyle_1 = new GUIStyle(GUI.skin.button);
+            AreaStyle_1 = new UnityEngine.GUIStyle(GUI.skin.button);
             AreaStyle_1.normal.background = DarkGreyTex;
         }
     }

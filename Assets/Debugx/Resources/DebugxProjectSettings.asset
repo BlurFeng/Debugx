@@ -15,23 +15,22 @@ MonoBehaviour:
   enableLogDefault: 1
   enableLogMemberDefault: 1
   logThisKeyMemberOnlyDefault: 0
-  normalMember:
-    enableDefault: 1
+  defaultMemberAssets:
+  - enableDefault: 1
     signature: Normal
     logSignature: 1
     key: -1
     header: 
     color: {r: 1, g: 1, b: 1, a: 1}
     fadeAreaOpenCached: 1
-  masterMember:
-    enableDefault: 1
+  - enableDefault: 1
     signature: Master
     logSignature: 1
     key: -2
     header: 
     color: {r: 1, g: 0.627, b: 0.627, a: 1}
     fadeAreaOpenCached: 1
-  customDebugxMemberAssets:
+  customMemberAssets:
   - enableDefault: 1
     signature: WinhooFeng
     logSignature: 1

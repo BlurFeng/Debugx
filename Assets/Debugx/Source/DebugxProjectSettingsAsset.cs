@@ -1,8 +1,7 @@
-﻿using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using System;
-using System.Diagnostics;
 using DebugxLog.Tools;
+using System.Collections.Generic;
 
 namespace DebugxLog
 {
@@ -31,6 +30,27 @@ namespace DebugxLog
         [Tooltip("打印Log颜色")]
         public Color color;
 
+        public DebugxMemberInfoAsset(int key)
+        {
+            enableDefault = true;
+            signature = $"Menber {key}";
+            logSignature = true;
+            this.key = key;
+            header = String.Empty;
+            color = DebugxProjectSettingsAsset.GetRandomColorForMember != null ? DebugxProjectSettingsAsset.GetRandomColorForMember.Invoke() : Color.white;
+            fadeAreaOpenCached = true;
+        }
+
+        /// <summary>
+        /// 将部分数据重置到默认
+        /// </summary>
+        public void ResetToDefaultPart()
+        {
+            enableDefault = true;
+            logSignature = true;
+            fadeAreaOpenCached = true;
+        }
+
         public DebugxMemberInfo CreateDebugxMemberInfo()
         {
             DebugxMemberInfo info = new()
@@ -47,9 +67,9 @@ namespace DebugxLog
             };
 
 #if UNITY_EDITOR
-            if (DebugxStaticData.MemberEnableDefaultDic.ContainsKey(key))
+            if (DebugxStaticData.MemberEnableDefaultDicPrefs.ContainsKey(key))
             {
-                info.enableDefault = DebugxStaticData.MemberEnableDefaultDic[key];
+                info.enableDefault = DebugxStaticData.MemberEnableDefaultDicPrefs[key];
             }
 #endif
 
@@ -83,7 +103,7 @@ namespace DebugxLog
                     if (instance == null)
                     {
                         instance = ScriptableObject.CreateInstance(typeof(DebugxProjectSettingsAsset)) as DebugxProjectSettingsAsset;
-                        instance.customDebugxMemberAssets = new DebugxMemberInfoAsset[1]
+                        instance.customMemberAssets = new DebugxMemberInfoAsset[1]
                         {
                             new DebugxMemberInfoAsset(){ signature = "WinhooFeng", logSignature = true, key = 1, color = new Color(0.7843f, 0.941f, 1f, 1f), enableDefault = true }
                         };
@@ -99,205 +119,137 @@ namespace DebugxLog
             }
         }
 
+        #region Action
+
+        //用于为创建的成员分配一个颜色
+        public static Func<Color> GetRandomColorForMember;
+
+        #endregion
+
         public static ActionHandler OnApplyTo = new ActionHandler();
 
-        [Tooltip("Log总开关")]
+        [Tooltip(DebugxStaticData.ToolTip_EnableLogDefault)]
         public bool enableLogDefault = true;
 
-        [Tooltip("成员Log总开关")]
+        [Tooltip(DebugxStaticData.ToolTip_EnableLogMemberDefault)]
         public bool enableLogMemberDefault = true;
 
-        [Tooltip("仅打印此Key的成员Log，0为关闭")]
+        [Tooltip(DebugxStaticData.ToolTip_LogThisKeyMemberOnlyDefault)]
         public int logThisKeyMemberOnlyDefault = 0;
 
-        [Tooltip("普通成员配置")]
-        public DebugxMemberInfoAsset normalMember;
+        [Tooltip(DebugxStaticData.ToolTip_CustomDebugxMemberAssets)]
+        public DebugxMemberInfoAsset[] defaultMemberAssets;
+        public int DefaultMemberAssetsLength => defaultMemberAssets == null ? 0 : defaultMemberAssets.Length;
 
-        [Tooltip("高级成员配置")]
-        public DebugxMemberInfoAsset masterMember;
+        [Tooltip(DebugxStaticData.ToolTip_CustomDebugxMemberAssets)]
+        public DebugxMemberInfoAsset[] customMemberAssets;
+        public int CustomMemberAssetsLength => customMemberAssets == null ? 0 : customMemberAssets.Length;
 
-        [Tooltip("自定义调试成员信息列表")]
-        public DebugxMemberInfoAsset[] customDebugxMemberAssets;
 
         /// <summary>
         /// 默认构造函数
         /// </summary>
         public DebugxProjectSettingsAsset()
         {
+            defaultMemberAssets = new DebugxMemberInfoAsset[2];
+
             //普通Log成员信息
-            normalMember.signature = DebugxProjectSettings.normalInfoSignature;
-            normalMember.logSignature = true;
-            normalMember.key = DebugxProjectSettings.normalInfoKey;
-            normalMember.color = DebugxProjectSettings.NormalInfoColor;
-            normalMember.enableDefault = true;
-            normalMember.fadeAreaOpenCached = true;
+            DebugxMemberInfoAsset normalMember = new()
+            {
+                signature = DebugxProjectSettings.normalInfoSignature,
+                logSignature = true,
+                key = DebugxProjectSettings.normalInfoKey,
+                color = DebugxProjectSettings.NormalInfoColor,
+                enableDefault = true,
+                fadeAreaOpenCached = true,
+            };
+            defaultMemberAssets[0] = normalMember;
 
             //高级Log成员信息
-            masterMember.signature = DebugxProjectSettings.masterInfoSignature;
-            masterMember.logSignature = true;
-            masterMember.key = DebugxProjectSettings.masterInfoKey;
-            masterMember.color = DebugxProjectSettings.MasterInfoColor;
-            masterMember.enableDefault = true;
-            masterMember.fadeAreaOpenCached = true;
-        }
-
-        [Conditional("UNITY_EDITOR")]
-        private void OnValidate()
-        {
-            //普通log参数限制
-            normalMember.signature = DebugxProjectSettings.normalInfoSignature;
-            normalMember.key = DebugxProjectSettings.normalInfoKey;
-
-            //高级log参数限制
-            masterMember.signature = DebugxProjectSettings.masterInfoSignature;
-            masterMember.key = DebugxProjectSettings.masterInfoKey;
-
-            //防止直接修改.asset文件中Key为重复的值
-            if (customDebugxMemberAssets != null && customDebugxMemberAssets.Length > 0)
+            DebugxMemberInfoAsset masterMember = new()
             {
-                List<int> keys = new List<int>();
-                for (int i = 0; i < customDebugxMemberAssets.Length; i++)
-                {
-                    var mInfo = customDebugxMemberAssets[i];
-                    if (DebugxProjectSettings.KeyValid(mInfo.key) && !keys.Contains(mInfo.key))
-                    {
-                        keys.Add(mInfo.key);
-                    }
-                    else
-                    {
-                        //Key重复了
-                        int newKey = 1;
-                        while (keys.Contains(newKey))
-                        {
-                            if (newKey >= int.MaxValue)
-                                break;
-                            newKey++;
-                        }
-                        mInfo.key = newKey;
-                        keys.Add(mInfo.key);
-                    }
-
-                    customDebugxMemberAssets[i] = mInfo;
-                }
-            }
-
-            ApplyTo(DebugxProjectSettings.Instance);
+                signature = DebugxProjectSettings.masterInfoSignature,
+                logSignature = true,
+                key = DebugxProjectSettings.masterInfoKey,
+                color = DebugxProjectSettings.MasterInfoColor,
+                enableDefault = true,
+                fadeAreaOpenCached = true,
+            };
+            defaultMemberAssets[1] = masterMember;
         }
 
-        #region Log Output
+#region Log Output
 
-        /// <summary>
-        /// 输出Log到本地文件
-        /// </summary>
         [Tooltip("普通Log配置")]
-        public bool logOutput = true;
+        public bool logOutput = DebugxStaticData.logOutputSet;
 
-        /// <summary>
-        /// 输出Log类型的堆栈跟踪
-        /// </summary>
         [Tooltip("输出Log类型的堆栈跟踪")]
-        public bool enableLogStackTrace = false;
+        public bool enableLogStackTrace = DebugxStaticData.enableLogStackTraceSet;
 
-        /// <summary>
-        /// 输出Warning类型的堆栈跟踪
-        /// </summary>
         [Tooltip("输出Warning类型的堆栈跟踪")]
-        public bool enableWarningStackTrace = false;
+        public bool enableWarningStackTrace = DebugxStaticData.enableWarningStackTraceSet;
 
-        /// <summary>
-        /// 输出Error类型的堆栈跟踪
-        /// </summary>
         [Tooltip("输出Error类型的堆栈跟踪")]
-        public bool enableErrorStackTrace = true;
+        public bool enableErrorStackTrace = DebugxStaticData.enableErrorStackTraceSet;
 
-        /// <summary>
-        /// 记录所有非Debugx打印的Log
-        /// </summary>
         [Tooltip("记录所有非Debugx打印的Log")]
-        public bool recordAllNonDebugxLogs = false;
+        public bool recordAllNonDebugxLogs = DebugxStaticData.recordAllNonDebugxLogsSet;
 
-        /// <summary>
-        /// 绘制Log到屏幕
-        /// </summary>
         [Tooltip("绘制Log到屏幕")]
-        public bool drawLogToScreen = false;
+        public bool drawLogToScreen = DebugxStaticData.drawLogToScreenSet;
 
-        /// <summary>
-        /// 限制绘制Log数量
-        /// </summary>
         [Tooltip("限制绘制Log数量")]
-        public bool restrictDrawLogCount = false;
+        public bool restrictDrawLogCount = DebugxStaticData.restrictDrawLogCountSet;
 
-        /// <summary>
-        /// 绘制Log最大数量
-        /// </summary>
         [Tooltip("绘制Log最大数量")]
-        public int maxDrawLogs = 100;
+        public int maxDrawLogs = DebugxStaticData.maxDrawLogsSet;
 
-        #endregion
+#endregion
 
-        /// <summary>
-        /// 复制数据到自身
-        /// </summary>
-        /// <param name="settingsAsset"></param>
-        public void Copy(DebugxProjectSettingsAsset settingsAsset)
-        {
-            enableLogDefault = settingsAsset.enableLogDefault;
-            enableLogMemberDefault = settingsAsset.enableLogMemberDefault;
-            logThisKeyMemberOnlyDefault = settingsAsset.logThisKeyMemberOnlyDefault;
-
-            normalMember = settingsAsset.normalMember;
-            masterMember = settingsAsset.masterMember;
-            customDebugxMemberAssets = settingsAsset.customDebugxMemberAssets;
-
-            logOutput = settingsAsset.logOutput;
-            enableLogStackTrace = settingsAsset.enableLogStackTrace;
-            enableWarningStackTrace = settingsAsset.enableWarningStackTrace;
-            enableErrorStackTrace = settingsAsset.enableErrorStackTrace;
-            recordAllNonDebugxLogs = settingsAsset.recordAllNonDebugxLogs;
-            drawLogToScreen = settingsAsset.drawLogToScreen;
-            restrictDrawLogCount = settingsAsset.restrictDrawLogCount;
-            maxDrawLogs = settingsAsset.maxDrawLogs;
-        }
-
-        //在DebugxProjectSettings初始化时通过接口调用，以及在DebugxProjectSettingsAsset资源变化时调用
+        //保存配置数据资源到dll中的DebugxProjectSettings，这是实际使用的配置数据
         public void ApplyTo(DebugxProjectSettings settings)
         {
+            if (settings == null) return;
+
 #if UNITY_EDITOR
-            settings.enableLogDefault = DebugxStaticData.EnableLogDefault;
-            settings.enableLogMemberDefault = DebugxStaticData.EnableLogMemberDefault;
-            settings.logThisKeyMemberOnlyDefault = DebugxStaticData.LogThisKeyMemberOnlyDefault;
+            settings.enableLogDefault = DebugxStaticData.EnableLogDefaultPrefs;
+            settings.enableLogMemberDefault = DebugxStaticData.EnableLogMemberDefaultPrefs;
+            settings.logThisKeyMemberOnlyDefault = DebugxStaticData.LogThisKeyMemberOnlyDefaultPrefs;
 #else
             settings.enableLogDefault = enableLogDefault;
             settings.enableLogMemberDefault = enableLogMemberDefault;
             settings.logThisKeyMemberOnlyDefault = logThisKeyMemberOnlyDefault;
 #endif
-            int customLength = customDebugxMemberAssets != null ? customDebugxMemberAssets.Length : 0;
-            settings.members = new DebugxMemberInfo[customLength + 2];
-            //添加普通和高级成员信息
-            settings.members[0] = normalMember.CreateDebugxMemberInfo();
-            settings.members[1] = masterMember.CreateDebugxMemberInfo();
+            settings.members = new DebugxMemberInfo[DefaultMemberAssetsLength + (customMemberAssets != null ? customMemberAssets.Length : 0)];
+
+            //添加默认成员信息
+            if (defaultMemberAssets != null && defaultMemberAssets.Length > 0)
+            {
+                for (int i = 0; i < defaultMemberAssets.Length; i++)
+                {
+                    settings.members[i] = defaultMemberAssets[i].CreateDebugxMemberInfo();
+                }
+            }
 
             //添加自定义成员信息
-            if (customDebugxMemberAssets != null && customDebugxMemberAssets.Length > 0)
+            if (customMemberAssets != null && customMemberAssets.Length > 0)
             {
-                for (int i = 0; i < customDebugxMemberAssets.Length; i++)
+                for (int i = 0; i < customMemberAssets.Length; i++)
                 {
-                    var info = customDebugxMemberAssets[i];
-                    settings.members[i + 2] = info.CreateDebugxMemberInfo();
+                    settings.members[i + DefaultMemberAssetsLength] = customMemberAssets[i].CreateDebugxMemberInfo();
                 }
             }
 
 #if UNITY_EDITOR
             //Log输出设置
-            settings.logOutput = DebugxStaticData.LogOutput;
-            settings.enableLogStackTrace = DebugxStaticData.EnableLogStackTrace;
-            settings.enableWarningStackTrace = DebugxStaticData.EnableWarningStackTrace;
-            settings.enableErrorStackTrace = DebugxStaticData.EnableErrorStackTrace;
-            settings.recordAllNonDebugxLogs = DebugxStaticData.RecordAllNonDebugxLogs;
-            settings.drawLogToScreen = DebugxStaticData.DrawLogToScreen;
-            settings.restrictDrawLogCount = DebugxStaticData.RestrictDrawLogCount;
-            settings.maxDrawLogs = DebugxStaticData.MaxDrawLogs;
+            settings.logOutput = DebugxStaticData.LogOutputPrefs;
+            settings.enableLogStackTrace = DebugxStaticData.EnableLogStackTracePrefs;
+            settings.enableWarningStackTrace = DebugxStaticData.EnableWarningStackTracePrefs;
+            settings.enableErrorStackTrace = DebugxStaticData.EnableErrorStackTracePrefs;
+            settings.recordAllNonDebugxLogs = DebugxStaticData.RecordAllNonDebugxLogsPrefs;
+            settings.drawLogToScreen = DebugxStaticData.DrawLogToScreenPrefs;
+            settings.restrictDrawLogCount = DebugxStaticData.RestrictDrawLogCountPrefs;
+            settings.maxDrawLogs = DebugxStaticData.MaxDrawLogsPrefs;
 #else
             //Log输出设置
             settings.logOutput = logOutput;

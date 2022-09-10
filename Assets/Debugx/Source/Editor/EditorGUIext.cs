@@ -39,7 +39,7 @@ namespace DebugxLog
 			return change;
         }
 
-		public static int IntField(string label, string tooltip, int value, float width = 250f)
+        public static int IntField(string label, string tooltip, int value, float width = 250f)
 		{
             EditorGUILayout.BeginHorizontal();
             EditorGUILayout.LabelField(new GUIContent(label, tooltip), GUILayout.Width(width));
@@ -48,7 +48,6 @@ namespace DebugxLog
 
             return change;
         }
-
     }
 
 	//GUI扩展工具
@@ -68,16 +67,6 @@ namespace DebugxLog
 		{
 			GUI.color = colors.Pop();
 		}
-
-		/// <summary>
-		/// 结束改变确认
-		/// </summary>
-		/// <param name="change">是否改变缓存值，只会讲此值从false改为true</param>
-		public static void EndChangeCheck(ref bool change)
-		{
-            bool changeTemp = EditorGUI.EndChangeCheck();
-			change = change ? change : changeTemp;
-        }
     }
 
 	/// <summary>
@@ -94,8 +83,8 @@ namespace DebugxLog
 		Rect lastRect;
 		float value;
 		float lastUpdate;
-        readonly GUIStyle labelStyle;
-        readonly GUIStyle areaStyle;
+        readonly UnityEngine.GUIStyle labelStyle;
+        readonly UnityEngine.GUIStyle areaStyle;
 		bool visible;
 		readonly EditorWindow editorWindow;
         readonly SettingsProvider settingsProvider;
@@ -112,7 +101,12 @@ namespace DebugxLog
 		public static bool fancyEffects = true;
 		const float animationSpeed = 100f;
 
-		public FadeArea(EditorWindow editor, bool open, GUIStyle areaStyle, GUIStyle labelStyle = null, float beginSpace = 1.5f, bool immediately = false)
+		public FadeArea(SettingsProvider settingsProvider, bool open)
+		{
+			new FadeArea(settingsProvider, open, GUIStyle.Get.AreaStyle_1, GUIStyle.Get.LabelStyle_FadeAreaHeader);
+        }
+
+		public FadeArea(EditorWindow editor, bool open, UnityEngine.GUIStyle areaStyle, UnityEngine.GUIStyle labelStyle = null, float beginSpace = 1.5f, bool immediately = false)
 		{
 			this.editorWindow = editor;
 
@@ -124,7 +118,7 @@ namespace DebugxLog
             this.immediately = immediately;
         }
 
-        public FadeArea(SettingsProvider settingsProvider, bool open, GUIStyle areaStyle, GUIStyle labelStyle = null, float beginSpace = 1.5f, bool immediately = false)
+        public FadeArea(SettingsProvider settingsProvider, bool open, UnityEngine.GUIStyle areaStyle, UnityEngine.GUIStyle labelStyle = null, float beginSpace = 1.5f, bool immediately = false)
         {
 			this.settingsProvider = settingsProvider;
 
@@ -206,7 +200,9 @@ namespace DebugxLog
 
 		public void Header(string label, ref bool open, int width = -1)
 		{
-			bool press = false;
+			bool changedCached = GUI.changed;
+
+            bool press = false;
 			if(width > 0)
             {
 				press = GUILayout.Button(label, labelStyle, GUILayout.Width(width));
@@ -224,7 +220,9 @@ namespace DebugxLog
 			}
 			this.open = open;
 			if (immediately) value = open ? 1f : 0f;
-		}
+
+			if (!changedCached) GUI.changed = changedCached;//开关FadeArea排除Changed判断
+        }
 
 		/// <summary>Hermite spline interpolation</summary>
 		static float Hermite(float start, float end, float value)

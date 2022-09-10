@@ -5,6 +5,8 @@ using UnityEditor;
 using UnityEditor.PackageManager.UI;
 using UnityEditor.Search;
 using UnityEditor.SearchService;
+using UnityEditor.VersionControl;
+using UnityEditorInternal;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -13,88 +15,113 @@ namespace DebugxLog
     static class DebugxPreferencesProvider
     {
         private static SettingsProvider settingsProvider;
-
+        private static DebugxEditorConfig EditorConfig => DebugxEditorConfig.Get;
         private static DebugxProjectSettings Settings => DebugxProjectSettings.Instance;
-        private static Dictionary<int, bool> MemberEnableDefaultDic => DebugxStaticData.MemberEnableDefaultDic;
+        private static Dictionary<int, bool> MemberEnableDefaultDic => DebugxStaticData.MemberEnableDefaultDicPrefs;
+        private static FadeArea faMemberEnableSetting;
+        private static bool isInitGUI;
+        private static ReorderableList membersList;
 
         [SettingsProvider]
-        public static SettingsProvider DebugxDebugxSettingsProvider()
+        public static SettingsProvider DebugxPreferencesProviderCreate()
         {
-            settingsProvider = new SettingsProvider("Preferences/Debugx", SettingsScope.User)
+            if(settingsProvider == null)
             {
-                label = "Debugx",
-                activateHandler = Enable,
-                guiHandler = Draw,
-                deactivateHandler = Disable,
-            };
+                isInitGUI = false;
+
+                settingsProvider = new SettingsProvider("Preferences/Debugx", SettingsScope.User)
+                {
+                    label = "Debugx",
+                    activateHandler = Enable,
+                    guiHandler = Draw,
+                    deactivateHandler = Disable,
+                };
+            }
 
             return settingsProvider;
         }
 
         private static void Enable(string searchContext, VisualElement rootElement)
         {
-
         }
 
         private static void Disable()
         {
-
         }
 
         private static void Draw(string searchContext)
         {
+            if(!isInitGUI)
+            {
+                isInitGUI = true;
+
+                faMemberEnableSetting = new FadeArea(settingsProvider, EditorConfig.faMemberEnableSettingOpen, GUIStyle.Get.AreaStyle_1, GUIStyle.Get.LabelStyle_FadeAreaHeader, 0.8f);
+                membersList = new ReorderableList(Settings.members, typeof(DebugxMemberInfo), false, true, false, false)
+                {
+                    drawHeaderCallback = DrawMembersHeader,
+                    drawElementCallback = DrawMembersElement,
+                    elementHeight = 20f,
+                };
+            }
+
             EditorGUILayout.HelpBox("此处为用户设置，在 UNITY_EDITOR 编辑器时，一些参数会优先使用 Preferences 用户设置。用户设置不会影响项目的其他人。", MessageType.Info);
 
+            EditorGUI.BeginDisabledGroup(!EditorConfig.canResetPreferences);
+            if (GUILayout.Button("Reset to Default"))
+            {
+                if (EditorUtility.DisplayDialog("Reset to Default", "确认要重置到默认设置吗？", "Ok", "Cancel"))
+                {
+                    ResetPreferences();
+                    DebugxProjectSettingsAsset.Instance.ApplyTo(DebugxProjectSettings.Instance);
+                }
+            }
+            EditorGUI.EndDisabledGroup();
+
             EditorGUILayout.Space();
-            EditorGUILayout.LabelField("Default", EditorStyle.Get.TitleStyle_2);
+            EditorGUILayout.LabelField("Toggle", GUIStyle.Get.TitleStyle_2);
 
             EditorGUI.BeginChangeCheck();
 
-            DebugxStaticData.EnableLogDefault = GUILayoutx.Toggle("EnableLog Default", "Log总开关，默认状态", DebugxStaticData.EnableLogDefault);
-            DebugxStaticData.EnableLogMemberDefault = GUILayoutx.Toggle("EnableLogMember Default", "成员Log总开关，默认状态", DebugxStaticData.EnableLogMemberDefault);
-            DebugxStaticData.LogThisKeyMemberOnlyDefault = GUILayoutx.IntField("LogThisKeyMemberOnly", "仅打印此Key的成员Log，0为关闭", DebugxStaticData.LogThisKeyMemberOnlyDefault);
+            DebugxStaticData.EnableLogDefaultPrefs = GUILayoutx.Toggle("EnableLog Default", DebugxStaticData.ToolTip_EnableLogDefault, DebugxStaticData.EnableLogDefaultPrefs);
+            DebugxStaticData.EnableLogMemberDefaultPrefs = GUILayoutx.Toggle("EnableLogMember Default", DebugxStaticData.ToolTip_EnableLogMemberDefault, DebugxStaticData.EnableLogMemberDefaultPrefs);
+            DebugxStaticData.LogThisKeyMemberOnlyDefaultPrefs = GUILayoutx.IntField("LogThisKeyMemberOnly Default", DebugxStaticData.ToolTip_LogThisKeyMemberOnlyDefault, DebugxStaticData.LogThisKeyMemberOnlyDefaultPrefs);
 
             EditorGUILayout.Space();
-            EditorGUILayout.LabelField("Members", EditorStyle.Get.TitleStyle_3);
-            if (Settings.members != null && Settings.members.Length > 0)
+
+            faMemberEnableSetting.Begin();
+            faMemberEnableSetting.Header("Members Enable");
+            EditorConfig.faMemberEnableSettingOpen = faMemberEnableSetting.BeginFade();
+            if (EditorConfig.faMemberEnableSettingOpen)
             {
-                EditorGUI.BeginChangeCheck();
-                for (int i = 0; i < Settings.members.Length; i++)
+                if (Settings.members != null && Settings.members.Length > 0)
                 {
-                    var info = Settings.members[i];
                     EditorGUILayout.BeginHorizontal();
-                    bool enable = MemberEnableDefaultDic.ContainsKey(info.key) ? MemberEnableDefaultDic[info.key] : Debugx.MemberIsEnable(info.key);
-                    EditorGUI.BeginChangeCheck();
-                    enable = GUILayoutx.Toggle($" [{info.key}] {(string.IsNullOrEmpty(info.signature) ? "Member" : info.signature)}", "", enable);
-                    if (EditorGUI.EndChangeCheck())
-                    {
-                        if (MemberEnableDefaultDic.ContainsKey(info.key))
-                            MemberEnableDefaultDic[info.key] = enable;
-                        else
-                            MemberEnableDefaultDic.Add(info.key, enable);
-                    }
+                    if (GUILayout.Button("Enable All")) SetMemberEnableDefaultDicAll(true);
+                    if (GUILayout.Button("Disable All")) SetMemberEnableDefaultDicAll(false);
                     EditorGUILayout.EndHorizontal();
+
+                    EditorGUILayout.Space();
+
+                    membersList.DoLayoutList();
                 }
-                if (EditorGUI.EndChangeCheck())
-                    DebugxStaticData.SaveMemberEnableDefaultDic();
+                else EditorGUILayout.LabelField("没有配置任何成员");
+                
             }
-            else
-            {
-                EditorGUILayout.LabelField("没有配置任何成员");
-            }
+            faMemberEnableSetting.End();
+
 
             EditorGUILayout.Space();
-            EditorGUILayout.LabelField("Log Output", EditorStyle.Get.TitleStyle_2);
-            DebugxStaticData.LogOutput = GUILayoutx.Toggle("EnbaleLogOutput", "输出Log到本地（启动前设置，运行时设置无效）。编辑器时输出到项目的Logs文件夹下，实机运行时根据平台输出到不同目录下", DebugxStaticData.LogOutput);
-            EditorGUI.BeginDisabledGroup(!DebugxStaticData.LogOutput);
-            DebugxStaticData.EnableLogStackTrace = GUILayoutx.Toggle("EnableLogStackTrace", "输出Log类型的堆栈跟踪", DebugxStaticData.EnableLogStackTrace);
-            DebugxStaticData.EnableWarningStackTrace = GUILayoutx.Toggle("EnableWarningStackTrace", "输出Warning类型的堆栈跟踪", DebugxStaticData.EnableWarningStackTrace);
-            DebugxStaticData.EnableErrorStackTrace = GUILayoutx.Toggle("EnableErrorStackTrace", "输出Error类型的堆栈跟踪", DebugxStaticData.EnableErrorStackTrace);
-            DebugxStaticData.RecordAllNonDebugxLogs = GUILayoutx.Toggle("RecordAllNonDebugxLogs", "记录所有非Debugx打印的Log", DebugxStaticData.RecordAllNonDebugxLogs);
-            DebugxStaticData.DrawLogToScreen = GUILayoutx.Toggle("DrawLogToScreen", "绘制Log到屏幕", DebugxStaticData.DrawLogToScreen);
-            EditorGUI.BeginDisabledGroup(!DebugxStaticData.DrawLogToScreen);
-            DebugxStaticData.RestrictDrawLogCount = GUILayoutx.Toggle("RestrictDrawLogCount", "限制绘制Log数量", DebugxStaticData.RestrictDrawLogCount);
-            DebugxStaticData.MaxDrawLogs = GUILayoutx.IntField("MaxDrawLogs", "绘制Log最大数量", DebugxStaticData.MaxDrawLogs);
+            EditorGUILayout.LabelField("Log Output", GUIStyle.Get.TitleStyle_2);
+            DebugxStaticData.LogOutputPrefs = GUILayoutx.Toggle("EnbaleLogOutput", DebugxStaticData.ToolTip_LogOutput, DebugxStaticData.LogOutputPrefs);
+            EditorGUI.BeginDisabledGroup(!DebugxStaticData.LogOutputPrefs);
+            DebugxStaticData.EnableLogStackTracePrefs = GUILayoutx.Toggle("EnableLogStackTrace", DebugxStaticData.ToolTip_EnableLogStackTrace, DebugxStaticData.EnableLogStackTracePrefs);
+            DebugxStaticData.EnableWarningStackTracePrefs = GUILayoutx.Toggle("EnableWarningStackTrace", DebugxStaticData.ToolTip_EnableWarningStackTrace, DebugxStaticData.EnableWarningStackTracePrefs);
+            DebugxStaticData.EnableErrorStackTracePrefs = GUILayoutx.Toggle("EnableErrorStackTrace", DebugxStaticData.ToolTip_EnableErrorStackTrace, DebugxStaticData.EnableErrorStackTracePrefs);
+            DebugxStaticData.RecordAllNonDebugxLogsPrefs = GUILayoutx.Toggle("RecordAllNonDebugxLogs", DebugxStaticData.ToolTip_RecordAllNonDebugxLogs, DebugxStaticData.RecordAllNonDebugxLogsPrefs);
+            DebugxStaticData.DrawLogToScreenPrefs = GUILayoutx.Toggle("DrawLogToScreen", DebugxStaticData.ToolTip_DrawLogToScreen, DebugxStaticData.DrawLogToScreenPrefs);
+            EditorGUI.BeginDisabledGroup(!DebugxStaticData.DrawLogToScreenPrefs);
+            DebugxStaticData.RestrictDrawLogCountPrefs = GUILayoutx.Toggle("RestrictDrawLogCount", DebugxStaticData.ToolTip_RestrictDrawLogCount, DebugxStaticData.RestrictDrawLogCountPrefs);
+            DebugxStaticData.MaxDrawLogsPrefs = GUILayoutx.IntField("MaxDrawLogs", DebugxStaticData.ToolTip_MaxDrawLogs, DebugxStaticData.MaxDrawLogsPrefs);
             EditorGUI.EndDisabledGroup();
             EditorGUI.EndDisabledGroup();
 
@@ -102,7 +129,95 @@ namespace DebugxLog
             if (EditorGUI.EndChangeCheck())
             {
                 DebugxProjectSettingsAsset.Instance.ApplyTo(DebugxProjectSettings.Instance);
+                EditorConfig.canResetPreferences = true;
             }
+        }
+
+        /// <summary>
+        /// 重置用户设置
+        /// </summary>
+        public static void ResetPreferences()
+        {
+            if (!EditorConfig.canResetPreferences) return;
+            DebugxStaticData.ResetPreferences();
+            EditorConfig.canResetPreferences = false;
+        }
+
+        private static void DrawMembersHeader(Rect rect)
+        {
+            var buttonRect = rect;
+            buttonRect.x += rect.width - 140f;
+            buttonRect.width = 140f;
+            buttonRect.y += 1f;
+            buttonRect.height -= 2f;
+
+            var titleRect = rect;
+            titleRect.width -= buttonRect.width;
+            GUI.Label(titleRect, new GUIContent("Members Enable", "此处仅能配置成员的默认开关，详细成员配置在 Project Settings 中设置。在重置到默认状态时，成员开关将恢复到成员配置中的 Enable Default 的值。"));
+
+            EditorGUI.BeginDisabledGroup(!EditorConfig.canResetPreferencesMembers);
+            if (GUI.Button(buttonRect, new GUIContent("Reset", "重置到和目前成员配置中的 Enable Default 值一致。")))
+            {
+                DebugxStaticData.ResetPreferencesMembers();
+                EditorConfig.canResetPreferencesMembers = false;
+            }
+            EditorGUI.EndDisabledGroup();
+
+            //GUI.FocusControl("");
+        }
+
+        private static void DrawMembersElement(Rect rect, int index, bool isActive, bool isFocused)
+        {
+            if (index >= Settings.members.Length) return;
+
+            const float idWidth = 90f;
+            const float enableWidth = 30f;
+            const float interval = 5f;
+
+            var info = Settings.members[index];
+            bool enable = MemberEnableDefaultDic.ContainsKey(info.key) ? MemberEnableDefaultDic[info.key] : Debugx.MemberIsEnable(info.key);
+            EditorGUI.BeginChangeCheck();
+
+            Rect idRect = rect;
+            idRect.width = idWidth;
+            GUI.Label(idRect, $"[{info.key}]");
+
+            Rect signatureRect = rect;
+            signatureRect.x += idWidth + interval;
+            signatureRect.width = rect.width - idWidth - interval - enableWidth - interval;
+            GUI.Label(signatureRect, $"{(string.IsNullOrEmpty(info.signature) ? "Member" : info.signature)}");
+
+            Rect enableRect = rect;
+            enableRect.x = signatureRect.x + signatureRect.width + interval;
+            enableRect.width = enableWidth;
+
+            bool newEnable = EditorGUI.Toggle(enableRect, enable);
+            if (newEnable != enable)
+            {
+                SetMemberEnableDefaultDic(info.key, newEnable);
+
+                DebugxStaticData.SaveMemberEnableDefaultDicPrefs();
+                EditorConfig.canResetPreferencesMembers = true;
+            }
+        }
+
+        public static void SetMemberEnableDefaultDic(int key, bool enable)
+        {
+            if (MemberEnableDefaultDic.ContainsKey(key))
+                MemberEnableDefaultDic[key] = enable;
+            else
+                MemberEnableDefaultDic.Add(key, enable);
+        }
+
+        public static void SetMemberEnableDefaultDicAll(bool enable)
+        {
+            for (int i = 0; i < Settings.members.Length; i++)
+            {
+                SetMemberEnableDefaultDic(Settings.members[i].key, enable);
+            }
+
+            DebugxStaticData.SaveMemberEnableDefaultDicPrefs();
+            EditorConfig.canResetPreferencesMembers = true;
         }
     }
 }

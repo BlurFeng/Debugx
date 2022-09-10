@@ -188,13 +188,12 @@
             默认构造函数
             </summary>
         </member>
-        <member name="M:DebugxLog.DebugxMemberInfo.#ctor(System.Int32,System.String,UnityEngine.Color)">
+        <member name="M:DebugxLog.DebugxMemberInfo.#ctor(System.Int32,System.String)">
             <summary>
             快速构造简单成员信息
             </summary>
             <param name="key"></param>
             <param name="signature">使用者签名</param>
-            <param name="color">颜色</param>
         </member>
         <member name="T:DebugxLog.DebugxProjectSettings">
             <summary>

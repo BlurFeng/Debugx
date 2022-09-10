@@ -26,7 +26,7 @@ namespace DebugxLog
             }
         }
 
-        private static string m_EditorConfigPath;
+        private static string editorConfigPath;
         /// <summary>
         /// 编辑器用配置存储文件夹
         /// </summary>
@@ -34,13 +34,13 @@ namespace DebugxLog
         {
             get
             {
-                m_EditorConfigPath ??= RootPath + "/Source/Editor/Config";
+                editorConfigPath ??= RootPath + "/Source/Editor/Config";
 
                 //确认文件夹是否存在，否则创建
-                if (!Directory.Exists(m_EditorConfigPath))
-                    Directory.CreateDirectory(m_EditorConfigPath);
+                if (!Directory.Exists(editorConfigPath))
+                    Directory.CreateDirectory(editorConfigPath);
 
-                return m_EditorConfigPath;
+                return editorConfigPath;
             }
         }
 
@@ -65,7 +65,7 @@ namespace DebugxLog
         //确认Debugx项目设置资源存在
         public static void ExcuteInEditorLoad() 
         {
-            var s = ResourcesPath;//确认文件夹路径
+            var resourcesPath = ResourcesPath;//确认文件夹路径
         }
 
         /// <summary>

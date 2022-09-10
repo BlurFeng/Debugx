@@ -9,15 +9,15 @@ namespace DebugxLog
         static void InitializeOnLoadMethod()
         {
             DebugxEditorLibrary.ExcuteInEditorLoad();
-
-            EditorApplication.wantsToQuit -= Quit;
+            
             EditorApplication.wantsToQuit += Quit;
+            DebugxProjectSettingsAsset.GetRandomColorForMember += ColorDispenser.GetRandomColorForMember;
         }
 
         static bool Quit()
         {
-            DebugxStaticData.OnEditorQuit();
-
+            EditorApplication.wantsToQuit -= Quit;
+            DebugxProjectSettingsAsset.GetRandomColorForMember -= ColorDispenser.GetRandomColorForMember;
             return true;
         }
     }
