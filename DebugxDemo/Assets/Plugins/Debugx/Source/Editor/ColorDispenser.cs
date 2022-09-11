@@ -1,9 +1,6 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using Unity.VisualScripting;
+﻿using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
-using static DebugxLog.ColorDispenser;
 
 namespace DebugxLog
 {

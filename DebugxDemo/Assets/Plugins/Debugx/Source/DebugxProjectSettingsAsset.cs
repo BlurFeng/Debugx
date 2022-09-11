@@ -1,7 +1,6 @@
 ﻿using UnityEngine;
 using System;
 using DebugxLog.Tools;
-using System.Collections.Generic;
 
 namespace DebugxLog
 {

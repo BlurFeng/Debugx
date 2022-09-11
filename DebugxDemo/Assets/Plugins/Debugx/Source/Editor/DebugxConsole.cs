@@ -1,7 +1,4 @@
-﻿using DebugxLog;
-using System.Collections;
-using System.Collections.Generic;
-using UnityEditor;
+﻿using UnityEditor;
 using UnityEngine;
 
 namespace DebugxLog
