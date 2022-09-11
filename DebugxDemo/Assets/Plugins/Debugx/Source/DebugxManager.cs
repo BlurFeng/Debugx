@@ -14,7 +14,6 @@ namespace DebugxLog
 
         private static DebugxManager instance;
         private static GameObject GameObject;
-
         public static DebugxManager Instance
         {
             get
@@ -33,12 +32,8 @@ namespace DebugxLog
             }
         }
 
-        //成员在DebugxManagerIns类中公开到Inspector面板
-
-        [HideInInspector]
-        public DebugxProjectSettings Settings => DebugxProjectSettings.Instance;
-
 #if DEBUG_X
+        //游戏启动时自动创建
         [RuntimeInitializeOnLoadMethod]
         private static void CheckInstance()
         {
@@ -47,9 +42,8 @@ namespace DebugxLog
                 DebugxManager.Instance.Create();
             }
         }
-#endif
-
         public void Create() { }
+#endif
 
         private void Awake()
         {
@@ -68,9 +62,10 @@ namespace DebugxLog
             LogOutput.RecordStart();
             if (DebugxProjectSettings.Instance.logOutput)
                 Debugx.LogAdm($"DebugxManager --- Log output to {LogOutput.DirectoryPath}");
-#if UNITY_EDITOR
 
-            if (DebugxStaticData.enableAwakeTestLog)
+#if UNITY_EDITOR
+            //测试用
+            if (DebugxStaticData.EnableAwakeTestLog)
             {
                 //测试打印，可注释。有对应key的成员信息时才会被打印。
                 Debugx.LogNom("LogNom Print Test");
@@ -85,7 +80,8 @@ namespace DebugxLog
         private void Update()
         {
 #if UNITY_EDITOR
-            if (DebugxStaticData.enableUpdateTestLog)
+            //测试用
+            if (DebugxStaticData.EnableUpdateTestLog)
             {
                 //测试打印，可注释。有对应key的成员信息时才会被打印。
                 Debugx.Log(1, "MemberKey 1 Update");
@@ -104,11 +100,6 @@ namespace DebugxLog
         private void OnGUI()
         {
             LogOutput.DrawGUI();
-
-            if(Settings == null)
-            {
-                GUI.Label(new Rect(10,10,200,200),"debugxConfig is null");
-            }
         }
 
         /// <summary>

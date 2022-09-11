@@ -11,13 +11,13 @@ namespace DebugxLog
             DebugxEditorLibrary.ExcuteInEditorLoad();
             
             EditorApplication.wantsToQuit += Quit;
-            DebugxProjectSettingsAsset.GetRandomColorForMember += ColorDispenser.GetRandomColorForMember;
+            ColorDispenser.OnInitializeOnLoadMethod();
         }
 
         static bool Quit()
         {
+            ColorDispenser.OnQuit();
             EditorApplication.wantsToQuit -= Quit;
-            DebugxProjectSettingsAsset.GetRandomColorForMember -= ColorDispenser.GetRandomColorForMember;
             return true;
         }
     }

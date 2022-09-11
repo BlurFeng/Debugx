@@ -67,6 +67,7 @@ namespace DebugxLog
             };
 
 #if UNITY_EDITOR
+            //本地用户设置覆盖
             if (DebugxStaticData.MemberEnableDefaultDicPrefs.ContainsKey(key))
             {
                 info.enableDefault = DebugxStaticData.MemberEnableDefaultDicPrefs[key];
@@ -100,6 +101,7 @@ namespace DebugxLog
                 {
                     instance = Resources.Load<DebugxProjectSettingsAsset>(DebugxProjectSettings.fileName);
 #if UNITY_EDITOR
+                    //自动创建
                     if (instance == null)
                     {
                         instance = ScriptableObject.CreateInstance(typeof(DebugxProjectSettingsAsset)) as DebugxProjectSettingsAsset;
@@ -123,6 +125,10 @@ namespace DebugxLog
 
         //用于为创建的成员分配一个颜色
         public static Func<Color> GetRandomColorForMember;
+
+        public static Func<Color> GetNormalMemberColor;
+
+        public static Func<Color> GetMasterMemberColor;
 
         #endregion
 
@@ -151,6 +157,11 @@ namespace DebugxLog
         /// </summary>
         public DebugxProjectSettingsAsset()
         {
+            CreateDefaultMembers();
+        }
+
+        public void CreateDefaultMembers()
+        {
             defaultMemberAssets = new DebugxMemberInfoAsset[2];
 
             //普通Log成员信息
@@ -159,7 +170,7 @@ namespace DebugxLog
                 signature = DebugxProjectSettings.normalInfoSignature,
                 logSignature = true,
                 key = DebugxProjectSettings.normalInfoKey,
-                color = DebugxProjectSettings.NormalInfoColor,
+                color = GetNormalMemberColor != null? GetNormalMemberColor.Invoke() : Color.white,
                 enableDefault = true,
                 fadeAreaOpenCached = true,
             };
@@ -171,7 +182,7 @@ namespace DebugxLog
                 signature = DebugxProjectSettings.masterInfoSignature,
                 logSignature = true,
                 key = DebugxProjectSettings.masterInfoKey,
-                color = DebugxProjectSettings.MasterInfoColor,
+                color = GetMasterMemberColor != null ? GetMasterMemberColor.Invoke(): new Color(1f, 0.627f, 0.627f, 1f),
                 enableDefault = true,
                 fadeAreaOpenCached = true,
             };

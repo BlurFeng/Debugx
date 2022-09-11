@@ -64,10 +64,11 @@ namespace DebugxLog
             EditorGUI.BeginDisabledGroup(!EditorConfig.canResetProjectSettings);
             if (GUILayout.Button("Reset to Default"))
             {
-                if (EditorUtility.DisplayDialog("Reset to Default", "确认要重置到默认设置吗？\n重置并不会清空Member成员配置，仅将成员配置的部分字段重置。", "Ok", "Cancel"))
+                if (EditorUtility.DisplayDialog("Reset To Default", "确认要重置到默认设置吗？\n重置并不会清空Member成员配置，仅将成员配置的部分字段重置。", "Ok", "Cancel"))
                 {
+                    Undo.RecordObject(SettingsAsset, "ResetToDefault");
                     ResetProjectSettings();
-                    DebugxProjectSettingsAsset.Instance.ApplyTo(DebugxProjectSettings.Instance);
+                    Apply();
                 }
             }
             EditorGUI.EndDisabledGroup();
@@ -110,7 +111,7 @@ namespace DebugxLog
 
             if (EditorGUI.EndChangeCheck())
             {
-                SettingsAsset.ApplyTo(DebugxProjectSettings.Instance);
+                Apply();
                 EditorConfig.canResetProjectSettings = true;
             }
         }
@@ -131,25 +132,35 @@ namespace DebugxLog
                 {
                     if (EditorUtility.DisplayDialog("Reset Members Part Config", "确认要重置所有成员的部分设置吗？", "Ok", "Cancel"))
                     {
+                        Undo.RecordObject(SettingsAsset, "ResetMembersPartConfig");
                         ResetProjectSettingsMembers();
-                        DebugxProjectSettingsAsset.Instance.ApplyTo(DebugxProjectSettings.Instance);
                     }
                 }
-                if (GUILayout.Button(new GUIContent("Reset All Member Color By Editor Skin", "重置所有成员的颜色，根据当前编辑器皮肤。在Dark暗皮肤时Log颜色会变亮，在Light亮皮肤时Log颜色会变暗。")))
+                if (GUILayout.Button(new GUIContent("Adapt Color By Editor Skin", "颜色根据编辑器皮肤自动适应。在Dark暗皮肤时Log颜色会变亮，在Light亮皮肤时Log颜色会变暗。")))
                 {
-                    if (EditorUtility.DisplayDialog("Reset All Member Color By Editor Skin", "确认要重置所有成员的颜色吗？", "Ok", "Cancel"))
+                    if (EditorUtility.DisplayDialog("Adapt Color By Editor Skin", "确认要执行颜色根据编辑器皮肤自动适应吗？", "Ok", "Cancel"))
                     {
-                        ColorDispenser.ResetAllMemberColorByEditorSkin();
+                        Undo.RecordObject(SettingsAsset, "AdaptColorByEditorSkin");
+                        ColorDispenser.AdaptColorByEditorSkin();
                     }
                 }
                 EditorGUILayout.EndHorizontal();
 
-                EditorGUILayout.Space();
-
                 //默认成员
                 if (SettingsAsset.defaultMemberAssets != null)
                 {
+                    EditorGUILayout.Space();
+                    EditorGUILayout.BeginHorizontal();
                     EditorGUILayout.LabelField("Default", GUIStyle.Get.TitleStyle_3);
+                    if (GUILayoutx.ButtonYellow("Reset Default Members", "重置默认成员，这会重置默认成员的所有数据。"))
+                    {
+                        if (EditorUtility.DisplayDialog("Reset Default Members", "确认要重置所有默认成员吗？", "Ok", "Cancel"))
+                        {
+                            Undo.RecordObject(SettingsAsset, "ResetDefaultMembers");
+                            SettingsAsset.CreateDefaultMembers();
+                        }
+                    }
+                    EditorGUILayout.EndHorizontal();
 
                     FadeArea faTemp;
                     for (int i = 0; i < SettingsAsset.defaultMemberAssets.Length; i++)
@@ -170,8 +181,18 @@ namespace DebugxLog
                 EditorGUILayout.Space();
                 EditorGUILayout.BeginHorizontal();
                 EditorGUILayout.LabelField("Custom Members", GUIStyle.Get.TitleStyle_3);
+                if (GUILayoutx.ButtonYellow("Automatically Reassign Colors", "自动重分配所有自定义成员的颜色，颜色将根据成员数量平均分配。"))
+                {
+                    if (EditorUtility.DisplayDialog("Automatically Reassign Colors", "确认要重分配所有自定义成员的颜色吗？", "Ok", "Cancel"))
+                    {
+                        Undo.RecordObject(SettingsAsset, "AutomaticallyReassignColors");
+                        ColorDispenser.AutomaticallyReassignColors();
+                    }
+                }
                 if (GUILayout.Button("Add Member"))
                 {
+                    Undo.RecordObject(SettingsAsset, "AddMember");
+
                     //创建新成员
                     GetMemberKey(out int newKey);
                     DebugxMemberInfoAsset mInfo = new DebugxMemberInfoAsset(newKey);
@@ -222,6 +243,7 @@ namespace DebugxLog
                     //移除
                     if (removeIndex >= 0)
                     {
+                        Undo.RecordObject(SettingsAsset, "DeleteMember");
                         OnRemoveMemberInfo(removeIndex, SettingsAsset.customMemberAssets[removeIndex]);
                         List<DebugxMemberInfoAsset> mInfos = new(SettingsAsset.customMemberAssets);
                         mInfos.RemoveAt(removeIndex);
@@ -241,7 +263,7 @@ namespace DebugxLog
 
             //签名
             EditorGUI.BeginDisabledGroup(lockSignature);
-            mInfo.signature = EditorGUILayout.TextField(new GUIContent("Signature", "成员签名"), mInfo.signature);
+            mInfo.signature = EditorGUILayout.DelayedTextField(new GUIContent("Signature", "成员签名"), mInfo.signature);
             EditorGUI.EndDisabledGroup();
             mInfo.logSignature = EditorGUILayout.Toggle(new GUIContent("LogSignature", "是否打印签名"), mInfo.logSignature);
 
@@ -270,7 +292,7 @@ namespace DebugxLog
             }
             EditorGUI.EndDisabledGroup();
 
-            mInfo.header = EditorGUILayout.TextField(new GUIContent("Header", "头部信息，在答应log时打印在头部"), mInfo.header);
+            mInfo.header = EditorGUILayout.DelayedTextField(new GUIContent("Header", "头部信息，在答应log时打印在头部"), mInfo.header);
             mInfo.color = EditorGUILayout.ColorField(new GUIContent("Color", "Log颜色"), mInfo.color);
         }
 
@@ -348,6 +370,12 @@ namespace DebugxLog
             {
                 SettingsAsset.customMemberAssets[i].ResetToDefaultPart();
             }
+        }
+
+        public static void Apply()
+        {
+            SettingsAsset.ApplyTo(DebugxProjectSettings.Instance);
+            //Debugx.LogAdm("Apply");
         }
 
         #region MemberInfoKey

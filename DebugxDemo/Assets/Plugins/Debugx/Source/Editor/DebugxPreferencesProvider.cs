@@ -72,7 +72,7 @@ namespace DebugxLog
                 if (EditorUtility.DisplayDialog("Reset to Default", "确认要重置到默认设置吗？", "Ok", "Cancel"))
                 {
                     ResetPreferences();
-                    DebugxProjectSettingsAsset.Instance.ApplyTo(DebugxProjectSettings.Instance);
+                    Apply();
                 }
             }
             EditorGUI.EndDisabledGroup();
@@ -128,8 +128,8 @@ namespace DebugxLog
             //还是调用DebugxProjectSettingsAsset的保存，里面会判断在UNITY_EDITOR时优先使用Prefs
             if (EditorGUI.EndChangeCheck())
             {
-                DebugxProjectSettingsAsset.Instance.ApplyTo(DebugxProjectSettings.Instance);
                 EditorConfig.canResetPreferences = true;
+                Apply();
             }
         }
 
@@ -158,12 +158,12 @@ namespace DebugxLog
             EditorGUI.BeginDisabledGroup(!EditorConfig.canResetPreferencesMembers);
             if (GUI.Button(buttonRect, new GUIContent("Reset", "重置到和目前成员配置中的 Enable Default 值一致。")))
             {
+                GUI.FocusControl("");//移除焦点
                 DebugxStaticData.ResetPreferencesMembers();
                 EditorConfig.canResetPreferencesMembers = false;
+                Apply();
             }
             EditorGUI.EndDisabledGroup();
-
-            //GUI.FocusControl("");
         }
 
         private static void DrawMembersElement(Rect rect, int index, bool isActive, bool isFocused)
@@ -198,6 +198,7 @@ namespace DebugxLog
 
                 DebugxStaticData.SaveMemberEnableDefaultDicPrefs();
                 EditorConfig.canResetPreferencesMembers = true;
+                Apply();
             }
         }
 
@@ -218,6 +219,12 @@ namespace DebugxLog
 
             DebugxStaticData.SaveMemberEnableDefaultDicPrefs();
             EditorConfig.canResetPreferencesMembers = true;
+        }
+
+        public static void Apply()
+        {
+            DebugxProjectSettingsAsset.Instance.ApplyTo(DebugxProjectSettings.Instance);
+            //Debugx.LogAdm("Apply");
         }
     }
 }

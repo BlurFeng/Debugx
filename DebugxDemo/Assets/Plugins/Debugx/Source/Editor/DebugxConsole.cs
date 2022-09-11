@@ -9,14 +9,16 @@ namespace DebugxLog
     public class DebugxConsole : EditorWindow
     {
         private static DebugxProjectSettings Settings => DebugxProjectSettings.Instance;
+        private static DebugxProjectSettingsAsset SettingsAsset => DebugxProjectSettingsAsset.Instance;
 
         private static EditorWindow window;
         private static Vector2 scrollViewPos;
 
-        [MenuItem("Window/Debugx/DebugxConsole", false, 1)]
+        [MenuItem("Window/Debugx/DebugxConsole", false, 4)]
         public static void ShowWindow()
         {
             window = EditorWindow.GetWindow(typeof(DebugxConsole));
+            window.titleContent.text = "DebugxConsole";
             window.minSize = new Vector2(400f, 300f);
         }
 
@@ -68,8 +70,8 @@ namespace DebugxLog
 #if UNITY_EDITOR
             EditorGUILayout.Space();
             EditorGUILayout.LabelField("Test", GUIStyle.Get.TitleStyle_2);
-            DebugxStaticData.enableAwakeTestLog = GUILayoutx.Toggle("EnableAwakeTestLog", "打开Awake中测试用的Log打印", DebugxStaticData.enableAwakeTestLog);
-            DebugxStaticData.enableUpdateTestLog = GUILayoutx.Toggle("EnableUpdateTestLog", "打开Update中测试用的Log打印", DebugxStaticData.enableUpdateTestLog);
+            DebugxStaticData.EnableAwakeTestLog = GUILayoutx.Toggle("EnableAwakeTestLog", "打开Awake中测试用的Log打印", DebugxStaticData.EnableAwakeTestLog);
+            DebugxStaticData.EnableUpdateTestLog = GUILayoutx.Toggle("EnableUpdateTestLog", "打开Update中测试用的Log打印", DebugxStaticData.EnableUpdateTestLog);
 #endif
 
 

@@ -30,8 +30,7 @@
         <member name="T:DebugxLog.Tools.ActionHandler`1">
             <summary>
             事件处理器
-            提供了绑定，解绑，调用等方法。
-            没有提供Clear，因为每个人都应当管理自己需要绑定和解绑的委托。此处理器就是为了屏蔽action=null等较危险的操作权限
+            提供了绑定(无法重复绑定)，解绑，调用等方法。
             </summary>
             <typeparam name="T"></typeparam>
         </member>
@@ -237,11 +236,6 @@
             默认成员，普通成员密钥
             </summary>
         </member>
-        <member name="P:DebugxLog.DebugxProjectSettings.NormalInfoColor">
-            <summary>
-            默认成员，普通成员颜色
-            </summary>
-        </member>
         <member name="F:DebugxLog.DebugxProjectSettings.masterInfoSignature">
             <summary>
             默认成员，高级成员签名
@@ -250,11 +244,6 @@
         <member name="F:DebugxLog.DebugxProjectSettings.masterInfoKey">
             <summary>
             默认成员，高级成员密钥
-            </summary>
-        </member>
-        <member name="P:DebugxLog.DebugxProjectSettings.MasterInfoColor">
-            <summary>
-            默认成员，高级成员颜色
             </summary>
         </member>
         <member name="F:DebugxLog.DebugxProjectSettings.enableLogDefault">

@@ -189,11 +189,19 @@ namespace DebugxLog
         #endregion
 
 #if UNITY_EDITOR
-        [HideInInspector]
-        public static bool enableAwakeTestLog = true;
 
-        [HideInInspector]
-        public static bool enableUpdateTestLog = false;
+        public static bool EnableAwakeTestLog
+        {
+            get => EditorPrefs.GetBool("DebugxStaticData.EnableAwakeTestLog", true);
+            set => EditorPrefs.SetBool("DebugxStaticData.EnableAwakeTestLog", value);
+        }
+
+        public static bool EnableUpdateTestLog
+        {
+            get => EditorPrefs.GetBool("DebugxStaticData.EnableUpdateTestLog", false);
+            set => EditorPrefs.SetBool("DebugxStaticData.EnableUpdateTestLog", value);
+        }
+
 #endif
     }
 }

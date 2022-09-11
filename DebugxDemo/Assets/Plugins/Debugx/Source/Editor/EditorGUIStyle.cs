@@ -56,7 +56,7 @@ namespace DebugxLog
         public Color colorLightGray { get; private set; } = new (0.8f, 0.8f, 0.8f);
 
         private Texture2D m_DarkGreyTex;
-        public Texture2D DarkGreyTex
+        public Texture2D backgroundTex
         {
             get
             {
@@ -143,7 +143,7 @@ namespace DebugxLog
             LabelStyle_FadeAreaHeader.fontStyle = FontStyle.Bold;
 
             AreaStyle_1 = new UnityEngine.GUIStyle(GUI.skin.button);
-            AreaStyle_1.normal.background = DarkGreyTex;
+            AreaStyle_1.normal.background = backgroundTex;
         }
     }
 }

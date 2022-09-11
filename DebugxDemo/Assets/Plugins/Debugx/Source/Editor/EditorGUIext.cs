@@ -11,25 +11,34 @@ namespace DebugxLog
 {
 	public static class GUILayoutx
 	{
-		public static bool ButtonGreen(string text)
+		public static bool ButtonGreen(string text, string tooltip = "")
 		{
 			GUIUtilityx.PushTint(Color.green);
-			bool press = GUILayout.Button(text);
+			bool press = GUILayout.Button(new GUIContent(text, tooltip));
 			GUIUtilityx.PopTint();
 
 			return press;
 		}
 
-		public static bool ButtonRed(string text)
+		public static bool ButtonRed(string text, string tooltip = "")
 		{
 			GUIUtilityx.PushTint(Color.red);
-			bool press = GUILayout.Button(text);
+			bool press = GUILayout.Button(new GUIContent(text, tooltip));
 			GUIUtilityx.PopTint();
 
 			return press;
 		}
 
-		public static bool Toggle(string label, string tooltip, bool value, float width = 250f)
+        public static bool ButtonYellow(string text, string tooltip = "")
+        {
+            GUIUtilityx.PushTint(Color.yellow);
+            bool press = GUILayout.Button(new GUIContent(text, tooltip));
+            GUIUtilityx.PopTint();
+
+            return press;
+        }
+
+        public static bool Toggle(string label, string tooltip, bool value, float width = 250f)
 		{
             EditorGUILayout.BeginHorizontal();
             EditorGUILayout.LabelField(new GUIContent(label, tooltip), GUILayout.Width(width));
