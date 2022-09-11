@@ -19,6 +19,8 @@ namespace DebugxLog
         private const float s_Light = 0.75f;
         private const float v_Light = 0.17f;
 
+        private static bool isDarkSkin;
+
         /// <summary>
         /// HSV颜色模型
         /// 值为0-1
@@ -31,11 +33,9 @@ namespace DebugxLog
 
             public ColorHSV(float h)
             {
-                bool isDark = EditorGUIUtility.isProSkin;
-
                 this.h = h;
-                s = isDark ? s_Dark : s_Light;
-                v = isDark ? v_Dark : v_Light;
+                s = isDarkSkin ? s_Dark : s_Light;
+                v = isDarkSkin ? v_Dark : v_Light;
             }
         }
 
@@ -44,6 +44,7 @@ namespace DebugxLog
             DebugxProjectSettingsAsset.GetRandomColorForMember += GetRandomColorForMember;
             DebugxProjectSettingsAsset.GetNormalMemberColor += GetNormalMemberColor;
             DebugxProjectSettingsAsset.GetMasterMemberColor += GetMasterMemberColor;
+            isDarkSkin = EditorGUIUtility.isProSkin;
         }
 
         public static void OnQuit()
@@ -64,7 +65,7 @@ namespace DebugxLog
 
         public static Color GetNormalMemberColor()
         {
-            return EditorGUIUtility.isProSkin ? Color.white : Color.black;
+            return isDarkSkin ? Color.white : Color.black;
         }
 
         public static Color GetMasterMemberColor()

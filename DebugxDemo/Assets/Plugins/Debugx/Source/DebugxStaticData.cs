@@ -8,7 +8,6 @@ namespace DebugxLog
 {
     public static class DebugxStaticData
     {
-        private static DebugxProjectSettingsAsset SettingsAsset => DebugxProjectSettingsAsset.Instance;
 
         public static string rootPath;
 
@@ -31,6 +30,28 @@ namespace DebugxLog
         public static bool restrictDrawLogCountSet = false;
         public static int maxDrawLogsSet = 100;
 
+        #endregion
+
+#if UNITY_EDITOR
+
+        public static bool EnableAwakeTestLog
+        {
+            get => EditorPrefs.GetBool("DebugxStaticData.EnableAwakeTestLog", true);
+            set => EditorPrefs.SetBool("DebugxStaticData.EnableAwakeTestLog", value);
+        }
+
+        public static bool EnableUpdateTestLog
+        {
+            get => EditorPrefs.GetBool("DebugxStaticData.EnableUpdateTestLog", false);
+            set => EditorPrefs.SetBool("DebugxStaticData.EnableUpdateTestLog", value);
+        }
+
+        #region ProjectSettings
+        public static bool FAMemberConfigSettingOpen
+        {
+            get => EditorPrefs.GetBool("DebugxStaticData.FAMemberConfigSettingOpen", true);
+            set => EditorPrefs.SetBool("DebugxStaticData.FAMemberConfigSettingOpen", value);
+        }
         #endregion
 
         #region Preferences
@@ -168,6 +189,24 @@ namespace DebugxLog
             get => EditorPrefs.GetInt("DebugxStaticData.MaxDrawLogs", maxDrawLogsSet);
             set => EditorPrefs.SetInt("DebugxStaticData.MaxDrawLogs", value);
         }
+
+        public static bool FAMemberEnableSettingOpen
+        {
+            get => EditorPrefs.GetBool("DebugxStaticData.FAMemberEnableSettingOpen", true);
+            set => EditorPrefs.SetBool("DebugxStaticData.FAMemberEnableSettingOpen", value);
+        }
+
+        public static bool CanResetPreferences
+        {
+            get => EditorPrefs.GetBool("DebugxStaticData.CanResetPreferences", true);
+            set => EditorPrefs.SetBool("DebugxStaticData.CanResetPreferences", value);
+        }
+
+        public static bool CanResetPreferencesMembers
+        {
+            get => EditorPrefs.GetBool("DebugxStaticData.CanResetPreferencesMembers", true);
+            set => EditorPrefs.SetBool("DebugxStaticData.CanResetPreferencesMembers", value);
+        }
         #endregion
 
         #region Text
@@ -187,21 +226,6 @@ namespace DebugxLog
         public const string ToolTip_MaxDrawLogs = "绘制Log最大数量";
 
         #endregion
-
-#if UNITY_EDITOR
-
-        public static bool EnableAwakeTestLog
-        {
-            get => EditorPrefs.GetBool("DebugxStaticData.EnableAwakeTestLog", true);
-            set => EditorPrefs.SetBool("DebugxStaticData.EnableAwakeTestLog", value);
-        }
-
-        public static bool EnableUpdateTestLog
-        {
-            get => EditorPrefs.GetBool("DebugxStaticData.EnableUpdateTestLog", false);
-            set => EditorPrefs.SetBool("DebugxStaticData.EnableUpdateTestLog", value);
-        }
-
 #endif
     }
 }

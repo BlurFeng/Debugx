@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEditor;
+using UnityEditor.Build;
 using UnityEditor.PackageManager.UI;
 using UnityEditor.Search;
 using UnityEditor.SearchService;
@@ -55,7 +56,7 @@ namespace DebugxLog
             {
                 isInitGUI = true;
 
-                faMemberEnableSetting = new FadeArea(settingsProvider, EditorConfig.faMemberEnableSettingOpen, GUIStyle.Get.AreaStyle_1, GUIStyle.Get.LabelStyle_FadeAreaHeader, 0.8f);
+                faMemberEnableSetting = new FadeArea(settingsProvider, DebugxStaticData.FAMemberEnableSettingOpen, GUIStyle.Get.AreaStyle_1, GUIStyle.Get.LabelStyle_FadeAreaHeader, 0.8f);
                 membersList = new ReorderableList(Settings.members, typeof(DebugxMemberInfo), false, true, false, false)
                 {
                     drawHeaderCallback = DrawMembersHeader,
@@ -64,9 +65,15 @@ namespace DebugxLog
                 };
             }
 
+            string defineSymbols = PlayerSettings.GetScriptingDefineSymbols(NamedBuildTarget.Standalone);
+            if (!defineSymbols.Contains("DEBUG_X"))
+            {
+                EditorGUILayout.HelpBox("当前项目的Standalone平台未配置宏\"DEBUG_X\",Debugx不会进行工作。", MessageType.Warning);
+            }
+
             EditorGUILayout.HelpBox("此处为用户设置，在 UNITY_EDITOR 编辑器时，一些参数会优先使用 Preferences 用户设置。用户设置不会影响项目的其他人。", MessageType.Info);
 
-            EditorGUI.BeginDisabledGroup(!EditorConfig.canResetPreferences);
+            EditorGUI.BeginDisabledGroup(!DebugxStaticData.CanResetPreferences);
             if (GUILayout.Button("Reset to Default"))
             {
                 if (EditorUtility.DisplayDialog("Reset to Default", "确认要重置到默认设置吗？", "Ok", "Cancel"))
@@ -90,8 +97,8 @@ namespace DebugxLog
 
             faMemberEnableSetting.Begin();
             faMemberEnableSetting.Header("Members Enable");
-            EditorConfig.faMemberEnableSettingOpen = faMemberEnableSetting.BeginFade();
-            if (EditorConfig.faMemberEnableSettingOpen)
+            DebugxStaticData.FAMemberEnableSettingOpen = faMemberEnableSetting.BeginFade();
+            if (DebugxStaticData.FAMemberEnableSettingOpen)
             {
                 if (Settings.members != null && Settings.members.Length > 0)
                 {
@@ -128,7 +135,7 @@ namespace DebugxLog
             //还是调用DebugxProjectSettingsAsset的保存，里面会判断在UNITY_EDITOR时优先使用Prefs
             if (EditorGUI.EndChangeCheck())
             {
-                EditorConfig.canResetPreferences = true;
+                DebugxStaticData.CanResetPreferences = true;
                 Apply();
             }
         }
@@ -138,9 +145,9 @@ namespace DebugxLog
         /// </summary>
         public static void ResetPreferences()
         {
-            if (!EditorConfig.canResetPreferences) return;
+            if (!DebugxStaticData.CanResetPreferences) return;
             DebugxStaticData.ResetPreferences();
-            EditorConfig.canResetPreferences = false;
+            DebugxStaticData.CanResetPreferences = false;
         }
 
         private static void DrawMembersHeader(Rect rect)
@@ -155,12 +162,12 @@ namespace DebugxLog
             titleRect.width -= buttonRect.width;
             GUI.Label(titleRect, new GUIContent("Members Enable", "此处仅能配置成员的默认开关，详细成员配置在 Project Settings 中设置。在重置到默认状态时，成员开关将恢复到成员配置中的 Enable Default 的值。"));
 
-            EditorGUI.BeginDisabledGroup(!EditorConfig.canResetPreferencesMembers);
+            EditorGUI.BeginDisabledGroup(!DebugxStaticData.CanResetPreferencesMembers);
             if (GUI.Button(buttonRect, new GUIContent("Reset", "重置到和目前成员配置中的 Enable Default 值一致。")))
             {
                 GUI.FocusControl("");//移除焦点
                 DebugxStaticData.ResetPreferencesMembers();
-                EditorConfig.canResetPreferencesMembers = false;
+                DebugxStaticData.CanResetPreferencesMembers = false;
                 Apply();
             }
             EditorGUI.EndDisabledGroup();
@@ -197,7 +204,7 @@ namespace DebugxLog
                 SetMemberEnableDefaultDic(info.key, newEnable);
 
                 DebugxStaticData.SaveMemberEnableDefaultDicPrefs();
-                EditorConfig.canResetPreferencesMembers = true;
+                DebugxStaticData.CanResetPreferencesMembers = true;
                 Apply();
             }
         }
@@ -218,7 +225,7 @@ namespace DebugxLog
             }
 
             DebugxStaticData.SaveMemberEnableDefaultDicPrefs();
-            EditorConfig.canResetPreferencesMembers = true;
+            DebugxStaticData.CanResetPreferencesMembers = true;
         }
 
         public static void Apply()

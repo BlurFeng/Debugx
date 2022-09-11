@@ -23,12 +23,6 @@ namespace DebugxLog
             }
         }
 
-
-        public bool faMemberConfigSettingOpen;
         public bool canResetProjectSettings;
-
-        public bool faMemberEnableSettingOpen;
-        public bool canResetPreferences;
-        public bool canResetPreferencesMembers;
     }
 }

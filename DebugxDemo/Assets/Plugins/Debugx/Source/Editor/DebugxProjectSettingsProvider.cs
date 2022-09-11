@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEditor;
+using UnityEditor.Build;
 using UnityEditor.PackageManager.UI;
 using UnityEditor.Search;
 using UnityEditor.SearchService;
@@ -57,6 +58,12 @@ namespace DebugxLog
                 //一些初始化内容调用到GUI类，必须在OnGUI内调用
                 isInitGUI = true;
                 ResetWindowData();
+            }
+
+            string defineSymbols = PlayerSettings.GetScriptingDefineSymbols(NamedBuildTarget.Standalone);
+            if (!defineSymbols.Contains("DEBUG_X"))
+            {
+                EditorGUILayout.HelpBox("当前项目的Standalone平台未配置宏\"DEBUG_X\",Debugx不会进行工作。", MessageType.Warning);
             }
 
             EditorGUILayout.HelpBox("此处为项目设置，项目设置会影响所有人的项目和打包后的包体软件。\n如果你仅想对自己的项目做一些本地化的设置，请在 Preferences/Debugx 用户设置中配置。", MessageType.Info);
@@ -124,8 +131,8 @@ namespace DebugxLog
             faMemberConfigSetting.Begin();
             faMemberConfigSetting.Header("Members");
 
-            EditorConfig.faMemberConfigSettingOpen = faMemberConfigSetting.BeginFade();
-            if (EditorConfig.faMemberConfigSettingOpen)
+            DebugxStaticData.FAMemberConfigSettingOpen = faMemberConfigSetting.BeginFade();
+            if (DebugxStaticData.FAMemberConfigSettingOpen)
             {
                 EditorGUILayout.BeginHorizontal();
                 if (GUILayout.Button(new GUIContent("Reset Members Part Config", "重置成员设置，仅会重置部分成员的配置到默认值。（重置内容：EnableDefault,LogSignature,fadeAreaOpen）")))
@@ -301,7 +308,7 @@ namespace DebugxLog
         {
             //此方法内调用到了GUI.skin.button，GUI类必须在OnGUI才能调用，不能在OnEnable
 
-            faMemberConfigSetting = new FadeArea(settingsProvider, EditorConfig.faMemberConfigSettingOpen, GUIStyle.Get.AreaStyle_1, GUIStyle.Get.LabelStyle_FadeAreaHeader, 0.8f);
+            faMemberConfigSetting = new FadeArea(settingsProvider, DebugxStaticData.FAMemberConfigSettingOpen, GUIStyle.Get.AreaStyle_1, GUIStyle.Get.LabelStyle_FadeAreaHeader, 0.8f);
 
             memberInfosFadeAreaPool.Clear();
             memberInfoKeyDic.Clear();

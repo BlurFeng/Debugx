@@ -9,11 +9,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: dc9a9f5aa45db5e418d1c42965b6db3b, type: 3}
+  m_Script: {fileID: 11500000, guid: c877a039950cea342a97f0db948e1d5f, type: 3}
   m_Name: DebugxEditorConfig
   m_EditorClassIdentifier: 
-  faMemberConfigSettingOpen: 1
-  canResetProjectSettings: 1
-  faMemberEnableSettingOpen: 1
-  canResetPreferences: 1
-  canResetPreferencesMembers: 1
+  canResetProjectSettings: 0
