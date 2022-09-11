@@ -216,7 +216,14 @@ namespace DebugxLog
                     FadeArea faTemp;
                     for (int i = 0; i < SettingsAsset.customMemberAssets.Length; i++)
                     {
-                        faTemp = memberInfosFadeAreaPool[i + SettingsAsset.DefaultMemberAssetsLength];
+                        int index = i + SettingsAsset.DefaultMemberAssetsLength;
+                        if (index >= memberInfosFadeAreaPool.Count)
+                        {
+                            //Undo回退可能导致memberInfosFadeAreaPool数量不正确
+                            ResetWindowData();
+                            break;
+                        }
+                        faTemp = memberInfosFadeAreaPool[index];
                         DebugxMemberInfoAsset mInfo = SettingsAsset.customMemberAssets[i];
 
                         faTemp.Begin();
