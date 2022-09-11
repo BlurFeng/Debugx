@@ -37,7 +37,9 @@ namespace DebugxLog
             this.key = key;
             header = String.Empty;
             color = DebugxProjectSettingsAsset.GetRandomColorForMember != null ? DebugxProjectSettingsAsset.GetRandomColorForMember.Invoke() : Color.white;
+#if UNITY_EDITOR
             fadeAreaOpenCached = true;
+#endif
         }
 
         /// <summary>
@@ -47,7 +49,9 @@ namespace DebugxLog
         {
             enableDefault = true;
             logSignature = true;
+#if UNITY_EDITOR
             fadeAreaOpenCached = true;
+#endif
         }
 
         public DebugxMemberInfo CreateDebugxMemberInfo()
@@ -169,7 +173,9 @@ namespace DebugxLog
                 key = DebugxProjectSettings.normalInfoKey,
                 color = GetNormalMemberColor != null? GetNormalMemberColor.Invoke() : Color.white,
                 enableDefault = true,
+#if UNITY_EDITOR
                 fadeAreaOpenCached = true,
+#endif
             };
             defaultMemberAssets[0] = normalMember;
 
@@ -181,11 +187,26 @@ namespace DebugxLog
                 key = DebugxProjectSettings.masterInfoKey,
                 color = GetMasterMemberColor != null ? GetMasterMemberColor.Invoke(): new Color(1f, 0.627f, 0.627f, 1f),
                 enableDefault = true,
+#if UNITY_EDITOR
                 fadeAreaOpenCached = true,
+#endif
             };
             defaultMemberAssets[1] = masterMember;
 
-            customMemberAssets = new DebugxMemberInfoAsset[1]{new DebugxMemberInfoAsset(){ signature = "Winhoo", logSignature = true, key = 1, color = new Color(0.7843f, 0.941f, 1f, 1f), enableDefault = true, fadeAreaOpenCached = true}};
+            customMemberAssets = new DebugxMemberInfoAsset[1]
+            {
+                new DebugxMemberInfoAsset()
+                { 
+                    signature = "Winhoo", 
+                    logSignature = true, 
+                    key = 1, 
+                    color = new Color(0.7843f, 0.941f, 1f, 1f), 
+                    enableDefault = true, 
+#if UNITY_EDITOR
+                fadeAreaOpenCached = true,
+#endif
+                }
+            };
         }
 
 #region Log Output

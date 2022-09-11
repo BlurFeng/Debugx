@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using NUnit.Framework;
+using System.Collections.Generic;
 using UnityEditor;
 using UnityEditor.Build;
 using UnityEngine;
@@ -15,6 +16,7 @@ namespace DebugxLog
         private static readonly List<FadeArea> memberInfosFadeAreaPool = new();
         private static FadeArea faMemberConfigSetting;
         private static bool isInitGUI;
+        private static bool assetIsDirty;
 
         [SettingsProvider]
         public static SettingsProvider DebugxProjectSettingsProviderCreate()
@@ -37,14 +39,17 @@ namespace DebugxLog
 
         private static void Enable(string searchContext, VisualElement rootElement)
         {
+            DebugxStaticDataEditor.OnAutoSaveChange.Bind(OnAutoSaveChange);
         }
 
         private static void Disable()
         {
-            //标脏当前配置，并保存。主要为了保证FadeAreaOpenCached能被保存下来
-            //否则每次FadeAreaOpenCached更新后，重启项目后又恢复旧的数据了。只有直接鼠标点击修改Config文件上的FadeAreaOpenCached才有被确实的标脏和保存
             EditorUtility.SetDirty(EditorConfig);
             AssetDatabase.SaveAssetIfDirty(EditorConfig);
+
+            Save();
+
+            DebugxStaticDataEditor.OnAutoSaveChange.Unbind(OnAutoSaveChange);
         }
 
         private static void Draw(string searchContext)
@@ -64,8 +69,15 @@ namespace DebugxLog
 
             EditorGUILayout.HelpBox("此处为项目设置，项目设置会影响所有人的项目和打包后的包体软件。\n如果你仅想对自己的项目做一些本地化的设置，请在 Preferences/Debugx 用户设置中配置。", MessageType.Info);
 
-            EditorGUI.BeginDisabledGroup(!EditorConfig.canResetProjectSettings);
-            if (GUILayout.Button("Reset to Default"))
+            EditorGUILayout.BeginHorizontal();
+
+            DebugxStaticDataEditor.AutoSave = GUILayoutx.Toggle("AutoSave Asset", "自动保存配置资源，自动保存时在修改内容时会有卡顿。", DebugxStaticDataEditor.AutoSave);
+            EditorGUI.BeginDisabledGroup(!assetIsDirty);
+            if (GUILayoutx.ButtonGreen("Save Asset")) Save();
+            EditorGUI.EndDisabledGroup();
+
+            EditorGUI.BeginDisabledGroup(false/*!EditorConfig.canResetProjectSettings*/);
+            if (GUILayoutx.ButtonRed("Reset to Default"))
             {
                 if (EditorUtility.DisplayDialog("Reset To Default", "确认要重置到默认设置吗？\n重置并不会清空Member成员配置，仅将成员配置的部分字段重置。", "Ok", "Cancel"))
                 {
@@ -75,6 +87,7 @@ namespace DebugxLog
                 }
             }
             EditorGUI.EndDisabledGroup();
+            EditorGUILayout.EndHorizontal();
 
             EditorGUILayout.Space();
             EditorGUILayout.LabelField("Config Settings", GUIStyle.Get.TitleStyle_3);
@@ -115,7 +128,6 @@ namespace DebugxLog
             if (EditorGUI.EndChangeCheck())
             {
                 Apply();
-                EditorConfig.canResetProjectSettings = true;
             }
         }
 
@@ -127,8 +139,8 @@ namespace DebugxLog
             faMemberConfigSetting.Begin();
             faMemberConfigSetting.Header("Members");
 
-            DebugxStaticData.FAMemberConfigSettingOpen = faMemberConfigSetting.BeginFade();
-            if (DebugxStaticData.FAMemberConfigSettingOpen)
+            DebugxStaticDataEditor.FAMemberConfigSettingOpen = faMemberConfigSetting.BeginFade();
+            if (DebugxStaticDataEditor.FAMemberConfigSettingOpen)
             {
                 EditorGUILayout.BeginHorizontal();
                 if (GUILayout.Button(new GUIContent("Reset Members Part Config", "重置成员设置，仅会重置部分成员的配置到默认值。（重置内容：EnableDefault,LogSignature,fadeAreaOpen）")))
@@ -319,7 +331,7 @@ namespace DebugxLog
         {
             //此方法内调用到了GUI.skin.button，GUI类必须在OnGUI才能调用，不能在OnEnable
 
-            faMemberConfigSetting = new FadeArea(settingsProvider, DebugxStaticData.FAMemberConfigSettingOpen, GUIStyle.Get.AreaStyle_1, GUIStyle.Get.LabelStyle_FadeAreaHeader, 0.8f);
+            faMemberConfigSetting = new FadeArea(settingsProvider, DebugxStaticDataEditor.FAMemberConfigSettingOpen, GUIStyle.Get.AreaStyle_1, GUIStyle.Get.LabelStyle_FadeAreaHeader, 0.8f);
 
             memberInfosFadeAreaPool.Clear();
             memberInfoKeyDic.Clear();
@@ -357,7 +369,7 @@ namespace DebugxLog
 
         private static void ResetProjectSettings()
         {
-            if (!EditorConfig.canResetProjectSettings) return;
+            //if (!EditorConfig.canResetProjectSettings) return;
 
             SettingsAsset.enableLogDefault = DebugxStaticData.enableLogDefaultSet;
             SettingsAsset.enableLogMemberDefault = DebugxStaticData.enableLogMemberDefaultSet;
@@ -374,7 +386,7 @@ namespace DebugxLog
 
             ResetProjectSettingsMembers();
 
-            EditorConfig.canResetProjectSettings = false;
+            //EditorConfig.canResetProjectSettings = false;
         }
 
         private static void ResetProjectSettingsMembers()
@@ -393,7 +405,35 @@ namespace DebugxLog
         public static void Apply()
         {
             SettingsAsset.ApplyTo(DebugxProjectSettings.Instance);
-            //Debugx.LogAdm("Apply");
+
+            if(DebugxStaticDataEditor.AutoSave)
+            {
+                Save(true);
+            }
+            else
+            {
+                assetIsDirty = true;
+            }
+
+            //EditorConfig.canResetProjectSettings = true;
+        }
+
+        private static void Save(bool force = false)
+        {
+            if (!force && !assetIsDirty) return;
+            assetIsDirty = false;
+
+            EditorUtility.SetDirty(SettingsAsset);
+            AssetDatabase.SaveAssetIfDirty(SettingsAsset);
+        }
+
+        private static void OnAutoSaveChange(bool enable)
+        {
+            //变为自动保存时，自动进行一次存储
+            if(enable)
+            {
+                Save();
+            }
         }
 
         #region MemberInfoKey

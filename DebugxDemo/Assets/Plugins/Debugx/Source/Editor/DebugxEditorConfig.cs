@@ -19,6 +19,6 @@ namespace DebugxLog
             }
         }
 
-        public bool canResetProjectSettings;
+        //public bool canResetProjectSettings;
     }
 }

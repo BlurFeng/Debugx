@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Text;
-using UnityEditor;
+using UnityEngine;
 
 namespace DebugxLog
 {
@@ -10,6 +10,50 @@ namespace DebugxLog
         public static string rootPath;
 
         public static string resourcesPath;
+
+        #region Tools
+
+        public static bool PlayerPrefsGetBool(string key, bool defaultValue)
+        {
+            return PlayerPrefs.GetInt(key, defaultValue ? 1 : 2) == 1;
+        }
+
+        public static void PlayerPrefsSetBool(string key, bool value)
+        {
+            PlayerPrefs.SetInt(key, value ? 1 : 2);
+        }
+
+        #endregion
+
+        public static bool EnableAwakeTestLog
+        {
+            get => PlayerPrefsGetBool("DebugxStaticData.EnableAwakeTestLog", true);
+            set => PlayerPrefsSetBool("DebugxStaticData.EnableAwakeTestLog", value);
+        }
+
+        public static bool EnableUpdateTestLog
+        {
+            get => PlayerPrefsGetBool("DebugxStaticData.EnableUpdateTestLog", false);
+            set => PlayerPrefsSetBool("DebugxStaticData.EnableUpdateTestLog", value);
+        }
+
+        #region Text
+        public const string ToolTip_CustomDebugxMemberAssets = "自定义调试成员信息列表";
+
+        public const string ToolTip_EnableLogDefault = "Log总开关，启动时默认状态";
+        public const string ToolTip_EnableLogMemberDefault = "成员Log总开关，启动时默认状态";
+        public const string ToolTip_LogThisKeyMemberOnlyDefault = "仅打印此Key的成员Log，0为关闭。启动时默认状态";
+
+        public const string ToolTip_LogOutput = "输出Log到本地（启动前设置，运行时设置无效）。编辑器时输出到项目的Logs文件夹下，实机运行时根据平台输出到不同目录下";
+        public const string ToolTip_EnableLogStackTrace = "输出Log类型的堆栈跟踪";
+        public const string ToolTip_EnableWarningStackTrace = "输出Warning类型的堆栈跟踪";
+        public const string ToolTip_EnableErrorStackTrace = "输出Error类型的堆栈跟踪";
+        public const string ToolTip_RecordAllNonDebugxLogs = "记录所有非Debugx打印的Log";
+        public const string ToolTip_DrawLogToScreen = "绘制Log到屏幕";
+        public const string ToolTip_RestrictDrawLogCount = "限制绘制Log数量";
+        public const string ToolTip_MaxDrawLogs = "绘制Log最大数量";
+
+        #endregion
 
         #region Default Value
         //参数的默认值，用于恢复到默认参数功能
@@ -30,28 +74,6 @@ namespace DebugxLog
 
         #endregion
 
-#if UNITY_EDITOR
-
-        public static bool EnableAwakeTestLog
-        {
-            get => EditorPrefs.GetBool("DebugxStaticData.EnableAwakeTestLog", true);
-            set => EditorPrefs.SetBool("DebugxStaticData.EnableAwakeTestLog", value);
-        }
-
-        public static bool EnableUpdateTestLog
-        {
-            get => EditorPrefs.GetBool("DebugxStaticData.EnableUpdateTestLog", false);
-            set => EditorPrefs.SetBool("DebugxStaticData.EnableUpdateTestLog", value);
-        }
-
-        #region ProjectSettings
-        public static bool FAMemberConfigSettingOpen
-        {
-            get => EditorPrefs.GetBool("DebugxStaticData.FAMemberConfigSettingOpen", true);
-            set => EditorPrefs.SetBool("DebugxStaticData.FAMemberConfigSettingOpen", value);
-        }
-        #endregion
-
         #region Preferences
 
         /// <summary>
@@ -59,44 +81,44 @@ namespace DebugxLog
         /// </summary>
         public static void ResetPreferences()
         {
-            EnableLogDefaultPrefs = enableLogDefaultSet;
-            EnableLogMemberDefaultPrefs = enableLogMemberDefaultSet;
-            LogThisKeyMemberOnlyDefaultPrefs = logThisKeyMemberOnlyDefaultSet;
+            EnableLogDefaultPrefs = DebugxStaticData.enableLogDefaultSet;
+            EnableLogMemberDefaultPrefs = DebugxStaticData.enableLogMemberDefaultSet;
+            LogThisKeyMemberOnlyDefaultPrefs = DebugxStaticData.logThisKeyMemberOnlyDefaultSet;
 
-            LogOutputPrefs = logOutputSet;
-            EnableLogStackTracePrefs = enableLogStackTraceSet;
-            EnableWarningStackTracePrefs = enableWarningStackTraceSet;
-            EnableErrorStackTracePrefs = enableErrorStackTraceSet;
-            RecordAllNonDebugxLogsPrefs = recordAllNonDebugxLogsSet;
-            DrawLogToScreenPrefs = drawLogToScreenSet;
-            RestrictDrawLogCountPrefs = restrictDrawLogCountSet;
-            MaxDrawLogsPrefs = maxDrawLogsSet;
+            LogOutputPrefs = DebugxStaticData.logOutputSet;
+            EnableLogStackTracePrefs = DebugxStaticData.enableLogStackTraceSet;
+            EnableWarningStackTracePrefs = DebugxStaticData.enableWarningStackTraceSet;
+            EnableErrorStackTracePrefs = DebugxStaticData.enableErrorStackTraceSet;
+            RecordAllNonDebugxLogsPrefs = DebugxStaticData.recordAllNonDebugxLogsSet;
+            DrawLogToScreenPrefs = DebugxStaticData.drawLogToScreenSet;
+            RestrictDrawLogCountPrefs = DebugxStaticData.restrictDrawLogCountSet;
+            MaxDrawLogsPrefs = DebugxStaticData.maxDrawLogsSet;
 
             ResetPreferencesMembers();
         }
 
         public static void ResetPreferencesMembers()
         {
-            DebugxStaticData.MemberEnableDefaultDicPrefs.Clear();
-            EditorPrefs.DeleteKey("DebugxStaticData.MemberEnableDefaultDic");
+            MemberEnableDefaultDicPrefs.Clear();
+            PlayerPrefs.DeleteKey("DebugxStaticData.MemberEnableDefaultDic");
         }
 
         public static bool EnableLogDefaultPrefs
         {
-            get => EditorPrefs.GetBool("DebugxStaticData.EnableLogDefault", enableLogDefaultSet);
-            set => EditorPrefs.SetBool("DebugxStaticData.EnableLogDefault", value);
+            get => PlayerPrefsGetBool("DebugxStaticData.EnableLogDefault", DebugxStaticData.enableLogDefaultSet);
+            set => PlayerPrefsSetBool("DebugxStaticData.EnableLogDefault", value);
         }
 
         public static bool EnableLogMemberDefaultPrefs
         {
-            get => EditorPrefs.GetBool("DebugxStaticData.EnableLogMemberDefault", enableLogMemberDefaultSet);
-            set => EditorPrefs.SetBool("DebugxStaticData.EnableLogMemberDefault", value);
+            get => PlayerPrefsGetBool("DebugxStaticData.EnableLogMemberDefault", DebugxStaticData.enableLogMemberDefaultSet);
+            set => PlayerPrefsSetBool("DebugxStaticData.EnableLogMemberDefault", value);
         }
 
         public static int LogThisKeyMemberOnlyDefaultPrefs
         {
-            get => EditorPrefs.GetInt("DebugxStaticData.LogThisKeyMemberOnlyDefault", logThisKeyMemberOnlyDefaultSet);
-            set => EditorPrefs.SetInt("DebugxStaticData.LogThisKeyMemberOnlyDefault", value);
+            get => PlayerPrefs.GetInt("DebugxStaticData.LogThisKeyMemberOnlyDefault", DebugxStaticData.logThisKeyMemberOnlyDefaultSet);
+            set => PlayerPrefs.SetInt("DebugxStaticData.LogThisKeyMemberOnlyDefault", value);
         }
 
         private static Dictionary<int, bool> memberEnableDefaultDicPrefs;
@@ -108,7 +130,7 @@ namespace DebugxLog
                 {
                     memberEnableDefaultDicPrefs = new Dictionary<int, bool>();
 
-                    string data = EditorPrefs.GetString("DebugxStaticData.MemberEnableDefaultDic");
+                    string data = PlayerPrefs.GetString("DebugxStaticData.MemberEnableDefaultDic");
                     if (!string.IsNullOrEmpty(data))
                     {
                         string[] datas = data.Split(';');
@@ -136,94 +158,75 @@ namespace DebugxLog
                     sb.Append($"{item.Key},{item.Value}");
                     if (counter != memberEnableDefaultDicPrefs.Count) sb.Append(";");
                 }
-                EditorPrefs.SetString("DebugxStaticData.MemberEnableDefaultDic", sb.ToString());
+                PlayerPrefs.SetString("DebugxStaticData.MemberEnableDefaultDic", sb.ToString());
             }
         }
 
         public static bool LogOutputPrefs
         {
-            get => EditorPrefs.GetBool("DebugxStaticData.LogOutput", logOutputSet);
-            set => EditorPrefs.SetBool("DebugxStaticData.LogOutput", value);
+            get => PlayerPrefsGetBool("DebugxStaticData.LogOutput", DebugxStaticData.logOutputSet);
+            set => PlayerPrefsSetBool("DebugxStaticData.LogOutput", value);
         }
 
         public static bool EnableLogStackTracePrefs
         {
-            get => EditorPrefs.GetBool("DebugxStaticData.EnableLogStackTrace", enableLogStackTraceSet);
-            set => EditorPrefs.SetBool("DebugxStaticData.EnableLogStackTrace", value);
+            get => PlayerPrefsGetBool("DebugxStaticData.EnableLogStackTrace", DebugxStaticData.enableLogStackTraceSet);
+            set => PlayerPrefsSetBool("DebugxStaticData.EnableLogStackTrace", value);
         }
 
         public static bool EnableWarningStackTracePrefs
         {
-            get => EditorPrefs.GetBool("DebugxStaticData.EnableWarningStackTrace", enableWarningStackTraceSet);
-            set => EditorPrefs.SetBool("DebugxStaticData.EnableWarningStackTrace", value);
+            get => PlayerPrefsGetBool("DebugxStaticData.EnableWarningStackTrace", DebugxStaticData.enableWarningStackTraceSet);
+            set => PlayerPrefsSetBool("DebugxStaticData.EnableWarningStackTrace", value);
         }
 
         public static bool EnableErrorStackTracePrefs
         {
-            get => EditorPrefs.GetBool("DebugxStaticData.EnableErrorStackTrace", enableErrorStackTraceSet);
-            set => EditorPrefs.SetBool("DebugxStaticData.EnableErrorStackTrace", value);
+            get => PlayerPrefsGetBool("DebugxStaticData.EnableErrorStackTrace", DebugxStaticData.enableErrorStackTraceSet);
+            set => PlayerPrefsSetBool("DebugxStaticData.EnableErrorStackTrace", value);
         }
 
         public static bool RecordAllNonDebugxLogsPrefs
         {
-            get => EditorPrefs.GetBool("DebugxStaticData.RecordAllNonDebugxLogs", recordAllNonDebugxLogsSet);
-            set => EditorPrefs.SetBool("DebugxStaticData.RecordAllNonDebugxLogs", value);
+            get => PlayerPrefsGetBool("DebugxStaticData.RecordAllNonDebugxLogs", DebugxStaticData.recordAllNonDebugxLogsSet);
+            set => PlayerPrefsSetBool("DebugxStaticData.RecordAllNonDebugxLogs", value);
         }
 
         public static bool DrawLogToScreenPrefs
         {
-            get => EditorPrefs.GetBool("DebugxStaticData.DrawLogToScreen", drawLogToScreenSet);
-            set => EditorPrefs.SetBool("DebugxStaticData.DrawLogToScreen", value);
+            get => PlayerPrefsGetBool("DebugxStaticData.DrawLogToScreen", DebugxStaticData.drawLogToScreenSet);
+            set => PlayerPrefsSetBool("DebugxStaticData.DrawLogToScreen", value);
         }
 
         public static bool RestrictDrawLogCountPrefs
         {
-            get => EditorPrefs.GetBool("DebugxStaticData.RestrictDrawLogCount", restrictDrawLogCountSet);
-            set => EditorPrefs.SetBool("DebugxStaticData.RestrictDrawLogCount", value);
+            get => PlayerPrefsGetBool("DebugxStaticData.RestrictDrawLogCount", DebugxStaticData.restrictDrawLogCountSet);
+            set => PlayerPrefsSetBool("DebugxStaticData.RestrictDrawLogCount", value);
         }
 
         public static int MaxDrawLogsPrefs
         {
-            get => EditorPrefs.GetInt("DebugxStaticData.MaxDrawLogs", maxDrawLogsSet);
-            set => EditorPrefs.SetInt("DebugxStaticData.MaxDrawLogs", value);
+            get => PlayerPrefs.GetInt("DebugxStaticData.MaxDrawLogs", DebugxStaticData.maxDrawLogsSet);
+            set => PlayerPrefs.SetInt("DebugxStaticData.MaxDrawLogs", value);
         }
 
         public static bool FAMemberEnableSettingOpen
         {
-            get => EditorPrefs.GetBool("DebugxStaticData.FAMemberEnableSettingOpen", true);
-            set => EditorPrefs.SetBool("DebugxStaticData.FAMemberEnableSettingOpen", value);
+            get => PlayerPrefsGetBool("DebugxStaticData.FAMemberEnableSettingOpen", true);
+            set => PlayerPrefsSetBool("DebugxStaticData.FAMemberEnableSettingOpen", value);
         }
 
         public static bool CanResetPreferences
         {
-            get => EditorPrefs.GetBool("DebugxStaticData.CanResetPreferences", false);
-            set => EditorPrefs.SetBool("DebugxStaticData.CanResetPreferences", value);
+            get => PlayerPrefsGetBool("DebugxStaticData.CanResetPreferences", false);
+            set => PlayerPrefsSetBool("DebugxStaticData.CanResetPreferences", value);
         }
 
         public static bool CanResetPreferencesMembers
         {
-            get => EditorPrefs.GetBool("DebugxStaticData.CanResetPreferencesMembers", false);
-            set => EditorPrefs.SetBool("DebugxStaticData.CanResetPreferencesMembers", value);
+            get => PlayerPrefsGetBool("DebugxStaticData.CanResetPreferencesMembers", false);
+            set => PlayerPrefsSetBool("DebugxStaticData.CanResetPreferencesMembers", value);
         }
         #endregion
-
-        #region Text
-        public const string ToolTip_CustomDebugxMemberAssets = "自定义调试成员信息列表";
-
-        public const string ToolTip_EnableLogDefault = "Log总开关，启动时默认状态";
-        public const string ToolTip_EnableLogMemberDefault = "成员Log总开关，启动时默认状态";
-        public const string ToolTip_LogThisKeyMemberOnlyDefault = "仅打印此Key的成员Log，0为关闭。启动时默认状态";
-
-        public const string ToolTip_LogOutput = "输出Log到本地（启动前设置，运行时设置无效）。编辑器时输出到项目的Logs文件夹下，实机运行时根据平台输出到不同目录下";
-        public const string ToolTip_EnableLogStackTrace = "输出Log类型的堆栈跟踪";
-        public const string ToolTip_EnableWarningStackTrace = "输出Warning类型的堆栈跟踪";
-        public const string ToolTip_EnableErrorStackTrace = "输出Error类型的堆栈跟踪";
-        public const string ToolTip_RecordAllNonDebugxLogs = "记录所有非Debugx打印的Log";
-        public const string ToolTip_DrawLogToScreen = "绘制Log到屏幕";
-        public const string ToolTip_RestrictDrawLogCount = "限制绘制Log数量";
-        public const string ToolTip_MaxDrawLogs = "绘制Log最大数量";
-
-        #endregion
-#endif
     }
 }
