@@ -105,13 +105,7 @@ namespace DebugxLog
                     if (instance == null)
                     {
                         instance = ScriptableObject.CreateInstance(typeof(DebugxProjectSettingsAsset)) as DebugxProjectSettingsAsset;
-                        instance.customMemberAssets = new DebugxMemberInfoAsset[1]
-                        {
-                            new DebugxMemberInfoAsset(){ signature = "WinhooFeng", logSignature = true, key = 1, color = new Color(0.7843f, 0.941f, 1f, 1f), enableDefault = true }
-                        };
-
                         UnityEditor.AssetDatabase.CreateAsset(instance, $"{DebugxStaticData.resourcesPath}/{DebugxProjectSettings.fileName}.asset");
-
                         instance.ApplyTo(DebugxProjectSettings.Instance);
                     }
 #endif
@@ -187,6 +181,8 @@ namespace DebugxLog
                 fadeAreaOpenCached = true,
             };
             defaultMemberAssets[1] = masterMember;
+
+            customMemberAssets = new DebugxMemberInfoAsset[1]{new DebugxMemberInfoAsset(){ signature = "Winhoo", logSignature = true, key = 1, color = new Color(0.7843f, 0.941f, 1f, 1f), enableDefault = true, fadeAreaOpenCached = true}};
         }
 
 #region Log Output

@@ -198,13 +198,13 @@ namespace DebugxLog
 
         public static bool CanResetPreferences
         {
-            get => EditorPrefs.GetBool("DebugxStaticData.CanResetPreferences", true);
+            get => EditorPrefs.GetBool("DebugxStaticData.CanResetPreferences", false);
             set => EditorPrefs.SetBool("DebugxStaticData.CanResetPreferences", value);
         }
 
         public static bool CanResetPreferencesMembers
         {
-            get => EditorPrefs.GetBool("DebugxStaticData.CanResetPreferencesMembers", true);
+            get => EditorPrefs.GetBool("DebugxStaticData.CanResetPreferencesMembers", false);
             set => EditorPrefs.SetBool("DebugxStaticData.CanResetPreferencesMembers", value);
         }
         #endregion
