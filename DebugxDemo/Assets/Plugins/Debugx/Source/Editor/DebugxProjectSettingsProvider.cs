@@ -296,7 +296,15 @@ namespace DebugxLog
             EditorGUI.EndDisabledGroup();
 
             mInfo.header = EditorGUILayout.DelayedTextField(new GUIContent("Header", "头部信息，在答应log时打印在头部"), mInfo.header);
+
+            EditorGUILayout.BeginHorizontal();
             mInfo.color = EditorGUILayout.ColorField(new GUIContent("Color", "Log颜色"), mInfo.color);
+            if (GUILayout.Button(new GUIContent("Adapt Color", "颜色根据编辑器皮肤自动适应。在Dark暗皮肤时Log颜色会变亮，在Light亮皮肤时Log颜色会变暗。"), GUILayout.Width(100)))
+            {
+                Undo.RecordObject(SettingsAsset, "AdaptColor Single");
+                mInfo.color = ColorDispenser.GetMemberColorByEditorSkin(mInfo.color);
+            }
+            EditorGUILayout.EndHorizontal();
         }
 
         //重置窗口数据

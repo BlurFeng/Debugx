@@ -8,15 +8,18 @@ namespace DebugxLog
         [InitializeOnLoadMethod]
         static void InitializeOnLoadMethod()
         {
-            DebugxEditorLibrary.ExcuteInEditorLoad();
-            
-            EditorApplication.wantsToQuit += Quit;
+            DebugxEditorLibrary.OnInitializeOnLoadMethod();
+            DebugxProjectSettingsAsset.OnInitializeOnLoadMethod();
+
             ColorDispenser.OnInitializeOnLoadMethod();
+
+            EditorApplication.wantsToQuit += Quit;
         }
 
         static bool Quit()
         {
             ColorDispenser.OnQuit();
+
             EditorApplication.wantsToQuit -= Quit;
             return true;
         }

@@ -12,4 +12,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c877a039950cea342a97f0db948e1d5f, type: 3}
   m_Name: DebugxEditorConfig
   m_EditorClassIdentifier: 
-  canResetProjectSettings: 0
+  canResetProjectSettings: 1

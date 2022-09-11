@@ -174,8 +174,8 @@ namespace DebugxLog
         /// </summary>
         public static void AdaptColorByEditorSkin()
         {
-            bool change1 = ResetAllMemberColorByEditorSkin(SettingsAsset.defaultMemberAssets);
-            bool change2 = ResetAllMemberColorByEditorSkin(SettingsAsset.customMemberAssets);
+            bool change1 = ResetMembersColorByEditorSkin(SettingsAsset.defaultMemberAssets);
+            bool change2 = ResetMembersColorByEditorSkin(SettingsAsset.customMemberAssets);
 
             if (change1 || change2)
             {
@@ -183,7 +183,7 @@ namespace DebugxLog
             }
         }
 
-        private static bool ResetAllMemberColorByEditorSkin(DebugxMemberInfoAsset[] debugxMemberInfoAsset)
+        private static bool ResetMembersColorByEditorSkin(DebugxMemberInfoAsset[] debugxMemberInfoAsset)
         {
             int length = debugxMemberInfoAsset != null ? debugxMemberInfoAsset.Length : 0;
             if (length == 0) return false;
@@ -208,6 +208,17 @@ namespace DebugxLog
             }
 
             return change;
+        }
+
+        public static Color GetMemberColorByEditorSkin(Color color)
+        {
+            Color.RGBToHSV(color, out float h, out float s, out float v);
+            bool isDark = EditorGUIUtility.isProSkin;
+            if (s == (isDark ? s_Dark : s_Light) && v == (isDark ? v_Dark : v_Light)) return color;
+
+            var colorHSV = new ColorHSV(h);
+            color = Color.HSVToRGB(colorHSV.h, colorHSV.s, colorHSV.v);
+            return color;
         }
     }
 }

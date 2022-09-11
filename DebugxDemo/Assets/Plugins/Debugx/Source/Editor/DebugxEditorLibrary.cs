@@ -61,7 +61,7 @@ namespace DebugxLog
         }
 
         //确认Debugx项目设置资源存在
-        public static void ExcuteInEditorLoad() 
+        public static void OnInitializeOnLoadMethod() 
         {
             var resourcesPath = ResourcesPath;//确认文件夹路径
         }

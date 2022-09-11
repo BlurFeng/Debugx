@@ -144,6 +144,10 @@ namespace DebugxLog
         public DebugxMemberInfoAsset[] customMemberAssets;
         public int CustomMemberAssetsLength => customMemberAssets == null ? 0 : customMemberAssets.Length;
 
+        public static void OnInitializeOnLoadMethod()
+        {
+            if (Instance != null) return;
+        }
 
         /// <summary>
         /// 默认构造函数
