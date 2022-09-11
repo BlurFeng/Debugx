@@ -1,7 +1,7 @@
 ﻿#region AuthorInfo
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 // Author: WinhooFeng
-// Time: 20220903
+// Time: 202209011
 // Version: 1.1.0.0
 // Description:
 // The debug log is managed according to its members.use macro "DEBUG_X" open the functional.
@@ -31,7 +31,7 @@
 // 3.Debugx.dll中修改Dictionary为List。为了DOTS等某些情况下，不支持Dictionary的情况。
 // 4.LogOutput类，新增绘制Log到屏幕功能，在DebugxManager上设置是否绘制。
 ////////////////////
-// 2.0.0.0 202209010
+// 2.0.0.0 202209011
 // 1.DebugxMemberConfig类改名为DebugxProjectSettings，增加更多成员字段；创建对应配置用类DebugxProjectSettingsAsset，用于生成.asset文件在编辑器中配置。
 // 2.设置界面从EditorWindow改为SettingsProvider，在Editor->ProjectSetting->Debugx中设置。设置内容调整。
 // 3.新增界面 PreferencesDebugx 在 Editor->Preferences->Debugx 目录下。可以让不同用户配置本地化的内容，比如一些成员在自己设备的项目中仅想看到自己打印的Log。
