@@ -50,7 +50,7 @@ namespace DebugxLog
             {
                 isInitGUI = true;
 
-                faMemberEnableSetting = new FadeArea(settingsProvider, DebugxStaticData.FAMemberEnableSettingOpen, GUIStyle.Get.AreaStyle_1, GUIStyle.Get.LabelStyle_FadeAreaHeader, 0.8f);
+                faMemberEnableSetting = new FadeArea(settingsProvider, DebugxStaticData.FAMemberEnableSettingOpen, GUIStylex.Get.AreaStyle_1, GUIStylex.Get.LabelStyle_FadeAreaHeader, 0.8f);
                 membersList = new ReorderableList(Settings.members, typeof(DebugxMemberInfo), false, true, false, false)
                 {
                     drawHeaderCallback = DrawMembersHeader,
@@ -79,7 +79,7 @@ namespace DebugxLog
             EditorGUI.EndDisabledGroup();
 
             EditorGUILayout.Space();
-            EditorGUILayout.LabelField("Toggle", GUIStyle.Get.TitleStyle_2);
+            EditorGUILayout.LabelField("Toggle", GUIStylex.Get.TitleStyle_2);
 
             EditorGUI.BeginChangeCheck();
 
@@ -112,7 +112,7 @@ namespace DebugxLog
 
 
             EditorGUILayout.Space();
-            EditorGUILayout.LabelField("Log Output", GUIStyle.Get.TitleStyle_2);
+            EditorGUILayout.LabelField("Log Output", GUIStylex.Get.TitleStyle_2);
             DebugxStaticData.LogOutputPrefs = GUILayoutx.Toggle("EnbaleLogOutput", DebugxStaticData.ToolTip_LogOutput, DebugxStaticData.LogOutputPrefs);
             EditorGUI.BeginDisabledGroup(!DebugxStaticData.LogOutputPrefs);
             DebugxStaticData.EnableLogStackTracePrefs = GUILayoutx.Toggle("EnableLogStackTrace", DebugxStaticData.ToolTip_EnableLogStackTrace, DebugxStaticData.EnableLogStackTracePrefs);

@@ -90,7 +90,7 @@ namespace DebugxLog
             EditorGUILayout.EndHorizontal();
 
             EditorGUILayout.Space();
-            EditorGUILayout.LabelField("Config Settings", GUIStyle.Get.TitleStyle_3);
+            EditorGUILayout.LabelField("Config Settings", GUIStylex.Get.TitleStyle_3);
             EditorGUI.BeginDisabledGroup(true);
             EditorGUILayout.ObjectField("", DebugxProjectSettingsAsset.Instance, typeof(DebugxProjectSettingsAsset), false);
             EditorGUI.EndDisabledGroup();
@@ -101,7 +101,7 @@ namespace DebugxLog
             EditorGUI.BeginChangeCheck();
 
             EditorGUILayout.Space();
-            EditorGUILayout.LabelField("Toggle", GUIStyle.Get.TitleStyle_2);
+            EditorGUILayout.LabelField("Toggle", GUIStylex.Get.TitleStyle_2);
 
             SettingsAsset.enableLogDefault = Toggle("EnableLog Default", DebugxStaticData.ToolTip_EnableLogDefault, SettingsAsset.enableLogDefault);
             SettingsAsset.enableLogMemberDefault = Toggle("EnableLogMember Default", DebugxStaticData.ToolTip_EnableLogMemberDefault, SettingsAsset.enableLogMemberDefault);
@@ -111,7 +111,7 @@ namespace DebugxLog
             DrawMemberConfigSetting();
 
             EditorGUILayout.Space();
-            EditorGUILayout.LabelField("Log Output", GUIStyle.Get.TitleStyle_2);
+            EditorGUILayout.LabelField("Log Output", GUIStylex.Get.TitleStyle_2);
             SettingsAsset.logOutput = Toggle("EnbaleLogOutput", DebugxStaticData.ToolTip_LogOutput, SettingsAsset.logOutput);
             EditorGUI.BeginDisabledGroup(!SettingsAsset.logOutput);
             SettingsAsset.enableLogStackTrace = Toggle("EnableLogStackTrace", DebugxStaticData.ToolTip_EnableLogStackTrace, SettingsAsset.enableLogStackTrace);
@@ -134,7 +134,7 @@ namespace DebugxLog
         private static void DrawMemberConfigSetting()
         {
             EditorGUILayout.Space();
-            EditorGUILayout.LabelField("Member Settings", GUIStyle.Get.TitleStyle_2);
+            EditorGUILayout.LabelField("Member Settings", GUIStylex.Get.TitleStyle_2);
 
             faMemberConfigSetting.Begin();
             faMemberConfigSetting.Header("Members");
@@ -166,7 +166,7 @@ namespace DebugxLog
                 {
                     EditorGUILayout.Space();
                     EditorGUILayout.BeginHorizontal();
-                    EditorGUILayout.LabelField("Default", GUIStyle.Get.TitleStyle_3);
+                    EditorGUILayout.LabelField("Default", GUIStylex.Get.TitleStyle_3);
                     if (GUILayoutx.ButtonYellow("Reset Default Members", "重置默认成员，这会重置默认成员的所有数据。"))
                     {
                         if (EditorUtility.DisplayDialog("Reset Default Members", "确认要重置所有默认成员吗？", "Ok", "Cancel"))
@@ -195,7 +195,7 @@ namespace DebugxLog
                 //自定义成员
                 EditorGUILayout.Space();
                 EditorGUILayout.BeginHorizontal();
-                EditorGUILayout.LabelField("Custom Members", GUIStyle.Get.TitleStyle_3);
+                EditorGUILayout.LabelField("Custom Members", GUIStylex.Get.TitleStyle_3);
                 if (GUILayoutx.ButtonYellow("Automatically Reassign Colors", "自动重分配所有自定义成员的颜色，颜色将根据成员数量平均分配。"))
                 {
                     if (EditorUtility.DisplayDialog("Automatically Reassign Colors", "确认要重分配所有自定义成员的颜色吗？", "Ok", "Cancel"))
@@ -331,7 +331,7 @@ namespace DebugxLog
         {
             //此方法内调用到了GUI.skin.button，GUI类必须在OnGUI才能调用，不能在OnEnable
 
-            faMemberConfigSetting = new FadeArea(settingsProvider, DebugxStaticDataEditor.FAMemberConfigSettingOpen, GUIStyle.Get.AreaStyle_1, GUIStyle.Get.LabelStyle_FadeAreaHeader, 0.8f);
+            faMemberConfigSetting = new FadeArea(settingsProvider, DebugxStaticDataEditor.FAMemberConfigSettingOpen, GUIStylex.Get.AreaStyle_1, GUIStylex.Get.LabelStyle_FadeAreaHeader, 0.8f);
 
             memberInfosFadeAreaPool.Clear();
             memberInfoKeyDic.Clear();
@@ -356,7 +356,7 @@ namespace DebugxLog
         //当添加一个成员信息时
         private static void OnAddMemberInfo(DebugxMemberInfoAsset info)
         {
-            memberInfosFadeAreaPool.Add(new FadeArea(settingsProvider, info.fadeAreaOpenCached, GUIStyle.Get.AreaStyle_1, GUIStyle.Get.LabelStyle_FadeAreaHeader));
+            memberInfosFadeAreaPool.Add(new FadeArea(settingsProvider, info.fadeAreaOpenCached, GUIStylex.Get.AreaStyle_1, GUIStylex.Get.LabelStyle_FadeAreaHeader));
             AddKey(info.key);
         }
 
