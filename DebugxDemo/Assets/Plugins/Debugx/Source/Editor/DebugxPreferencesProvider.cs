@@ -10,7 +10,6 @@ namespace DebugxLog
     static class DebugxPreferencesProvider
     {
         private static SettingsProvider settingsProvider;
-        private static DebugxEditorConfig EditorConfig => DebugxEditorConfig.Get;
         private static DebugxProjectSettings Settings => DebugxProjectSettings.Instance;
         private static Dictionary<int, bool> MemberEnableDefaultDic => DebugxStaticData.MemberEnableDefaultDicPrefs;
         private static FadeArea faMemberEnableSetting;
@@ -126,12 +125,15 @@ namespace DebugxLog
             EditorGUI.EndDisabledGroup();
             EditorGUI.EndDisabledGroup();
 
+
             //还是调用DebugxProjectSettingsAsset的保存，里面会判断在UNITY_EDITOR时优先使用Prefs
             if (EditorGUI.EndChangeCheck())
             {
                 DebugxStaticData.CanResetPreferences = true;
                 Apply();
             }
+
+            EditorGUILayout.Space(16f);
         }
 
         /// <summary>

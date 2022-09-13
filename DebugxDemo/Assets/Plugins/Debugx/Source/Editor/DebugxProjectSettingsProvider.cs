@@ -10,8 +10,6 @@ namespace DebugxLog
     static class DebugxProjectSettingsProvider
     {
         private static SettingsProvider settingsProvider;
-
-        private static DebugxEditorConfig EditorConfig => DebugxEditorConfig.Get;
         private static DebugxProjectSettingsAsset SettingsAsset => DebugxProjectSettingsAsset.Instance;
         private static readonly List<FadeArea> memberInfosFadeAreaPool = new();
         private static FadeArea faMemberConfigSetting;
@@ -44,9 +42,6 @@ namespace DebugxLog
 
         private static void Disable()
         {
-            EditorUtility.SetDirty(EditorConfig);
-            AssetDatabase.SaveAssetIfDirty(EditorConfig);
-
             Save();
 
             DebugxStaticDataEditor.OnAutoSaveChange.Unbind(OnAutoSaveChange);
@@ -129,6 +124,8 @@ namespace DebugxLog
             {
                 Apply();
             }
+
+            EditorGUILayout.Space(16f);
         }
 
         private static void DrawMemberConfigSetting()
