@@ -56,7 +56,7 @@ namespace DebugxLog
 
         public DebugxMemberInfo CreateDebugxMemberInfo()
         {
-            DebugxMemberInfo info = new()
+            DebugxMemberInfo info = new DebugxMemberInfo()
             {
                 key = key,
                 enableDefault = enableDefault,
@@ -166,7 +166,7 @@ namespace DebugxLog
             defaultMemberAssets = new DebugxMemberInfoAsset[2];
 
             //普通Log成员信息
-            DebugxMemberInfoAsset normalMember = new()
+            DebugxMemberInfoAsset normalMember = new DebugxMemberInfoAsset()
             {
                 signature = DebugxProjectSettings.normalInfoSignature,
                 logSignature = true,
@@ -180,7 +180,7 @@ namespace DebugxLog
             defaultMemberAssets[0] = normalMember;
 
             //高级Log成员信息
-            DebugxMemberInfoAsset masterMember = new()
+            DebugxMemberInfoAsset masterMember = new DebugxMemberInfoAsset()
             {
                 signature = DebugxProjectSettings.masterInfoSignature,
                 logSignature = true,
