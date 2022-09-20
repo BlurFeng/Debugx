@@ -1,4 +1,5 @@
 ﻿using NUnit.Framework;
+using System;
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEditor.Build;
@@ -178,6 +179,13 @@ namespace DebugxLog
                     for (int i = 0; i < SettingsAsset.defaultMemberAssets.Length; i++)
                     {
                         DebugxMemberInfoAsset mInfo = SettingsAsset.defaultMemberAssets[i];
+
+                        if (i >= memberInfosFadeAreaPool.Count)
+                        {
+                            //Undo回退可能导致memberInfosFadeAreaPool数量不正确
+                            ResetWindowData();
+                            break;
+                        }
 
                         faTemp = memberInfosFadeAreaPool[i];
                         faTemp.Begin();

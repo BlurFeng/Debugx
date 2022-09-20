@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System;
 using DebugxLog.Tools;
+using System.IO;
 
 namespace DebugxLog
 {
@@ -108,6 +109,11 @@ namespace DebugxLog
                     if (instance == null)
                     {
                         instance = ScriptableObject.CreateInstance(typeof(DebugxProjectSettingsAsset)) as DebugxProjectSettingsAsset;
+
+                        //确认文件夹是否存在，否则创建
+                        if (!Directory.Exists(DebugxStaticData.resourcesPath))
+                            Directory.CreateDirectory(DebugxStaticData.resourcesPath);
+
                         UnityEditor.AssetDatabase.CreateAsset(instance, $"{DebugxStaticData.resourcesPath}/{DebugxProjectSettings.fileName}.asset");
                         instance.ApplyTo(DebugxProjectSettings.Instance);
                     }

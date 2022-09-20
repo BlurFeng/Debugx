@@ -67,12 +67,6 @@
             输出Log到本地txt文件工具类
             </summary>
         </member>
-        <member name="F:DebugxLog.Tools.LogOutput.directoryPathCover">
-            <summary>
-            Log输出文件夹重写
-            在调用RecordStart前设置此字段以重写Log输出文件夹
-            </summary>
-        </member>
         <member name="P:DebugxLog.Tools.LogOutput.DirectoryPath">
             <summary>
             输出文件夹路径

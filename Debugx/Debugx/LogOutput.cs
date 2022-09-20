@@ -22,23 +22,14 @@ namespace DebugxLog.Tools
         private const string fileName = "DebugxLog";
         private const string fileNameFull = "DebugxLog.log";
         private const string fileType = ".log";
-        /// <summary>
-        /// Log输出文件夹重写
-        /// 在调用RecordStart前设置此字段以重写Log输出文件夹
-        /// </summary>
-        public static string directoryPathCover;
         private static string directoryPath;
         /// <summary>
         /// 输出文件夹路径
         /// </summary>
         public static string DirectoryPath
         {
-            get
-            {
-                if (!string.IsNullOrEmpty(directoryPathCover) && Directory.Exists(directoryPathCover))
-                    return directoryPathCover;
-                return directoryPath;
-            }
+            get => directoryPath;
+            set { if (value != string.Empty) directoryPath = value; }
         }
         private static string savePath;
         private static readonly System.Object locker = new System.Object();
@@ -55,13 +46,20 @@ namespace DebugxLog.Tools
         {
             if (!Enable) return;
 
-            System.IO.DirectoryInfo dir = new DirectoryInfo(Application.consoleLogPath);
-            directoryPath = dir.Parent.FullName;
+            if (string.IsNullOrEmpty(directoryPath))
+            {
+                directoryPath = Application.persistentDataPath;
+            }
+
             savePath = string.Format("{0}/{1}", DirectoryPath, fileNameFull);
 
             //PC目录为：C:\Users\UserName\AppData\LocalLow\DefaultCompany\ProjectName
 
+            if (string.IsNullOrEmpty(savePath)) return;
+
             FileInfo fileInfo = new FileInfo(savePath);
+
+            if (fileInfo == null) return;
 
             //创建文件夹
             directoryPath = fileInfo.DirectoryName;
@@ -85,7 +83,7 @@ namespace DebugxLog.Tools
         /// </summary>
         public static void RecordOver()
         {
-            if (!Enable) return;
+            if (!Enable || string.IsNullOrEmpty(savePath)) return;
 
             FileInfo fileInfo = new FileInfo(savePath);
             if(fileInfo != null)

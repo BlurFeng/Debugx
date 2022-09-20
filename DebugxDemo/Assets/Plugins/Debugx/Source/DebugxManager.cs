@@ -47,19 +47,26 @@ namespace DebugxLog
 
         private void Awake()
         {
-            Debugx.LogAdm("DebugxManager --- Awake");
-
             DontDestroyOnLoad(this);
-
             Debugx.OnAwake();
 
 #if UNITY_EDITOR
             //编辑器时重写Log输出路径到项目Logs文件夹下
             string directoryPathCover = Application.dataPath;
             directoryPathCover = directoryPathCover.Replace("Assets", "Logs");
-            LogOutput.directoryPathCover = directoryPathCover;
+            LogOutput.DirectoryPath = directoryPathCover;
+#elif UNITY_STANDALONE_WIN
+            LogOutput.DirectoryPath = Application.dataPath;
+#elif UNITY_ANDROID
+            LogOutput.DirectoryPath = $"{Application.persistentDataPath}/Log";
+#elif UNITY_IPHONE
+            LogOutput.DirectoryPath = Application.persistentDataPath;
 #endif
+
             LogOutput.RecordStart();
+
+            Debugx.LogAdm("DebugxManager --- Awake");
+
             if (DebugxProjectSettings.Instance.logOutput)
                 Debugx.LogAdm($"DebugxManager --- Log output to {LogOutput.DirectoryPath}");
 

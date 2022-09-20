@@ -1,8 +1,8 @@
 ﻿#region AuthorInfo
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 // Author: WinhooFeng
-// Time: 202209011
-// Version: 1.1.0.0
+// Time: 20220920
+// Version: 2.0.1.0
 // Description:
 // The debug log is managed according to its members.use macro "DEBUG_X" open the functional.
 // 此插件用于以成员的方式管理调试日志。使用宏"DEBUG_X"来开启功能。
@@ -31,7 +31,7 @@
 // 3.Debugx.dll中修改Dictionary为List。为了DOTS等某些情况下，不支持Dictionary的情况。
 // 4.LogOutput类，新增绘制Log到屏幕功能，在DebugxManager上设置是否绘制。
 ////////////////////
-// 2.0.0.0 202209011
+// 2.0.0.0 20220911
 // 1.DebugxMemberConfig类改名为DebugxProjectSettings，增加更多成员字段；创建对应配置用类DebugxProjectSettingsAsset，用于生成.asset文件在编辑器中配置。
 // 2.设置界面从EditorWindow改为SettingsProvider，在Editor->ProjectSetting->Debugx中设置。设置内容调整。
 // 3.新增界面 PreferencesDebugx 在 Editor->Preferences->Debugx 目录下。可以让不同用户配置本地化的内容，比如一些成员在自己设备的项目中仅想看到自己打印的Log。
@@ -40,6 +40,16 @@
 // 6.增加配置辅助功能，重置配置，快速设置全部成员开关，颜色重置和自动分配等。
 // 7.编辑器配置界面，适应Dark和Light编辑器皮肤。
 // 8.文件夹整理，类重命名，代码整理优化。
+////////////////////
+// 2.0.1.0 20220920
+// 1.GUI界面更新，颜色调整。
+// 2.移除DebugxEditorConfig类。
+// FixBug
+// 1.修复在安卓平台时Application.consoleLogPath获取为空导致无法输出Log文件的问题
+// 2.用户手册名称更新，去除中文。防止一些因中文路径导致打包失败。
+// 3.替换掉 new() 的语法，防止低版本的C#报错。
+// 4.修复DebugxProjectSettings自动创建流程相关的Bug
+// 5.修复ProjectSettings界面中数组越界Bug
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 #endregion
 
