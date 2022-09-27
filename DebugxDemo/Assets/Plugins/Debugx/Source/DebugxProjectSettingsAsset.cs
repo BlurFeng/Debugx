@@ -115,6 +115,9 @@ namespace DebugxLog
                             Directory.CreateDirectory(DebugxStaticData.resourcesPath);
 
                         UnityEditor.AssetDatabase.CreateAsset(instance, $"{DebugxStaticData.resourcesPath}/{DebugxProjectSettings.fileName}.asset");
+
+                        instance.CreateDefaultMembers();
+
                         instance.ApplyTo(DebugxProjectSettings.Instance);
                     }
 #endif
@@ -157,14 +160,6 @@ namespace DebugxLog
         public static void OnInitializeOnLoadMethod()
         {
             if (Instance != null) return;
-        }
-
-        /// <summary>
-        /// 默认构造函数
-        /// </summary>
-        public DebugxProjectSettingsAsset()
-        {
-            CreateDefaultMembers();
         }
 
         public void CreateDefaultMembers()
