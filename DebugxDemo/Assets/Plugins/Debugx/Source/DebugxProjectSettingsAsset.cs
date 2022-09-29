@@ -116,7 +116,7 @@ namespace DebugxLog
 
                         UnityEditor.AssetDatabase.CreateAsset(instance, $"{DebugxStaticData.resourcesPath}/{DebugxProjectSettings.fileName}.asset");
 
-                        instance.CreateDefaultMembers();
+                        instance.ResetMembers();
 
                         instance.ApplyTo(DebugxProjectSettings.Instance);
                     }
@@ -162,52 +162,58 @@ namespace DebugxLog
             if (Instance != null) return;
         }
 
-        public void CreateDefaultMembers()
+        public void ResetMembers(bool resetDefault = true, bool resetCustom = true)
         {
-            defaultMemberAssets = new DebugxMemberInfoAsset[2];
-
-            //普通Log成员信息
-            DebugxMemberInfoAsset normalMember = new DebugxMemberInfoAsset()
+            if (resetDefault)
             {
-                signature = DebugxProjectSettings.normalInfoSignature,
-                logSignature = true,
-                key = DebugxProjectSettings.normalInfoKey,
-                color = GetNormalMemberColor != null? GetNormalMemberColor.Invoke() : Color.white,
-                enableDefault = true,
-#if UNITY_EDITOR
-                fadeAreaOpenCached = true,
-#endif
-            };
-            defaultMemberAssets[0] = normalMember;
+                defaultMemberAssets = new DebugxMemberInfoAsset[2];
 
-            //高级Log成员信息
-            DebugxMemberInfoAsset masterMember = new DebugxMemberInfoAsset()
-            {
-                signature = DebugxProjectSettings.masterInfoSignature,
-                logSignature = true,
-                key = DebugxProjectSettings.masterInfoKey,
-                color = GetMasterMemberColor != null ? GetMasterMemberColor.Invoke(): new Color(1f, 0.627f, 0.627f, 1f),
-                enableDefault = true,
+                //普通Log成员信息
+                DebugxMemberInfoAsset normalMember = new DebugxMemberInfoAsset()
+                {
+                    signature = DebugxProjectSettings.normalInfoSignature,
+                    logSignature = true,
+                    key = DebugxProjectSettings.normalInfoKey,
+                    color = GetNormalMemberColor != null ? GetNormalMemberColor.Invoke() : Color.white,
+                    enableDefault = true,
 #if UNITY_EDITOR
-                fadeAreaOpenCached = true,
+                    fadeAreaOpenCached = true,
 #endif
-            };
-            defaultMemberAssets[1] = masterMember;
+                };
+                defaultMemberAssets[0] = normalMember;
 
-            customMemberAssets = new DebugxMemberInfoAsset[1]
-            {
-                new DebugxMemberInfoAsset()
-                { 
-                    signature = "Winhoo", 
-                    logSignature = true, 
-                    key = 1, 
-                    color = new Color(0.7843f, 0.941f, 1f, 1f), 
-                    enableDefault = true, 
+                //高级Log成员信息
+                DebugxMemberInfoAsset masterMember = new DebugxMemberInfoAsset()
+                {
+                    signature = DebugxProjectSettings.masterInfoSignature,
+                    logSignature = true,
+                    key = DebugxProjectSettings.masterInfoKey,
+                    color = GetMasterMemberColor != null ? GetMasterMemberColor.Invoke() : new Color(1f, 0.627f, 0.627f, 1f),
+                    enableDefault = true,
 #if UNITY_EDITOR
-                fadeAreaOpenCached = true,
+                    fadeAreaOpenCached = true,
 #endif
-                }
-            };
+                };
+                defaultMemberAssets[1] = masterMember;
+            }
+
+            if (resetCustom)
+            {
+                customMemberAssets = new DebugxMemberInfoAsset[1]
+                {
+                    new DebugxMemberInfoAsset()
+                    {
+                        signature = "Winhoo",
+                        logSignature = true,
+                        key = 1,
+                        color = new Color(0.7843f, 0.941f, 1f, 1f),
+                        enableDefault = true, 
+#if UNITY_EDITOR
+                        fadeAreaOpenCached = true,
+#endif
+                    }
+                };
+            }
         }
 
 #region Log Output

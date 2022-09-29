@@ -170,7 +170,7 @@ namespace DebugxLog
                         if (EditorUtility.DisplayDialog("Reset Default Members", "确认要重置所有默认成员吗？", "Ok", "Cancel"))
                         {
                             Undo.RecordObject(SettingsAsset, "ResetDefaultMembers");
-                            SettingsAsset.CreateDefaultMembers();
+                            SettingsAsset.ResetMembers(true, false);
                         }
                     }
                     EditorGUILayout.EndHorizontal();
