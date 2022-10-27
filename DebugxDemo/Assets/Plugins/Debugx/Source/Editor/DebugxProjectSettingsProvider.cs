@@ -101,6 +101,7 @@ namespace DebugxLog
 
             SettingsAsset.enableLogDefault = Toggle("EnableLog Default", DebugxStaticData.ToolTip_EnableLogDefault, SettingsAsset.enableLogDefault);
             SettingsAsset.enableLogMemberDefault = Toggle("EnableLogMember Default", DebugxStaticData.ToolTip_EnableLogMemberDefault, SettingsAsset.enableLogMemberDefault);
+            SettingsAsset.allowUnregisteredMember = Toggle("AllowUnregisteredMember", DebugxStaticData.ToolTip_AllowUnregisteredMember, SettingsAsset.allowUnregisteredMember);
             SettingsAsset.logThisKeyMemberOnlyDefault = IntField("LogThisKeyMemberOnly Default", DebugxStaticData.ToolTip_LogThisKeyMemberOnlyDefault, SettingsAsset.logThisKeyMemberOnlyDefault);
 
             //成员配置修改
@@ -378,6 +379,7 @@ namespace DebugxLog
 
             SettingsAsset.enableLogDefault = DebugxStaticData.enableLogDefaultSet;
             SettingsAsset.enableLogMemberDefault = DebugxStaticData.enableLogMemberDefaultSet;
+            SettingsAsset.allowUnregisteredMember = DebugxStaticData.allowUnregisteredMember;
             SettingsAsset.logThisKeyMemberOnlyDefault = DebugxStaticData.logThisKeyMemberOnlyDefaultSet;
 
             SettingsAsset.logOutput = DebugxStaticData.logOutputSet;

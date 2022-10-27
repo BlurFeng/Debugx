@@ -261,6 +261,11 @@
             成员Log总开关
             </summary>
         </member>
+        <member name="F:DebugxLog.DebugxProjectSettings.allowUnregisteredMember">
+            <summary>
+            允许没有注册成员进行打印
+            </summary>
+        </member>
         <member name="F:DebugxLog.DebugxProjectSettings.logThisKeyMemberOnlyDefault">
             <summary>
             仅打印此Key的成员Log，0为关闭
@@ -439,6 +444,11 @@
         <member name="F:Debugx.enableLogMember">
             <summary>
             成员Log总开关
+            </summary>
+        </member>
+        <member name="F:Debugx.allowUnregisteredMember">
+            <summary>
+            允许没有注册成员进行打印
             </summary>
         </member>
         <member name="F:Debugx.logThisKeyMemberOnly">

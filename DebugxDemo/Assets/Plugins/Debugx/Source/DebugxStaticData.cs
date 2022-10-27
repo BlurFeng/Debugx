@@ -42,6 +42,7 @@ namespace DebugxLog
 
         public const string ToolTip_EnableLogDefault = "Log总开关，启动时默认状态";
         public const string ToolTip_EnableLogMemberDefault = "成员Log总开关，启动时默认状态";
+        public const string ToolTip_AllowUnregisteredMember = "允许没有注册成员进行打印";
         public const string ToolTip_LogThisKeyMemberOnlyDefault = "仅打印此Key的成员Log，0为关闭。启动时默认状态";
 
         public const string ToolTip_LogOutput = "输出Log到本地（启动前设置，运行时设置无效）。编辑器时输出到项目的Logs文件夹下，实机运行时根据平台输出到不同目录下";
@@ -59,18 +60,19 @@ namespace DebugxLog
         //参数的默认值，用于恢复到默认参数功能
         //dll中的实际使用数据DebugxProjectSettings受到DebugxProjectSettingsAsset支配，其默认值不重要
 
-        public static bool enableLogDefaultSet = true;
-        public static bool enableLogMemberDefaultSet = true;
-        public static int logThisKeyMemberOnlyDefaultSet = 0;
+        public const bool enableLogDefaultSet = true;
+        public const bool enableLogMemberDefaultSet = true;
+        public const bool allowUnregisteredMember = true;
+        public const int logThisKeyMemberOnlyDefaultSet = 0;
 
-        public static bool logOutputSet = true;
-        public static bool enableLogStackTraceSet = false;
-        public static bool enableWarningStackTraceSet = false;
-        public static bool enableErrorStackTraceSet = true;
-        public static bool recordAllNonDebugxLogsSet = false;
-        public static bool drawLogToScreenSet = false;
-        public static bool restrictDrawLogCountSet = false;
-        public static int maxDrawLogsSet = 100;
+        public const bool logOutputSet = true;
+        public const bool enableLogStackTraceSet = false;
+        public const bool enableWarningStackTraceSet = false;
+        public const bool enableErrorStackTraceSet = true;
+        public const bool recordAllNonDebugxLogsSet = false;
+        public const bool drawLogToScreenSet = false;
+        public const bool restrictDrawLogCountSet = false;
+        public const int maxDrawLogsSet = 100;
 
         #endregion
 
@@ -83,6 +85,7 @@ namespace DebugxLog
         {
             EnableLogDefaultPrefs = DebugxStaticData.enableLogDefaultSet;
             EnableLogMemberDefaultPrefs = DebugxStaticData.enableLogMemberDefaultSet;
+            AllowUnregisteredMember = DebugxStaticData.allowUnregisteredMember;
             LogThisKeyMemberOnlyDefaultPrefs = DebugxStaticData.logThisKeyMemberOnlyDefaultSet;
 
             LogOutputPrefs = DebugxStaticData.logOutputSet;
@@ -113,6 +116,12 @@ namespace DebugxLog
         {
             get => PlayerPrefsGetBool("DebugxStaticData.EnableLogMemberDefault", DebugxStaticData.enableLogMemberDefaultSet);
             set => PlayerPrefsSetBool("DebugxStaticData.EnableLogMemberDefault", value);
+        }
+
+        public static bool AllowUnregisteredMember
+        {
+            get => PlayerPrefsGetBool("DebugxStaticData.AllowUnregisteredMember", DebugxStaticData.allowUnregisteredMember);
+            set => PlayerPrefsSetBool("DebugxStaticData.AllowUnregisteredMember", value);
         }
 
         public static int LogThisKeyMemberOnlyDefaultPrefs

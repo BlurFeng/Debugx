@@ -168,9 +168,16 @@ namespace DebugxLog
             {
                 if (instance == null)
                 {
-                    instance = new DebugxProjectSettings();
                     IDebugxProjectSettingsAsset iDebugxProjectSettingsAsset = (IDebugxProjectSettingsAsset)Resources.Load<ScriptableObject>(fileName);
-                    if(iDebugxProjectSettingsAsset != null) iDebugxProjectSettingsAsset.ApplyTo(instance);
+                    if (iDebugxProjectSettingsAsset != null)
+                    {
+                        instance = new DebugxProjectSettings();
+                        iDebugxProjectSettingsAsset.ApplyTo(instance);
+                    }
+                    else
+                    {
+                        Debugx.LogAdmWarning("Failed to load the DebugxProjectSettings configuration resource file. 加载DebugxProjectSettings配置资源文件失败。");
+                    }
                 }
 
                 return instance;
@@ -243,6 +250,11 @@ namespace DebugxLog
         public bool enableLogMemberDefault = true;
 
         /// <summary>
+        /// 允许没有注册成员进行打印
+        /// </summary>
+        public bool allowUnregisteredMember = true;
+
+        /// <summary>
         /// 仅打印此Key的成员Log，0为关闭
         /// </summary>
         public int logThisKeyMemberOnlyDefault = 0;
@@ -312,7 +324,8 @@ public class Debugx
     //在U3D项目中添加宏“DEBUG_X”开启功能方法
 
     private static DebugxProjectSettings Settings => DebugxProjectSettings.Instance;
-    private static DebugxMemberInfo AdminInfo => Settings.AdminInfo;
+    private static DebugxMemberInfo AdminInfo => Settings != null ? Settings.AdminInfo : adminInfoDefault;
+    private static DebugxMemberInfo adminInfoDefault = new DebugxMemberInfo(0, "Admin");
 
     private static Func<bool> serverCheckDelegate;
     private readonly static StringBuilder logxSb = new StringBuilder();
@@ -330,6 +343,11 @@ public class Debugx
     public static bool enableLogMember = true;
 
     /// <summary>
+    /// 允许没有注册成员进行打印
+    /// </summary>
+    public static bool allowUnregisteredMember = true;
+
+    /// <summary>
     /// 仅打印此Key的Log
     /// 0为关闭，设置其他Key时，只有此Key对应的成员信息确实存在，才会只打印此Key的成员Log
     /// 必须关闭logMasterOnly后才能设置此值
@@ -343,10 +361,13 @@ public class Debugx
     {
         ResetToDefault();
 
-        for (int i = 0; i < Settings.members.Length; i++)
+        if(Settings != null && Settings.members != null)
         {
-            var info = Settings.members[i];
-            memberEnables.Add(info.key, info.enableDefault);
+            for (int i = 0; i < Settings.members.Length; i++)
+            {
+                var info = Settings.members[i];
+                memberEnables.Add(info.key, info.enableDefault);
+            }
         }
     }
 
@@ -363,9 +384,13 @@ public class Debugx
     /// </summary>
     public static void ResetToDefault()
     {
-        enableLog = Settings.enableLogDefault;
-        enableLogMember = Settings.enableLogMemberDefault;
-        logThisKeyMemberOnly = Settings.logThisKeyMemberOnlyDefault;
+        if(Settings != null)
+        {
+            enableLog = Settings.enableLogDefault;
+            enableLogMember = Settings.enableLogMemberDefault;
+            allowUnregisteredMember = Settings.allowUnregisteredMember;
+            logThisKeyMemberOnly = Settings.logThisKeyMemberOnlyDefault;
+        }
 
         memberEnables.Clear();
     }
@@ -402,7 +427,7 @@ public class Debugx
             return memberEnables[key];
         }
 
-        if(Settings.members != null && Settings.members.Length > 0)
+        if(Settings != null && Settings.members != null && Settings.members.Length > 0)
         {
             for (int i = 0; i < Settings.members.Length; i++)
             {
@@ -449,7 +474,7 @@ public class Debugx
     private static bool GetMemberInfo(int key, out DebugxMemberInfo memberInfo)
     {
         memberInfo = null;
-        if (Settings.members == null || Settings.members.Length == 0) return false;
+        if (Settings == null || Settings.members == null || Settings.members.Length == 0) return false;
 
         for (int i = 0; i < Settings.members.Length; i++)
         {
@@ -643,19 +668,25 @@ public class Debugx
     /// <param name="showNetTag">显示网络标记，Server或者Client。此功能依赖项目，需要项目通过SetServerCheck方法来设置</param>
     private static void LogCreator(LogType type, int key, object message, bool showTime = false, bool showNetTag = true)
     {
-        if(Settings.members == null)
+        if (Settings == null)
         {
-            LogAdmWarning($"Debugx.LogCreator: The initial configuration is not performed. 未初始化配置。");
-            return;
+            LogAdmWarning($"Debugx.LogCreator: The initial configuration is not performed.Settings is null. 未成功初始化配置，Settings为空。");
         }
 
-        if (!GetMemberInfo(key, out DebugxMemberInfo memberInfo))
+        if (Settings.members == null)
+        {
+            LogAdmWarning($"Debugx.LogCreator: The initial configuration is not performed.Settings.members is null. 未初始化配置，Settings.members为空。");
+        }
+
+        if (GetMemberInfo(key, out DebugxMemberInfo memberInfo))
+        {
+            if (!MemberIsEnable(key)) return;//此成员未打开
+        }
+        else
         {
             LogAdmWarning($"Debugx.LogCreator: cant find memberInfo by key:{key}. 无法找到Key为{key}的成员信息。");
-            return;
+            if (!allowUnregisteredMember) return;
         }
-
-        if (!MemberIsEnable(key)) return;//此成员未打开
 
         //设置了仅打印某个Key成员Log
         if (!CheckLogThisKeyMemberOnly(key)) return;
@@ -675,13 +706,20 @@ public class Debugx
             logxSb.Append($" [{DateTime.Now.ToString("HH:mm:ss")}] ");
         }
 
-        if (info.LogSignature)
-            logxSb.Append($"[Sig: {info.signature}]");
+        if(info != null)
+        {
+            if (info.LogSignature)
+                logxSb.Append($"[Sig: {info.signature}]");
 
-        if(!string.IsNullOrEmpty(info.color))
-            logxSb.Append(info.haveHeader ? $" <color=#{info.color}>{info.header} : {message}</color>" : $" <color=#{info.color}>{message}</color>");
+            if (!string.IsNullOrEmpty(info.color))
+                logxSb.Append(info.haveHeader ? $" <color=#{info.color}>{info.header} : {message}</color>" : $" <color=#{info.color}>{message}</color>");
+            else
+                logxSb.Append(info.haveHeader ? $" {info.header} : {message}" : $" {message}");
+        }
         else
-            logxSb.Append(info.haveHeader ? $" {info.header} : {message}" : $" {message}");
+        {
+            logxSb.Append($" UnregisteredMember : {message}");
+        }
 
         UnityEngine.Debug.unityLogger.Log(type, logxSb.ToString());
         logxSb.Length = 0;

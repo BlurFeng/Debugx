@@ -84,6 +84,7 @@ namespace DebugxLog
 
             DebugxStaticData.EnableLogDefaultPrefs = GUILayoutx.Toggle("EnableLog Default", DebugxStaticData.ToolTip_EnableLogDefault, DebugxStaticData.EnableLogDefaultPrefs);
             DebugxStaticData.EnableLogMemberDefaultPrefs = GUILayoutx.Toggle("EnableLogMember Default", DebugxStaticData.ToolTip_EnableLogMemberDefault, DebugxStaticData.EnableLogMemberDefaultPrefs);
+            DebugxStaticData.AllowUnregisteredMember = GUILayoutx.Toggle("AllowUnregisteredMember", DebugxStaticData.ToolTip_AllowUnregisteredMember, DebugxStaticData.AllowUnregisteredMember);
             DebugxStaticData.LogThisKeyMemberOnlyDefaultPrefs = GUILayoutx.IntField("LogThisKeyMemberOnly Default", DebugxStaticData.ToolTip_LogThisKeyMemberOnlyDefault, DebugxStaticData.LogThisKeyMemberOnlyDefaultPrefs);
 
             EditorGUILayout.Space();

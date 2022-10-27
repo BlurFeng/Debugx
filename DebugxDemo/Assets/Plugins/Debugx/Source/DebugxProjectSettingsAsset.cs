@@ -146,6 +146,9 @@ namespace DebugxLog
         [Tooltip(DebugxStaticData.ToolTip_EnableLogMemberDefault)]
         public bool enableLogMemberDefault = true;
 
+        [Tooltip(DebugxStaticData.ToolTip_AllowUnregisteredMember)]
+        public bool allowUnregisteredMember = true;
+
         [Tooltip(DebugxStaticData.ToolTip_LogThisKeyMemberOnlyDefault)]
         public int logThisKeyMemberOnlyDefault = 0;
 

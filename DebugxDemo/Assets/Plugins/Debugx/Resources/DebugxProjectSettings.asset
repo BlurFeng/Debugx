@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   enableLogDefault: 1
   enableLogMemberDefault: 1
+  allowUnregisteredMember: 1
   logThisKeyMemberOnlyDefault: 0
   defaultMemberAssets:
   - enableDefault: 1
@@ -37,6 +38,13 @@ MonoBehaviour:
     key: 1
     header: 
     color: {r: 0.7843, g: 0.941, b: 1, a: 1}
+    fadeAreaOpenCached: 1
+  - enableDefault: 1
+    signature: TestMember
+    logSignature: 1
+    key: 2
+    header: 
+    color: {r: 0.95, g: 0.8455, b: 0.8075, a: 1}
     fadeAreaOpenCached: 1
   logOutput: 1
   enableLogStackTrace: 0
