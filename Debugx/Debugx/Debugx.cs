@@ -50,6 +50,12 @@
 // 3.替换掉 new() 的语法，防止低版本的C#报错。
 // 4.修复DebugxProjectSettings自动创建流程相关的Bug
 // 5.修复ProjectSettings界面中数组越界Bug
+////////////////////
+// 2.0.2.0 20221031
+// 1.未注册成员进行打印功能，新增allowUnregisteredMember字段，用于配置是否允许没有注册者打印内容
+// FixBug
+// 1.修复某些情况下DebugxProjectSettings初始化时无法通过Resources.Load加载，导致的各类问题。
+// 2.DebugxProjectSettingsAsset配置资源加载和创建流程更新，尝试修复配置被重置为空的问题。
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 #endregion
 
