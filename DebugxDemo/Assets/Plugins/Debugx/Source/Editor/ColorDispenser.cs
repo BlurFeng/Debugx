@@ -75,6 +75,8 @@ namespace DebugxLog
         //获取一个HSV颜色的H值，此值是和当前存在的Member的Color最不接近的值
         private static int GetColorH()
         {
+            if (SettingsAsset == null) return 0;
+
             int useLength = SettingsAsset.CustomMemberAssetsLength;
             if (useLength == 0) return Random.Range(0, 361);
             else if(useLength == 1)
@@ -156,6 +158,8 @@ namespace DebugxLog
         /// </summary>
         public static void AutomaticallyReassignColors()
         {
+            if (SettingsAsset == null) return;
+
             int length = SettingsAsset.CustomMemberAssetsLength;
             if (length == 0) return;
 
@@ -174,6 +178,8 @@ namespace DebugxLog
         /// </summary>
         public static void AdaptColorByEditorSkin()
         {
+            if (SettingsAsset == null) return;
+
             bool change1 = ResetMembersColorByEditorSkin(SettingsAsset.defaultMemberAssets);
             bool change2 = ResetMembersColorByEditorSkin(SettingsAsset.customMemberAssets);
 

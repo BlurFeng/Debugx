@@ -6,7 +6,6 @@ namespace DebugxLog
     public class DebugxConsole : EditorWindow
     {
         private static DebugxProjectSettings Settings => DebugxProjectSettings.Instance;
-        private static DebugxProjectSettingsAsset SettingsAsset => DebugxProjectSettingsAsset.Instance;
 
         private static EditorWindow window;
         private static Vector2 scrollViewPos;

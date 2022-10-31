@@ -11,6 +11,7 @@ namespace DebugxLog
     {
         private static SettingsProvider settingsProvider;
         private static DebugxProjectSettings Settings => DebugxProjectSettings.Instance;
+        private static DebugxProjectSettingsAsset SettingsAsset => DebugxProjectSettingsAsset.Instance;
         private static Dictionary<int, bool> MemberEnableDefaultDic => DebugxStaticData.MemberEnableDefaultDicPrefs;
         private static FadeArea faMemberEnableSetting;
         private static bool isInitGUI;
@@ -37,6 +38,7 @@ namespace DebugxLog
 
         private static void Enable(string searchContext, VisualElement rootElement)
         {
+            DebugxProjectSettingsAsset.CheckDebugxProjectSettingsAsset();
         }
 
         private static void Disable()
@@ -45,6 +47,8 @@ namespace DebugxLog
 
         private static void Draw(string searchContext)
         {
+            if (SettingsAsset == null) return;
+
             if(!isInitGUI)
             {
                 isInitGUI = true;

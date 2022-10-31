@@ -278,6 +278,11 @@
             <param name="key"></param>
             <returns></returns>
         </member>
+        <member name="M:DebugxLog.DebugxProjectSettings.LoadResources">
+            <summary>
+            加载配置资源
+            </summary>
+        </member>
         <member name="F:DebugxLog.DebugxProjectSettings.logOutput">
             <summary>
             输出Log到本地文件

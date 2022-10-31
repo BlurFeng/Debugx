@@ -38,6 +38,8 @@ namespace DebugxLog
 
         private static void Enable(string searchContext, VisualElement rootElement)
         {
+            DebugxProjectSettingsAsset.CheckDebugxProjectSettingsAsset();
+
             DebugxStaticDataEditor.OnAutoSaveChange.Bind(OnAutoSaveChange);
         }
 
@@ -50,6 +52,8 @@ namespace DebugxLog
 
         private static void Draw(string searchContext)
         {
+            if (SettingsAsset == null) return;
+
             if (!isInitGUI)
             {
                 //一些初始化内容调用到GUI类，必须在OnGUI内调用

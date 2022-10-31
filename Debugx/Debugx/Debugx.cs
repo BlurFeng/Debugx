@@ -159,6 +159,7 @@ namespace DebugxLog
         /// </summary>
         public const string fileName = "DebugxProjectSettings";
         private static DebugxProjectSettings instance;
+
         /// <summary>
         /// 单例
         /// </summary>
@@ -168,16 +169,7 @@ namespace DebugxLog
             {
                 if (instance == null)
                 {
-                    IDebugxProjectSettingsAsset iDebugxProjectSettingsAsset = (IDebugxProjectSettingsAsset)Resources.Load<ScriptableObject>(fileName);
-                    if (iDebugxProjectSettingsAsset != null)
-                    {
-                        instance = new DebugxProjectSettings();
-                        iDebugxProjectSettingsAsset.ApplyTo(instance);
-                    }
-                    else
-                    {
-                        Debugx.LogAdmWarning("Failed to load the DebugxProjectSettings configuration resource file. 加载DebugxProjectSettings配置资源文件失败。");
-                    }
+                    LoadResources();
                 }
 
                 return instance;
@@ -267,6 +259,23 @@ namespace DebugxLog
         public static bool KeyValid(int key)
         {
             return key != masterInfoKey && key != normalInfoKey && key != 0;
+        }
+
+        /// <summary>
+        /// 加载配置资源
+        /// </summary>
+        public static void LoadResources()
+        {
+            IDebugxProjectSettingsAsset iDebugxProjectSettingsAsset = (IDebugxProjectSettingsAsset)Resources.Load<ScriptableObject>(fileName);
+            if (iDebugxProjectSettingsAsset != null)
+            {
+                instance = new DebugxProjectSettings();
+                iDebugxProjectSettingsAsset.ApplyTo(instance);
+            }
+            else
+            {
+                Debugx.LogAdmWarning("Failed to load the DebugxProjectSettings configuration resource file. 加载DebugxProjectSettings配置资源文件失败。");
+            }
         }
 
         #region Log Output

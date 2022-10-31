@@ -104,23 +104,9 @@ namespace DebugxLog
                 if (instance == null)
                 {
                     instance = Resources.Load<DebugxProjectSettingsAsset>(DebugxProjectSettings.fileName);
-#if UNITY_EDITOR
-                    //自动创建
-                    if (instance == null)
-                    {
-                        instance = ScriptableObject.CreateInstance(typeof(DebugxProjectSettingsAsset)) as DebugxProjectSettingsAsset;
 
-                        //确认文件夹是否存在，否则创建
-                        if (!Directory.Exists(DebugxStaticData.resourcesPath))
-                            Directory.CreateDirectory(DebugxStaticData.resourcesPath);
-
-                        UnityEditor.AssetDatabase.CreateAsset(instance, $"{DebugxStaticData.resourcesPath}/{DebugxProjectSettings.fileName}.asset");
-
-                        instance.ResetMembers();
-
-                        instance.ApplyTo(DebugxProjectSettings.Instance);
-                    }
-#endif
+                    //通过CheckDebugxProjectSettingsAsset方法来确认并自动创建配置资源
+                    //在启动项目和打开ProjectSettings或Preferences时会确认
                 }
 
                 return instance;
@@ -163,6 +149,45 @@ namespace DebugxLog
         public static void OnInitializeOnLoadMethod()
         {
             if (Instance != null) return;
+
+            CheckDebugxProjectSettingsAsset();
+
+            //启动时加载配置
+            DebugxProjectSettings.LoadResources();
+        }
+
+        /// <summary>
+        /// 确认配置资源是否存在
+        /// </summary>
+        public static void CheckDebugxProjectSettingsAsset()
+        {
+            if(instance == null)
+            {
+                CreateDebugxProjectSettingsAsset();
+            }
+        }
+
+        /// <summary>
+        /// 创建配置资源
+        /// </summary>
+        public static void CreateDebugxProjectSettingsAsset()
+        {
+#if UNITY_EDITOR
+            instance = ScriptableObject.CreateInstance(typeof(DebugxProjectSettingsAsset)) as DebugxProjectSettingsAsset;
+
+            //确认文件夹是否存在，否则创建
+            if (!Directory.Exists(DebugxStaticData.resourcesPath))
+                Directory.CreateDirectory(DebugxStaticData.resourcesPath);
+
+            UnityEditor.AssetDatabase.CreateAsset(instance, $"{DebugxStaticData.resourcesPath}/{DebugxProjectSettings.fileName}.asset");
+
+            instance.ResetMembers();
+
+            instance.ApplyTo(DebugxProjectSettings.Instance);
+
+            UnityEditor.EditorUtility.SetDirty(instance);
+            UnityEditor.AssetDatabase.SaveAssetIfDirty(instance);
+#endif
         }
 
         public void ResetMembers(bool resetDefault = true, bool resetCustom = true)
