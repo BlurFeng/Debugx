@@ -22,11 +22,11 @@
 // 7.增加logThisKeyMemberOnly参数，用于设置仅打印某个Key的成员Log。LogAdm不受影响，LogMasterOnly为设置logThisKeyMemberOnly为MasterKey的快速开关。
 // 8.DebugxManager的Inspector界面更新。
 // 9.新增ActionHandler类，用于创建Action事件。
-// 10.新增DebugxTools类，提供一些可用的工具方法
+// 10.新增DebugxTools类，提供一些可用的工具方法。
 // 11.修复一些Bug。
 ////////////////////
 // 1.1.1.0 20220903
-// 1.新增功能，在Editor编辑器启动时，初始化调试成员配置到Debux，保证在编辑器非游玩时也能使用Debux.Log()
+// 1.新增功能，在Editor编辑器启动时，初始化调试成员配置到Debux，保证在编辑器非游玩时也能使用Debux.Log()。
 // 2.DebugxMemberWindow改名为DebugxSettingWindow，调整窗口内容，优化代码。
 // 3.Debugx.dll中修改Dictionary为List。为了DOTS等某些情况下，不支持Dictionary的情况。
 // 4.LogOutput类，新增绘制Log到屏幕功能，在DebugxManager上设置是否绘制。
@@ -45,17 +45,22 @@
 // 1.GUI界面更新，颜色调整。
 // 2.移除DebugxEditorConfig类。
 // FixBug
-// 1.修复在安卓平台时Application.consoleLogPath获取为空导致无法输出Log文件的问题
+// 1.修复在安卓平台时Application.consoleLogPath获取为空导致无法输出Log文件的问题。
 // 2.用户手册名称更新，去除中文。防止一些因中文路径导致打包失败。
 // 3.替换掉 new() 的语法，防止低版本的C#报错。
-// 4.修复DebugxProjectSettings自动创建流程相关的Bug
-// 5.修复ProjectSettings界面中数组越界Bug
+// 4.修复DebugxProjectSettings自动创建流程相关的Bug。
+// 5.修复ProjectSettings界面中数组越界Bug。
 ////////////////////
 // 2.0.2.0 20221031
-// 1.未注册成员进行打印功能，新增allowUnregisteredMember字段，用于配置是否允许没有注册者打印内容
+// 1.未注册成员进行打印功能，新增allowUnregisteredMember字段，用于配置是否允许没有注册者打印内容。
 // FixBug
 // 1.修复某些情况下DebugxProjectSettings初始化时无法通过Resources.Load加载，导致的各类问题。
 // 2.DebugxProjectSettingsAsset配置资源加载和创建流程更新，尝试修复配置被重置为空的问题。
+////////////////////
+// 2.0.2.1 20221102
+// FixBug
+// 1.在没有DebugxProjectSettings.asset文件时，如果编辑器启动或代码重编译，会导致Resources.Load方法报错堆栈溢出的问题修复。
+//   复现流程为在Editor启动方法中或代码编译时，新创建了DebugxProjectSettings.asset资源并保存后，直接调用Resources.Load方法加载此资源。
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 #endregion
 
@@ -270,18 +275,31 @@ namespace DebugxLog
         /// <summary>
         /// 加载配置资源
         /// </summary>
-        public static void LoadResources()
+        private static void LoadResources()
         {
-            IDebugxProjectSettingsAsset iDebugxProjectSettingsAsset = (IDebugxProjectSettingsAsset)Resources.Load<ScriptableObject>(fileName);
-            if (iDebugxProjectSettingsAsset != null)
+            //Resources.Load在某些生命周期时不可用，比如[InitializeOnLoadMethod]特性方法在启动Editor时调用会导致Resources.Load报错堆栈溢出
+            try
             {
-                instance = new DebugxProjectSettings();
-                iDebugxProjectSettingsAsset.ApplyTo(instance);
+                IDebugxProjectSettingsAsset asset = (IDebugxProjectSettingsAsset)Resources.Load<ScriptableObject>(fileName);
+                if (asset != null) ApplyBy(asset);
+                else Debugx.LogAdmWarning("Failed to load the DebugxProjectSettings configuration resource file. 加载DebugxProjectSettings配置资源文件失败。");
             }
-            else
+            catch
             {
                 Debugx.LogAdmWarning("Failed to load the DebugxProjectSettings configuration resource file. 加载DebugxProjectSettings配置资源文件失败。");
             }
+        }
+
+        /// <summary>
+        /// 从Asset读取数据保存到DebugxProjectSettings
+        /// </summary>
+        /// <param name="asset"></param>
+        public static void ApplyBy(IDebugxProjectSettingsAsset asset)
+        {
+            if (asset == null) return;
+
+            instance = new DebugxProjectSettings();
+            asset.ApplyTo(instance);
         }
 
         #region Log Output

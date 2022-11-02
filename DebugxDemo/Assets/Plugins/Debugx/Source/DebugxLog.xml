@@ -283,6 +283,12 @@
             加载配置资源
             </summary>
         </member>
+        <member name="M:DebugxLog.DebugxProjectSettings.ApplyBy(DebugxLog.IDebugxProjectSettingsAsset)">
+            <summary>
+            从Asset读取数据保存到DebugxProjectSettings
+            </summary>
+            <param name="asset"></param>
+        </member>
         <member name="F:DebugxLog.DebugxProjectSettings.logOutput">
             <summary>
             输出Log到本地文件

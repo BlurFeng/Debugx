@@ -159,7 +159,8 @@ namespace DebugxLog
                     if (EditorUtility.DisplayDialog("Adapt Color By Editor Skin", "确认要执行颜色根据编辑器皮肤自动适应吗？", "Ok", "Cancel"))
                     {
                         Undo.RecordObject(SettingsAsset, "AdaptColorByEditorSkin");
-                        ColorDispenser.AdaptColorByEditorSkin();
+
+                        if (ColorDispenser.AdaptColorByEditorSkin()) Apply();
                     }
                 }
                 EditorGUILayout.EndHorizontal();
@@ -415,8 +416,6 @@ namespace DebugxLog
 
         public static void Apply()
         {
-            SettingsAsset.ApplyTo(DebugxProjectSettings.Instance);
-
             if(DebugxStaticDataEditor.AutoSave)
             {
                 Save(true);
@@ -426,7 +425,7 @@ namespace DebugxLog
                 assetIsDirty = true;
             }
 
-            //EditorConfig.canResetProjectSettings = true;
+            SettingsAsset.ApplyTo(DebugxProjectSettings.Instance);
         }
 
         private static void Save(bool force = false)

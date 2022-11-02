@@ -176,17 +176,14 @@ namespace DebugxLog
         /// <summary>
         /// 重置所有成员颜色，根据当前编辑器皮肤
         /// </summary>
-        public static void AdaptColorByEditorSkin()
+        public static bool AdaptColorByEditorSkin()
         {
-            if (SettingsAsset == null) return;
+            if (SettingsAsset == null) return false;
 
             bool change1 = ResetMembersColorByEditorSkin(SettingsAsset.defaultMemberAssets);
             bool change2 = ResetMembersColorByEditorSkin(SettingsAsset.customMemberAssets);
 
-            if (change1 || change2)
-            {
-                SettingsAsset.ApplyTo(DebugxProjectSettings.Instance);
-            }
+            return change1 || change2;
         }
 
         private static bool ResetMembersColorByEditorSkin(DebugxMemberInfoAsset[] debugxMemberInfoAsset)

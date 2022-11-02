@@ -1,7 +1,6 @@
 ﻿using UnityEngine;
 using System;
 using DebugxLog.Tools;
-using System.IO;
 
 namespace DebugxLog
 {
@@ -103,7 +102,14 @@ namespace DebugxLog
             {
                 if (instance == null)
                 {
-                    instance = Resources.Load<DebugxProjectSettingsAsset>(DebugxProjectSettings.fileName);
+                    try
+                    {
+                        instance = Resources.Load<DebugxProjectSettingsAsset>(DebugxProjectSettings.fileName);
+                    }
+                    catch
+                    {
+
+                    }
 
                     //通过CheckDebugxProjectSettingsAsset方法来确认并自动创建配置资源
                     //在启动项目和打开ProjectSettings或Preferences时会确认
@@ -148,12 +154,8 @@ namespace DebugxLog
 
         public static void OnInitializeOnLoadMethod()
         {
-            if (Instance != null) return;
-
+            //项目启动时确认配置资源是否存在
             CheckDebugxProjectSettingsAsset();
-
-            //启动时加载配置
-            DebugxProjectSettings.LoadResources();
         }
 
         /// <summary>
@@ -161,7 +163,7 @@ namespace DebugxLog
         /// </summary>
         public static void CheckDebugxProjectSettingsAsset()
         {
-            if(instance == null)
+            if(Instance == null)
             {
                 CreateDebugxProjectSettingsAsset();
             }
@@ -172,21 +174,27 @@ namespace DebugxLog
         /// </summary>
         public static void CreateDebugxProjectSettingsAsset()
         {
+            //在编辑器启动或代码编译时，创建Asset后直接Resources.Load此资源会导致一个堆栈溢出的Bug。所以我们使用DebugxProjectSettings.ApplyBy接口进行保存，避开会调用到Resources.Load的流程
+            //调用Resources.Load加载已经存在的资源则不会有此问题，应该是Editor启动时创建的Asset资源还未成功进行保存
+
 #if UNITY_EDITOR
+            string path = $"{DebugxStaticData.resourcesPath}/{DebugxProjectSettings.fileName}.asset";
+
+            if (Instance) UnityEditor.AssetDatabase.DeleteAsset(path);//移除旧资源
+
             instance = ScriptableObject.CreateInstance(typeof(DebugxProjectSettingsAsset)) as DebugxProjectSettingsAsset;
 
             //确认文件夹是否存在，否则创建
-            if (!Directory.Exists(DebugxStaticData.resourcesPath))
-                Directory.CreateDirectory(DebugxStaticData.resourcesPath);
+            if (!System.IO.Directory.Exists(DebugxStaticData.resourcesPath))
+                System.IO.Directory.CreateDirectory(DebugxStaticData.resourcesPath);
 
-            UnityEditor.AssetDatabase.CreateAsset(instance, $"{DebugxStaticData.resourcesPath}/{DebugxProjectSettings.fileName}.asset");
+            UnityEditor.AssetDatabase.CreateAsset(instance, path);
 
             instance.ResetMembers();
 
-            instance.ApplyTo(DebugxProjectSettings.Instance);
-
             UnityEditor.EditorUtility.SetDirty(instance);
             UnityEditor.AssetDatabase.SaveAssetIfDirty(instance);
+            DebugxProjectSettings.ApplyBy(instance);
 #endif
         }
 

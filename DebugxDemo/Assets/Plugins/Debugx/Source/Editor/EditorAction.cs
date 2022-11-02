@@ -10,7 +10,6 @@ namespace DebugxLog
         {
             DebugxEditorLibrary.OnInitializeOnLoadMethod();
             DebugxProjectSettingsAsset.OnInitializeOnLoadMethod();
-
             ColorDispenser.OnInitializeOnLoadMethod();
 
             EditorApplication.wantsToQuit += Quit;
