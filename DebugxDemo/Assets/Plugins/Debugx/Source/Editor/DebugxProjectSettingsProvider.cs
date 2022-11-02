@@ -1,9 +1,8 @@
-﻿using NUnit.Framework;
-using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEditor;
 using UnityEditor.Build;
 using UnityEngine;
+using UnityEngine.Networking.Types;
 using UnityEngine.UIElements;
 
 namespace DebugxLog
@@ -16,6 +15,18 @@ namespace DebugxLog
         private static FadeArea faMemberConfigSetting;
         private static bool isInitGUI;
         private static bool assetIsDirty;
+        private static bool FadeAreaHeaderIsDirty
+        {
+            set
+            {
+                //标脏只能设为true
+                if (value)
+                {
+                    fadeAreaHeaderIsDirty = true;
+                }
+            }
+        }
+        private static bool fadeAreaHeaderIsDirty;
 
         [SettingsProvider]
         public static SettingsProvider DebugxProjectSettingsProviderCreate()
@@ -45,7 +56,7 @@ namespace DebugxLog
 
         private static void Disable()
         {
-            Save();
+            Apply();
 
             DebugxStaticDataEditor.OnAutoSaveChange.Unbind(OnAutoSaveChange);
         }
@@ -73,20 +84,18 @@ namespace DebugxLog
 
             DebugxStaticDataEditor.AutoSave = GUILayoutx.Toggle("AutoSave Asset", "自动保存配置资源，自动保存时在修改内容时会有卡顿。", DebugxStaticDataEditor.AutoSave);
             EditorGUI.BeginDisabledGroup(!assetIsDirty);
-            if (GUILayoutx.ButtonGreen("Save Asset")) Save();
+            if (GUILayoutx.ButtonGreen("Save Asset")) Apply();
             EditorGUI.EndDisabledGroup();
 
-            EditorGUI.BeginDisabledGroup(false/*!EditorConfig.canResetProjectSettings*/);
             if (GUILayoutx.ButtonRed("Reset to Default"))
             {
                 if (EditorUtility.DisplayDialog("Reset To Default", "确认要重置到默认设置吗？\n重置并不会清空Member成员配置，仅将成员配置的部分字段重置。", "Ok", "Cancel"))
                 {
                     Undo.RecordObject(SettingsAsset, "ResetToDefault");
                     ResetProjectSettings();
-                    Apply();
+                    SaveCheck();
                 }
             }
-            EditorGUI.EndDisabledGroup();
             EditorGUILayout.EndHorizontal();
 
             EditorGUILayout.Space();
@@ -128,7 +137,7 @@ namespace DebugxLog
 
             if (EditorGUI.EndChangeCheck())
             {
-                Apply();
+                SaveCheck();
             }
 
             EditorGUILayout.Space(16f);
@@ -140,7 +149,7 @@ namespace DebugxLog
             EditorGUILayout.LabelField("Member Settings", GUIStylex.Get.TitleStyle_2);
 
             faMemberConfigSetting.Begin();
-            faMemberConfigSetting.Header("Members");
+            FadeAreaHeaderIsDirty = faMemberConfigSetting.Header("Members");
 
             DebugxStaticDataEditor.FAMemberConfigSettingOpen = faMemberConfigSetting.BeginFade();
             if (DebugxStaticDataEditor.FAMemberConfigSettingOpen)
@@ -160,7 +169,7 @@ namespace DebugxLog
                     {
                         Undo.RecordObject(SettingsAsset, "AdaptColorByEditorSkin");
 
-                        if (ColorDispenser.AdaptColorByEditorSkin()) Apply();
+                        ColorDispenser.AdaptColorByEditorSkin();
                     }
                 }
                 EditorGUILayout.EndHorizontal();
@@ -195,7 +204,7 @@ namespace DebugxLog
 
                         faTemp = memberInfosFadeAreaPool[i];
                         faTemp.Begin();
-                        faTemp.Header(string.IsNullOrEmpty(mInfo.signature) ? $"Member {mInfo.key}" : mInfo.signature);
+                        FadeAreaHeaderIsDirty = faTemp.Header(string.IsNullOrEmpty(mInfo.signature) ? $"Member {mInfo.key}" : mInfo.signature);
                         SettingsAsset.defaultMemberAssets[i].fadeAreaOpenCached = faTemp.BeginFade();
                         if (SettingsAsset.defaultMemberAssets[i].fadeAreaOpenCached)
                             DrawMemberInfo(ref SettingsAsset.defaultMemberAssets[i], true, true);
@@ -220,7 +229,7 @@ namespace DebugxLog
                     Undo.RecordObject(SettingsAsset, "AddMember");
 
                     //创建新成员
-                    GetMemberKey(out int newKey);
+                    AutoGetMemberKey(out int newKey);
                     DebugxMemberInfoAsset mInfo = new DebugxMemberInfoAsset(newKey);
 
                     //添加到数组末尾
@@ -251,7 +260,7 @@ namespace DebugxLog
 
                         faTemp.Begin();
                         GUILayout.BeginHorizontal();
-                        faTemp.Header(string.IsNullOrEmpty(mInfo.signature) ? $"Member {mInfo.key}" : mInfo.signature, 320);
+                        FadeAreaHeaderIsDirty = faTemp.Header(string.IsNullOrEmpty(mInfo.signature) ? $"Member {mInfo.key}" : mInfo.signature, 320);
                         if (GUILayout.Button("Delete Member"))
                         {
                             removeIndex = i;
@@ -292,43 +301,42 @@ namespace DebugxLog
         {
             DebugxMemberInfoAsset mInfoOld = mInfo;
 
-            mInfo.enableDefault = EditorGUILayout.Toggle(new GUIContent("Enable Default", "是否开启，在运行时也可通过DebugxConsole动态改变开关。"), mInfo.enableDefault);
+            mInfo.enableDefault = Toggle("Enable Default", "是否开启，在运行时也可通过DebugxConsole动态改变开关。", mInfo.enableDefault);
 
             //签名
             EditorGUI.BeginDisabledGroup(lockSignature);
-            mInfo.signature = EditorGUILayout.DelayedTextField(new GUIContent("Signature", "成员签名"), mInfo.signature);
+            mInfo.signature = TextField("Signature", "成员签名", mInfo.signature);
             EditorGUI.EndDisabledGroup();
-            mInfo.logSignature = EditorGUILayout.Toggle(new GUIContent("LogSignature", "是否打印签名"), mInfo.logSignature);
+            mInfo.logSignature = Toggle("LogSignature", "是否打印签名", mInfo.logSignature);
 
             //打印密钥
             EditorGUI.BeginDisabledGroup(lockKey);
-            EditorGUI.BeginChangeCheck();
-            mInfo.key = Mathf.Clamp(EditorGUILayout.IntField(new GUIContent("Key", "成员信息密钥，在效用Debugx.Logx()方法时使用"), mInfo.key), int.MinValue, int.MaxValue);
-            if (EditorGUI.EndChangeCheck())
+            int changeKey = Mathf.Clamp(EditorGUILayout.DelayedIntField(new GUIContent("Key", "成员信息密钥，在效用Debugx.Logx()方法时使用"), mInfo.key), 1, int.MaxValue);
+            if (changeKey != mInfo.key)
             {
-                RemoveKey(mInfoOld.key);
+                bool setKey = true;
 
                 //确认Key是否重复，重复时自动从最小可用Key开始使用
-                if (!DebugxProjectSettings.KeyValid(mInfo.key) || CheckMemberKeyRepetition(mInfo.key))
+                if (!DebugxProjectSettings.KeyValid(changeKey) || CheckMemberKeyRepetition(changeKey, mInfo.key))
                 {
-                    if (GetMemberKey(out int newKey))
+                    if (!AutoGetMemberKey(out changeKey, mInfo.key))
                     {
-                        mInfo.key = newKey;
-                    }
-                    else
-                    {
-                        mInfo.key = mInfoOld.key;
+                        setKey = false;
                     }
                 }
 
-                AddKey(mInfo.key);
+                if (setKey)
+                {
+                    mInfo.key = changeKey;
+                    Undo.RecordObject(SettingsAsset, "Member Key Change");
+                }
             }
             EditorGUI.EndDisabledGroup();
 
-            mInfo.header = EditorGUILayout.DelayedTextField(new GUIContent("Header", "头部信息，在答应log时打印在头部"), mInfo.header);
+            mInfo.header = TextField("Header", "头部信息，在答应log时打印在头部", mInfo.header);
 
             EditorGUILayout.BeginHorizontal();
-            mInfo.color = EditorGUILayout.ColorField(new GUIContent("Color", "Log颜色"), mInfo.color);
+            mInfo.color = ColorField("Color", "Log颜色", mInfo.color);
             if (GUILayout.Button(new GUIContent("Adapt Color", "颜色根据编辑器皮肤自动适应。在Dark暗皮肤时Log颜色会变亮，在Light亮皮肤时Log颜色会变暗。"), GUILayout.Width(100)))
             {
                 Undo.RecordObject(SettingsAsset, "AdaptColor Single");
@@ -345,7 +353,6 @@ namespace DebugxLog
             faMemberConfigSetting = new FadeArea(settingsProvider, DebugxStaticDataEditor.FAMemberConfigSettingOpen, GUIStylex.Get.AreaStyle_1, GUIStylex.Get.LabelStyle_FadeAreaHeader, 0.8f);
 
             memberInfosFadeAreaPool.Clear();
-            memberInfoKeyDic.Clear();
 
             if (SettingsAsset.defaultMemberAssets != null)
             {
@@ -368,14 +375,12 @@ namespace DebugxLog
         private static void OnAddMemberInfo(DebugxMemberInfoAsset info)
         {
             memberInfosFadeAreaPool.Add(new FadeArea(settingsProvider, info.fadeAreaOpenCached, GUIStylex.Get.AreaStyle_1, GUIStylex.Get.LabelStyle_FadeAreaHeader));
-            AddKey(info.key);
         }
 
         //当移除一个成员信息时
         private static void OnRemoveMemberInfo(int index, DebugxMemberInfoAsset info)
         {
             memberInfosFadeAreaPool.RemoveAt(index + 2);//前面两个时Normal和Master用的
-            RemoveKey(info.key);
         }
 
         private static void ResetProjectSettings()
@@ -414,81 +419,58 @@ namespace DebugxLog
             }
         }
 
-        public static void Apply()
+        public static void SaveCheck()
         {
-            if(DebugxStaticDataEditor.AutoSave)
+            assetIsDirty = true;
+
+            if (DebugxStaticDataEditor.AutoSave)
             {
-                Save(true);
+                Apply();
             }
-            else
-            {
-                assetIsDirty = true;
-            }
-
-            SettingsAsset.ApplyTo(DebugxProjectSettings.Instance);
-        }
-
-        private static void Save(bool force = false)
-        {
-            if (!force && !assetIsDirty) return;
-            assetIsDirty = false;
-
-            EditorUtility.SetDirty(SettingsAsset);
-            AssetDatabase.SaveAssetIfDirty(SettingsAsset);
         }
 
         private static void OnAutoSaveChange(bool enable)
         {
             //变为自动保存时，自动进行一次存储
-            if(enable)
+            if (enable)
             {
-                Save();
+                Apply();
             }
+        }
+
+        public static void Apply()
+        {
+            if (!DebugxStaticDataEditor.AutoSave && !assetIsDirty && !fadeAreaHeaderIsDirty) return;
+            assetIsDirty = false; fadeAreaHeaderIsDirty = false;
+
+            EditorUtility.SetDirty(SettingsAsset);
+            AssetDatabase.SaveAssetIfDirty(SettingsAsset);
+            SettingsAsset.ApplyTo(DebugxProjectSettings.Instance);
         }
 
         #region MemberInfoKey
-        //Key=DebugxMemberInfo.key vaule=使用的成员信息，要求只能有一个
-        private static Dictionary<int, int> memberInfoKeyDic = new Dictionary<int, int>();
-
-        private static void AddKey(int key)
-        {
-            if (memberInfoKeyDic.ContainsKey(key))
-            {
-                memberInfoKeyDic[key]++;
-
-                if (memberInfoKeyDic[key] > 1)
-                {
-                    //重复了
-                    Debugx.LogNomError($"Key：{key} 重复了。");
-                }
-            }
-            //记录已经被使用过的Key
-            else
-            {
-                memberInfoKeyDic.Add(key, 1);
-            }
-        }
-
-        private static void RemoveKey(int key)
-        {
-            if (!memberInfoKeyDic.ContainsKey(key)) return;
-
-            memberInfoKeyDic[key]--;
-        }
 
         //确认成员信息的Key是否重复，重复时返回true
-        private static bool CheckMemberKeyRepetition(int key)
+        private static bool CheckMemberKeyRepetition(int key, int withoutKey = 0)
         {
-            if (!memberInfoKeyDic.ContainsKey(key)) return false;
+            if (SettingsAsset.CustomMemberAssetsLength == 0) return false;
 
-            return memberInfoKeyDic[key] >= 1;
+            for (int i = 0; i < SettingsAsset.CustomMemberAssetsLength; i++)
+            {
+                var m = SettingsAsset.customMemberAssets[i];
+                if (m.key == withoutKey) continue;
+                if (m.key == key)
+                    return true;
+            }
+
+            return false;
         }
 
         //获取一个不重复的Key
-        private static bool GetMemberKey(out int key)
+        private static bool AutoGetMemberKey(out int key, int withoutKey = 0)
         {
             key = 1;
-            while (CheckMemberKeyRepetition(key))
+            while (CheckMemberKeyRepetition(key, withoutKey))
             {
                 if (key > int.MaxValue)
                 {
@@ -505,9 +487,8 @@ namespace DebugxLog
 
         public static bool Toggle(string label, string tooltip, bool value, float width = 250f)
         {
-            bool valueCached = value;
-            bool valueNew = GUILayoutx.Toggle(label, tooltip, valueCached, width);
-            if(valueNew != valueCached)
+            bool valueNew = GUILayoutx.Toggle(label, tooltip, value, width);
+            if(valueNew != value)
             {
                 Undo.RecordObject(SettingsAsset, "DebugxSettingsProvider Toggle Set");
             }
@@ -517,9 +498,8 @@ namespace DebugxLog
 
         public static int IntField(string label, string tooltip, int value, float width = 250f)
         {
-            int valueCached = value;
-            int valueNew = GUILayoutx.IntField(label, tooltip, valueCached, width);
-            if (valueNew != valueCached)
+            int valueNew = GUILayoutx.IntField(label, tooltip, value, width);
+            if (valueNew != value)
             {
                 Undo.RecordObject(SettingsAsset, "DebugxSettingsProvider Int Set");
             }
@@ -527,6 +507,38 @@ namespace DebugxLog
             return valueNew;
         }
 
+        public static bool Toggle(string label, string tooltip, bool value)
+        {
+            bool valueNew = EditorGUILayout.Toggle(new GUIContent(label, tooltip), value);
+            if (valueNew != value)
+            {
+                Undo.RecordObject(SettingsAsset, "DebugxSettingsProvider Toggle Set");
+            }
+
+            return valueNew;
+        }
+
+        public static string TextField(string label, string tooltip, string value)
+        {
+            string valueNew = EditorGUILayout.DelayedTextField(new GUIContent(label, tooltip), value);
+            if (valueNew != value)
+            {
+                Undo.RecordObject(SettingsAsset, "DebugxSettingsProvider Text Set");
+            }
+
+            return valueNew;
+        }
+
+        public static Color ColorField(string label, string tooltip, Color value)
+        {
+            Color valueNew = EditorGUILayout.ColorField(new GUIContent(label, tooltip), value);
+            if (valueNew != value)
+            {
+                Undo.RecordObject(SettingsAsset, "Member Color Set");
+            }
+
+            return valueNew;
+        }
         #endregion
     }
 }

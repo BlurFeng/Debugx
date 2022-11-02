@@ -155,7 +155,7 @@ namespace DebugxLog
         public static void OnInitializeOnLoadMethod()
         {
             //项目启动时确认配置资源是否存在
-            CheckDebugxProjectSettingsAsset();
+            CheckDebugxProjectSettingsAsset(); 
         }
 
         /// <summary>

@@ -188,22 +188,30 @@ namespace DebugxLog
             EditorGUILayout.Space(beginSpace);
         }
 
-        public void Header(string label, string tooltip = "")
+        public bool Header(string label, string tooltip = "")
         {
-            Header(label, ref open, tooltip);
+            return Header(label, ref open, tooltip);
         }
 
-        public void Header(string label, string tooltip, int width)
+        public bool Header(string label, string tooltip, int width)
         {
-            Header(label, ref open, tooltip, width);
+            return Header(label, ref open, tooltip, width);
         }
 
-        public void Header(string label, int width)
+        public bool Header(string label, int width)
         {
-            Header(label, ref open, "", width);
+            return Header(label, ref open, "", width);
         }
 
-        public void Header(string label, ref bool open, string tooltip = "", int width = -1)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="label"></param>
+        /// <param name="open"></param>
+        /// <param name="tooltip"></param>
+        /// <param name="width"></param>
+        /// <returns>Header是否被点击产生开关变化</returns>
+        public bool Header(string label, ref bool open, string tooltip = "", int width = -1)
         {
             if (changedExcludeHeraderClick)
                 changedCached = GUI.changed;
@@ -228,6 +236,8 @@ namespace DebugxLog
             if (immediately) value = open ? 1f : 0f;
 
             if (changedExcludeHeraderClick && !changedCached) GUI.changed = changedCached;//开关FadeArea排除Changed判断
+
+            return press;
         }
 
         /// <summary>Hermite spline interpolation</summary>

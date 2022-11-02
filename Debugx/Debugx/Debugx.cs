@@ -57,7 +57,9 @@
 // 1.修复某些情况下DebugxProjectSettings初始化时无法通过Resources.Load加载，导致的各类问题。
 // 2.DebugxProjectSettingsAsset配置资源加载和创建流程更新，尝试修复配置被重置为空的问题。
 ////////////////////
-// 2.0.2.1 20221102
+// 2.0.2.1 20221102 (更新中，未发布)
+// 1.菜单栏新增CreateDebugxProjectSettingsAsset方法用于创建配置资源文件。
+// 2.DebugxProjectSettingsProvider项目设置界面优化。
 // FixBug
 // 1.在没有DebugxProjectSettings.asset文件时，如果编辑器启动或代码重编译，会导致Resources.Load方法报错堆栈溢出的问题修复。
 //   复现流程为在Editor启动方法中或代码编译时，新创建了DebugxProjectSettings.asset资源并保存后，直接调用Resources.Load方法加载此资源。
@@ -269,7 +271,7 @@ namespace DebugxLog
         /// <returns></returns>
         public static bool KeyValid(int key)
         {
-            return key != masterInfoKey && key != normalInfoKey && key != 0;
+            return key > 0;
         }
 
         /// <summary>
