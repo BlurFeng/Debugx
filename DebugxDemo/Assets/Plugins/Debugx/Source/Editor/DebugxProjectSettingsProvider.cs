@@ -101,7 +101,7 @@ namespace DebugxLog
             EditorGUILayout.Space();
             EditorGUILayout.LabelField("Config Settings", GUIStylex.Get.TitleStyle_3);
             EditorGUI.BeginDisabledGroup(true);
-            EditorGUILayout.ObjectField("", DebugxProjectSettingsAsset.Instance, typeof(DebugxProjectSettingsAsset), false);
+            EditorGUILayout.ObjectField("", SettingsAsset, typeof(DebugxProjectSettingsAsset), false);
             EditorGUI.EndDisabledGroup();
 
             EditorGUILayout.Space();
@@ -443,9 +443,12 @@ namespace DebugxLog
             if (!DebugxStaticDataEditor.AutoSave && !assetIsDirty && !fadeAreaHeaderIsDirty) return;
             assetIsDirty = false; fadeAreaHeaderIsDirty = false;
 
-            EditorUtility.SetDirty(SettingsAsset);
-            AssetDatabase.SaveAssetIfDirty(SettingsAsset);
-            SettingsAsset.ApplyTo(DebugxProjectSettings.Instance);
+            if(SettingsAsset != null)
+            {
+                EditorUtility.SetDirty(SettingsAsset);
+                AssetDatabase.SaveAssetIfDirty(SettingsAsset);
+                SettingsAsset.ApplyTo(DebugxProjectSettings.Instance);
+            }
         }
 
         #region MemberInfoKey

@@ -232,7 +232,8 @@ namespace DebugxLog
         public static void Apply()
         {
             //ApplyTo中会判断如果在Editor就使用用户偏好设置，而不是使用DebugxProjectSettingsAsset配置
-            DebugxProjectSettingsAsset.Instance.ApplyTo(DebugxProjectSettings.Instance);
+            if(SettingsAsset != null)
+                SettingsAsset.ApplyTo(DebugxProjectSettings.Instance);
         }
     }
 }
