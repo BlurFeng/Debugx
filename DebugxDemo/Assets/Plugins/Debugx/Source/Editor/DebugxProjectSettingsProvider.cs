@@ -311,9 +311,11 @@ namespace DebugxLog
 
             //打印密钥
             EditorGUI.BeginDisabledGroup(lockKey);
-            int changeKey = Mathf.Clamp(EditorGUILayout.DelayedIntField(new GUIContent("Key", "成员信息密钥，在效用Debugx.Logx()方法时使用"), mInfo.key), 1, int.MaxValue);
+            int changeKey = EditorGUILayout.DelayedIntField(new GUIContent("Key", "成员信息密钥，在效用Debugx.Logx()方法时使用"), mInfo.key);
             if (changeKey != mInfo.key)
             {
+                if (changeKey <= 0) changeKey = 1;
+
                 bool setKey = true;
 
                 //确认Key是否重复，重复时自动从最小可用Key开始使用
