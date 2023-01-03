@@ -29,7 +29,7 @@ MonoBehaviour:
     logSignature: 1
     key: -2
     header: 
-    color: {r: 0.95, g: 0.819375, b: 0.8075, a: 1}
+    color: {r: 1, g: 0.627, b: 0.627, a: 1}
     fadeAreaOpenCached: 1
   customMemberAssets:
   - enableDefault: 1

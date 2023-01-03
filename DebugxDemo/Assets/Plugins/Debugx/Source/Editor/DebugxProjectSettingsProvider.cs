@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Text.RegularExpressions;
 using UnityEditor;
 using UnityEditor.Build;
 using UnityEngine;
@@ -298,13 +299,20 @@ namespace DebugxLog
 
         public static void DrawMemberInfo(ref DebugxMemberInfoAsset mInfo, bool lockSignature = false, bool lockKey = false)
         {
-            DebugxMemberInfoAsset mInfoOld = mInfo;
-
             mInfo.enableDefault = Toggle("Enable Default", "是否开启，在运行时也可通过DebugxConsole动态改变开关。", mInfo.enableDefault);
 
             //签名
             EditorGUI.BeginDisabledGroup(lockSignature);
-            mInfo.signature = TextField("Signature", "成员签名", mInfo.signature);
+            string signatureNew = EditorGUILayout.DelayedTextField(new GUIContent("Signature", "成员签名"), mInfo.signature);
+            if (signatureNew != mInfo.signature)
+            {
+                //确认是否重复
+                CheckMemberSignatureRepetition(ref signatureNew, mInfo.signature);
+                mInfo.signature = signatureNew;
+
+                Undo.RecordObject(SettingsAsset, "DebugxSettingsProvider Text Set");
+            }
+
             EditorGUI.EndDisabledGroup();
             mInfo.logSignature = Toggle("LogSignature", "是否打印签名", mInfo.logSignature);
 
@@ -452,7 +460,9 @@ namespace DebugxLog
             }
         }
 
-        #region MemberInfoKey
+        #region MemberInfo
+
+        private static readonly Regex regex_EndingDigit = new Regex(@"\d+$");
 
         //确认成员信息的Key是否重复，重复时返回true
         private static bool CheckMemberKeyRepetition(int key, int withoutKey = 0)
@@ -468,6 +478,63 @@ namespace DebugxLog
             }
 
             return false;
+        }
+
+        private static bool CheckMemberSignatureRepetition(ref string signature, string withoutSignature = "")
+        {
+            if (string.IsNullOrEmpty(signature)) return false;
+
+            for (int i = 0; i < SettingsAsset.CustomMemberAssetsLength; i++)
+            {
+                var m = SettingsAsset.customMemberAssets[i];
+                if (m.signature.Equals(withoutSignature)) continue;
+                if (m.signature.Equals(signature))
+                {
+                    GetSignatureUnique(ref signature, withoutSignature);
+                    return true;
+                }
+            }
+
+            for (int i = 0; i < SettingsAsset.DefaultMemberAssetsLength; i++)
+            {
+                var m = SettingsAsset.defaultMemberAssets[i];
+                if (m.signature.Equals(withoutSignature)) continue;
+                if (m.signature.Equals(signature))
+                {
+                    GetSignatureUnique(ref signature, withoutSignature);
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        private static void GetSignatureUnique(ref string signature, string withoutSignature = "")
+        {
+            string signatureOri = signature;
+            string signatureBase = signature;
+            int num = 1;
+            Match match = regex_EndingDigit.Match(signatureBase);
+            if (match.Length != 0)
+            {
+                int.TryParse(match.Value, out num);
+                signatureBase = regex_EndingDigit.Replace(signatureBase, "");
+            }
+
+            string signatureNew = $"{signatureBase}{num}";
+            while (signatureOri.Equals(signatureNew))
+            {
+                num++;
+                signatureNew = $"{signatureBase}{num}";
+                if (num == int.MaxValue)
+                {
+                    signatureNew = "";
+                    break;
+                }
+            }
+
+            signature = signatureNew;
+            CheckMemberSignatureRepetition(ref signature, withoutSignature);
         }
 
         //获取一个不重复的Key

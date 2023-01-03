@@ -86,9 +86,9 @@ namespace DebugxLog.Tools
             if (!Enable || string.IsNullOrEmpty(savePath)) return;
 
             FileInfo fileInfo = new FileInfo(savePath);
-            if(fileInfo != null)
+            if (fileInfo != null)
             {
-                if(fileInfo.Length == 0)
+                if (fileInfo.Length == 0)
                 {
                     fileInfo.Delete();
                 }
@@ -118,8 +118,8 @@ namespace DebugxLog.Tools
                 logBuilder.Append(log);
 
                 //是否记录对战跟踪
-                if(type == LogType.Log && LogStackTrace 
-                    ||type == LogType.Warning && WarningStackTrace
+                if (type == LogType.Log && LogStackTrace
+                    || type == LogType.Warning && WarningStackTrace
                     || type == LogType.Error && ErrorStackTrace)
                 {
                     logBuilder.Append(stackTrace);
@@ -175,7 +175,7 @@ namespace DebugxLog.Tools
                 return;
             }
 
-            windowRect = collapse? new Rect(10,10, Screen.width * 0.4f - (margin * 5), 40f) : new Rect(10, 10, Screen.width * 0.4f - (margin * 5), Screen.height * 0.3f - (margin * 6));
+            windowRect = collapse ? new Rect(10, 10, Screen.width * 0.4f - (margin * 5), 40f) : new Rect(10, 10, Screen.width * 0.4f - (margin * 5), Screen.height * 0.3f - (margin * 6));
             windowRect = GUILayout.Window(19940223, windowRect, DrawConsoleWindow, "Debugx Logs");
         }
 
@@ -205,7 +205,7 @@ namespace DebugxLog.Tools
         private static void DrawConsoleWindow(int windowID)
         {
             DrawToolbar();
-            if(!collapse)
+            if (!collapse)
                 DrawLogsList();
 
             // Allow the window to be dragged by its title bar.  
@@ -261,7 +261,7 @@ namespace DebugxLog.Tools
                 drawLogs.Clear();
             }
 
-            collapseRepetition = GUILayout.Toggle(collapseRepetition, "Collapse Repetition", GUILayout.ExpandWidth(false));  
+            collapseRepetition = GUILayout.Toggle(collapseRepetition, "Collapse Repetition", GUILayout.ExpandWidth(false));
 
             GUILayout.EndHorizontal();
         }

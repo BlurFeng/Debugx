@@ -60,13 +60,14 @@
 // 2.0.2.1 20221102 (更新中，未发布)
 // 1.菜单栏新增CreateDebugxProjectSettingsAsset方法用于创建配置资源文件。
 // 2.DebugxProjectSettingsProvider项目设置界面优化。
+// 3.Log方法扩展，可以输入Signature签名来代替Key作为成员参数。
+// 4.DebugxBurst更新，移除会导致DOTS项目编译报错的方法。
 // FixBug
 // 1.在没有DebugxProjectSettings.asset文件时，如果编辑器启动或代码重编译，会导致Resources.Load方法报错堆栈溢出的问题修复。
 //   复现流程为在Editor启动方法中或代码编译时，新创建了DebugxProjectSettings.asset资源并保存后，直接调用Resources.Load方法加载此资源。
+// 2.修复每次代码重编译时DebugxProjectSettingsAsset资源都被重新创建的默认资源覆盖的bug。
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 #endregion
-
-#define DEBUG_X
 
 using System;
 using System.Diagnostics;
@@ -75,7 +76,7 @@ using UnityEngine;
 using DebugxLog;
 using System.Collections.Generic;
 
-namespace DebugxLog 
+namespace DebugxLog
 {
     /// <summary>
     /// Debugx设置资源接口
@@ -396,7 +397,7 @@ public class Debugx
     {
         ResetToDefault();
 
-        if(Settings != null && Settings.members != null)
+        if (Settings != null && Settings.members != null)
         {
             for (int i = 0; i < Settings.members.Length; i++)
             {
@@ -419,7 +420,7 @@ public class Debugx
     /// </summary>
     public static void ResetToDefault()
     {
-        if(Settings != null)
+        if (Settings != null)
         {
             enableLog = Settings.enableLogDefault;
             enableLogMember = Settings.enableLogMemberDefault;
@@ -440,7 +441,7 @@ public class Debugx
     {
         if (memberEnables == null || memberEnables.Count == 0) return;
 
-        if(!memberEnables.ContainsKey(key))
+        if (!memberEnables.ContainsKey(key))
         {
             Debugx.LogAdmWarning($"Debugx.SetMemberEnable: cant find memberInfo by key:{key}. 无法找到Key为{key}的成员信息。");
             return;
@@ -456,18 +457,18 @@ public class Debugx
     /// <returns></returns>
     public static bool MemberIsEnable(int key)
     {
-        if(memberEnables != null && memberEnables.Count > 0)
+        if (memberEnables != null && memberEnables.Count > 0)
         {
             if (!memberEnables.ContainsKey(key)) return false;
             return memberEnables[key];
         }
 
-        if(Settings != null && Settings.members != null && Settings.members.Length > 0)
+        if (Settings != null && Settings.members != null && Settings.members.Length > 0)
         {
             for (int i = 0; i < Settings.members.Length; i++)
             {
                 var info = Settings.members[i];
-                if(info.key == key)
+                if (info.key == key)
                 {
                     return info.enableDefault;
                 }
@@ -513,7 +514,41 @@ public class Debugx
 
         for (int i = 0; i < Settings.members.Length; i++)
         {
-            if(Settings.members[i].key == key)
+            if (Settings.members[i].key == key)
+            {
+                memberInfo = Settings.members[i];
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private static bool GetMemberInfo(string signature, out DebugxMemberInfo memberInfo)
+    {
+        memberInfo = null;
+
+        if (Settings == null)
+        {
+            LogAdmWarning($"Debugx.GetMemberInfo: The initial configuration is not performed.Settings is null. 未成功初始化配置，Settings为空。");
+            return false;
+        }
+
+        if (Settings.members == null)
+        {
+            LogAdmWarning($"Debugx.GetMemberInfo: The initial configuration is not performed.Settings.members is null. 未初始化配置，Settings.members为空。");
+            return false;
+        }
+
+        if (Settings.members.Length == 0)
+        {
+            LogAdmWarning($"Debugx.GetMemberInfo: There are no members available.Settings.members.Length is 0. 没有任何可用的成员，Settings.members.Length为0。");
+            return false;
+        }
+
+        for (int i = 0; i < Settings.members.Length; i++)
+        {
+            if (Settings.members[i].signature == signature)
             {
                 memberInfo = Settings.members[i];
                 return true;
@@ -642,7 +677,7 @@ public class Debugx
     /// <summary>
     /// 成员打印Log
     /// </summary>
-    /// <param name="key">DebugxMemberInfo中配置的key</param>
+    /// <param name="key">成员密钥，DebugxMemberInfo中配置的key</param>
     /// <param name="message">打印内容</param>
     /// <param name="showTime">显示时间</param>
     /// <param name="showNetTag">显示网络标记，Server或者Client。此功能依赖项目，需要项目通过SetServerCheck方法来设置</param>
@@ -653,9 +688,22 @@ public class Debugx
     }
 
     /// <summary>
+    /// 成员打印Log
+    /// </summary>
+    /// <param name="signature">成员签名，DebugxMemberInfo中配置的Signature</param>
+    /// <param name="message">打印内容</param>
+    /// <param name="showTime">显示时间</param>
+    /// <param name="showNetTag">显示网络标记，Server或者Client。此功能依赖项目，需要项目通过SetServerCheck方法来设置</param>
+    [Conditional("DEBUG_X")]
+    public static void Log(string signature, object message, bool showTime = false, bool showNetTag = true)
+    {
+        Log(LogType.Log, signature, message, showTime, showNetTag);
+    }
+
+    /// <summary>
     /// 成员打印LogWarning
     /// </summary>
-    /// <param name="key">DebugxMemberInfo中配置的key</param>
+    /// <param name="key">成员密钥，DebugxMemberInfo中配置的key</param>
     /// <param name="message">打印内容</param>
     /// <param name="showTime">显示时间</param>
     /// <param name="showNetTag">显示网络标记，Server或者Client。此功能依赖项目，需要项目通过SetServerCheck方法来设置</param>
@@ -666,9 +714,22 @@ public class Debugx
     }
 
     /// <summary>
+    /// 成员打印LogWarning
+    /// </summary>
+    /// <param name="signature">成员签名，DebugxMemberInfo中配置的Signature</param>
+    /// <param name="message">打印内容</param>
+    /// <param name="showTime">显示时间</param>
+    /// <param name="showNetTag">显示网络标记，Server或者Client。此功能依赖项目，需要项目通过SetServerCheck方法来设置</param>
+    [Conditional("DEBUG_X")]
+    public static void LogWarning(string signature, object message, bool showTime = false, bool showNetTag = true)
+    {
+        Log(LogType.Warning, signature, message, showTime, showNetTag);
+    }
+
+    /// <summary>
     /// 成员打印LogError
     /// </summary>
-    /// <param name="key">DebugxMemberInfo中配置的key</param>
+    /// <param name="key">成员密钥，DebugxMemberInfo中配置的key</param>
     /// <param name="message">打印内容</param>
     /// <param name="showTime">显示时间</param>
     /// <param name="showNetTag">显示网络标记，Server或者Client。此功能依赖项目，需要项目通过SetServerCheck方法来设置</param>
@@ -678,10 +739,29 @@ public class Debugx
         Log(LogType.Error, key, message, showTime, showNetTag);
     }
 
+    /// <summary>
+    /// 成员打印LogError
+    /// </summary>
+    /// <param name="signature">成员签名，DebugxMemberInfo中配置的Signature</param>
+    /// <param name="message">打印内容</param>
+    /// <param name="showTime">显示时间</param>
+    /// <param name="showNetTag">显示网络标记，Server或者Client。此功能依赖项目，需要项目通过SetServerCheck方法来设置</param>
+    [Conditional("DEBUG_X")]
+    public static void LogError(string signature, object message, bool showTime = false, bool showNetTag = true)
+    {
+        Log(LogType.Error, signature, message, showTime, showNetTag);
+    }
+
     private static void Log(LogType type, int key, object message, bool showTime = false, bool showNetTag = true)
     {
         if (!enableLog || !enableLogMember) return;
         LogCreator(type, key, message, showTime, showNetTag);
+    }
+
+    private static void Log(LogType type, string signature, object message, bool showTime = false, bool showNetTag = true)
+    {
+        if (!enableLog || !enableLogMember) return;
+        LogCreator(type, signature, message, showTime, showNetTag);
     }
 
     /// <summary>
@@ -703,16 +783,6 @@ public class Debugx
     /// <param name="showNetTag">显示网络标记，Server或者Client。此功能依赖项目，需要项目通过SetServerCheck方法来设置</param>
     private static void LogCreator(LogType type, int key, object message, bool showTime = false, bool showNetTag = true)
     {
-        if (Settings == null)
-        {
-            LogAdmWarning($"Debugx.LogCreator: The initial configuration is not performed.Settings is null. 未成功初始化配置，Settings为空。");
-        }
-
-        if (Settings.members == null)
-        {
-            LogAdmWarning($"Debugx.LogCreator: The initial configuration is not performed.Settings.members is null. 未初始化配置，Settings.members为空。");
-        }
-
         if (GetMemberInfo(key, out DebugxMemberInfo memberInfo))
         {
             if (!MemberIsEnable(key)) return;//此成员未打开
@@ -720,6 +790,26 @@ public class Debugx
         else
         {
             LogAdmWarning($"Debugx.LogCreator: cant find memberInfo by key:{key}. 无法找到Key为{key}的成员信息。");
+            if (!allowUnregisteredMember) return;
+        }
+
+        //设置了仅打印某个Key成员Log
+        if (!CheckLogThisKeyMemberOnly(key)) return;
+
+        LogCreator(type, memberInfo, message, showTime, showNetTag);
+    }
+
+    private static void LogCreator(LogType type, string signature, object message, bool showTime = false, bool showNetTag = true)
+    {
+        int key = 0;
+        if (GetMemberInfo(signature, out DebugxMemberInfo memberInfo))
+        {
+            key = memberInfo.key;
+            if (!MemberIsEnable(key)) return;//此成员未打开
+        }
+        else
+        {
+            LogAdmWarning($"Debugx.LogCreator: cant find memberInfo by signature:{signature}. 无法找到Signature为{signature}的成员信息。");
             if (!allowUnregisteredMember) return;
         }
 
@@ -741,7 +831,7 @@ public class Debugx
             logxSb.Append($" [{DateTime.Now.ToString("HH:mm:ss")}] ");
         }
 
-        if(info != null)
+        if (info != null)
         {
             if (info.LogSignature)
                 logxSb.Append($"[Sig: {info.signature}]");

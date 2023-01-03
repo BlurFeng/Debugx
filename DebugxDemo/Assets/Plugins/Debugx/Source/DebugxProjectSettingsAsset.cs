@@ -163,10 +163,24 @@ namespace DebugxLog
         /// </summary>
         public static void CheckDebugxProjectSettingsAsset()
         {
-            if (Instance == null)
+#if UNITY_EDITOR
+            //在代码编译时走到这里，无法通过instance = Resources.Load<DebugxProjectSettingsAsset>(DebugxProjectSettings.fileName);方式获取到实际存在的文件
+            //这会导致每次代码重编译时都创建了新的DebugxProjectSettingsAsset并覆盖了旧的
+
+            bool haveAsset = false;
+            string[] assetGUIDs = UnityEditor.AssetDatabase.FindAssets(DebugxProjectSettings.fileName);
+            for (int i = 0; i < assetGUIDs.Length; i++)
             {
-                CreateDebugxProjectSettingsAsset();
+                string path = UnityEditor.AssetDatabase.GUIDToAssetPath(assetGUIDs[i]);
+                if (path.Contains("/Debugx/Resources/"))
+                {
+                    var ps = UnityEditor.AssetDatabase.LoadAssetAtPath<DebugxProjectSettingsAsset>(path);
+                    haveAsset = true;
+                }
             }
+
+            if (!haveAsset) CreateDebugxProjectSettingsAsset();
+#endif
         }
 
         /// <summary>

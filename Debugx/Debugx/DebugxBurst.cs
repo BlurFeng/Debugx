@@ -1,5 +1,4 @@
-﻿#define DEBUG_X
-
+﻿
 using System.Diagnostics;
 using Unity.Burst;
 
@@ -16,7 +15,8 @@ public class DebugxBurst
     //in ref out 都不支持
     //所以使用[BurstDiscard]特性用于在多线程时直接排除此方法，添加此宏能够使一些被限制的代码在编译时不报错，但必须在Entities.ForEach().WithoutBurst().Run()才能工作;,因为所有[BurstDiscard]特性的方法在多线程中都不工作。
 
-    //使用LogInBurst()方法可以直接在Burst多线程中打印（但不支持任何成员配置信息），效果和UnityEngine.Debug.Log()是一样的，这种方法应该坐过处理，所以直接传参object也不会报错
+    //在Burst多线程中打印可以直接使用UnityEngine.Debug.Log()，就算调用只传递string的自定义Log方法，运行时不报错但是打包编译时会报错
+    //UnityEngine.Debug.Log()应该是Unity经过处理，所以不会打包编译报错
 
 
 
@@ -138,41 +138,5 @@ public class DebugxBurst
     public static void LogError(int key, object message, bool showTime = false, bool showNetTag = true)
     {
         Debugx.LogError(key, message, showTime, showNetTag);
-    }
-
-    /// <summary>
-    /// 在Burst多线程中打印Log
-    /// 必须在Entities.ForEach().WithoutBurst().Run()时才能工作
-    /// 不支持调试成员配置信息功能。没有运行时开关，因为Burst多线程内使用的bool值必须是只读的。
-    /// </summary>
-    /// <param name="message">打印内容</param>
-    [Conditional("DEBUG_X")]
-    public static void LogInBurst(string message)
-    {
-        UnityEngine.Debug.Log(message);
-    }
-
-    /// <summary>
-    /// 在Burst多线程中打印LogWarning
-    /// 必须在Entities.ForEach().WithoutBurst().Run()时才能工作
-    /// 不支持调试成员配置信息功能。没有运行时开关，因为Burst多线程内使用的bool值必须是只读的。
-    /// </summary>
-    /// <param name="message">打印内容</param>
-    [Conditional("DEBUG_X")]
-    public static void LogInBurstWarning(string message)
-    {
-        UnityEngine.Debug.LogWarning(message);
-    }
-
-    /// <summary>
-    /// 在Burst多线程中打印LogInBurstError
-    /// 必须在Entities.ForEach().WithoutBurst().Run()时才能工作
-    /// 不支持调试成员配置信息功能。没有运行时开关，因为Burst多线程内使用的bool值必须是只读的。
-    /// </summary>
-    /// <param name="message">打印内容</param>
-    [Conditional("DEBUG_X")]
-    public static void LogInBurstError(string message)
-    {
-        UnityEngine.Debug.LogError(message);
     }
 }
