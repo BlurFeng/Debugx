@@ -79,14 +79,14 @@ namespace DebugxLog
 
             int useLength = SettingsAsset.CustomMemberAssetsLength;
             if (useLength == 0) return Random.Range(0, 361);
-            else if(useLength == 1)
+            else if (useLength == 1)
             {
                 int num = GetColorH360(SettingsAsset.customMemberAssets[0].color);
                 num += 180;
                 if (num > hDimension) num -= hDimension;
                 return num;
             }
-            else if(useLength == 2)
+            else if (useLength == 2)
             {
                 int num1 = GetColorH360(SettingsAsset.customMemberAssets[0].color);
                 int num2 = GetColorH360(SettingsAsset.customMemberAssets[1].color);
@@ -132,7 +132,7 @@ namespace DebugxLog
 
             int colorH;
             //其他线段
-            if ( left >= 0)
+            if (left >= 0)
             {
                 colorH = left + (int)(line * 0.5f);
             }

@@ -1,4 +1,4 @@
-using DebugxLog;
+ï»¿using DebugxLog;
 using UnityEditor;
 
 public static class DebugxTools
@@ -10,7 +10,7 @@ public static class DebugxTools
         {
             DebugxProjectSettingsAsset.CreateDebugxProjectSettingsAsset();
         }
-        else if(EditorUtility.DisplayDialog("Create DebugxProjectSettings Asset", "The debugxProjectSettings asset already exists, whether to create a new and overwrite?\nDebugxÏîÄ¿ÅäÖÃ×ÊÔ´ÒÑ¾­´æÔÚ£¬ÊÇ·ñ´´½¨Ò»¸öĞÂµÄ²¢¸²¸Ç£¿", "Yes", "Cancel"))
+        else if (EditorUtility.DisplayDialog("Create DebugxProjectSettings Asset", "The debugxProjectSettings asset already exists, whether to create a new and overwrite?\nDebugxé¡¹ç›®é…ç½®èµ„æºå·²ç»å­˜åœ¨ï¼Œæ˜¯å¦åˆ›å»ºä¸€ä¸ªæ–°çš„å¹¶è¦†ç›–ï¼Ÿ", "Yes", "Cancel"))
         {
             DebugxProjectSettingsAsset.CreateDebugxProjectSettingsAsset();
         }

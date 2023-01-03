@@ -20,7 +20,7 @@ namespace DebugxLog
         [SettingsProvider]
         public static SettingsProvider DebugxPreferencesProviderCreate()
         {
-            if(settingsProvider == null)
+            if (settingsProvider == null)
             {
                 isInitGUI = false;
 
@@ -49,7 +49,7 @@ namespace DebugxLog
         {
             if (SettingsAsset == null) return;
 
-            if(!isInitGUI)
+            if (!isInitGUI)
             {
                 isInitGUI = true;
 
@@ -110,7 +110,7 @@ namespace DebugxLog
                     membersList.DoLayoutList();
                 }
                 else EditorGUILayout.LabelField("没有配置任何成员");
-                
+
             }
             faMemberEnableSetting.End();
 
@@ -232,7 +232,7 @@ namespace DebugxLog
         public static void Apply()
         {
             //ApplyTo中会判断如果在Editor就使用用户偏好设置，而不是使用DebugxProjectSettingsAsset配置
-            if(SettingsAsset != null)
+            if (SettingsAsset != null)
                 SettingsAsset.ApplyTo(DebugxProjectSettings.Instance);
         }
     }

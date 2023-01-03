@@ -1,7 +1,4 @@
 ﻿using DebugxLog.Tools;
-using DebugxLog;
-using System.Collections.Generic;
-using System.Text;
 using UnityEditor;
 
 public static class DebugxStaticDataEditor

@@ -8,18 +8,18 @@ namespace DebugxLog
         private static int editorSkinCached = -1;
         public static bool isDarkSkin => editorSkinCached == 1;
         private static GUIStylex style = null;
-        public static GUIStylex Get 
-        { 
+        public static GUIStylex Get
+        {
             get
-            { 
+            {
                 if (style == null || editorSkinCached != (EditorGUIUtility.isProSkin ? 1 : 2))
                 {
                     editorSkinCached = EditorGUIUtility.isProSkin ? 1 : 2;
                     style = new GUIStylex();
                 }
 
-                return style; 
-            } 
+                return style;
+            }
         }
 
         /// <summary>

@@ -8,7 +8,7 @@ namespace DebugxLog
     /// Debugx调试功能管理器
     /// 一般添加到启动用GameObject上
     /// </summary>
-    public class DebugxManager  : MonoBehaviour
+    public class DebugxManager : MonoBehaviour
     {
         //在U3D项目中添加宏“DEBUG_X”开启功能
 

@@ -20,14 +20,14 @@ MonoBehaviour:
   - enableDefault: 1
     signature: Normal
     logSignature: 1
-    key: 2
+    key: -1
     header: 
     color: {r: 1, g: 1, b: 1, a: 1}
     fadeAreaOpenCached: 1
   - enableDefault: 1
     signature: Master
     logSignature: 1
-    key: 2
+    key: -2
     header: 
     color: {r: 0.95, g: 0.819375, b: 0.8075, a: 1}
     fadeAreaOpenCached: 1

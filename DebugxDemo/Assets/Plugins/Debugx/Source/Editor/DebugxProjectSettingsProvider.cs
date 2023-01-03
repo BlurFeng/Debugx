@@ -2,7 +2,6 @@
 using UnityEditor;
 using UnityEditor.Build;
 using UnityEngine;
-using UnityEngine.Networking.Types;
 using UnityEngine.UIElements;
 
 namespace DebugxLog
@@ -31,7 +30,7 @@ namespace DebugxLog
         [SettingsProvider]
         public static SettingsProvider DebugxProjectSettingsProviderCreate()
         {
-            if(settingsProvider == null)
+            if (settingsProvider == null)
             {
                 isInitGUI = false;
 
@@ -445,7 +444,7 @@ namespace DebugxLog
             if (!DebugxStaticDataEditor.AutoSave && !assetIsDirty && !fadeAreaHeaderIsDirty) return;
             assetIsDirty = false; fadeAreaHeaderIsDirty = false;
 
-            if(SettingsAsset != null)
+            if (SettingsAsset != null)
             {
                 EditorUtility.SetDirty(SettingsAsset);
                 AssetDatabase.SaveAssetIfDirty(SettingsAsset);
@@ -493,7 +492,7 @@ namespace DebugxLog
         public static bool Toggle(string label, string tooltip, bool value, float width = 250f)
         {
             bool valueNew = GUILayoutx.Toggle(label, tooltip, value, width);
-            if(valueNew != value)
+            if (valueNew != value)
             {
                 Undo.RecordObject(SettingsAsset, "DebugxSettingsProvider Toggle Set");
             }

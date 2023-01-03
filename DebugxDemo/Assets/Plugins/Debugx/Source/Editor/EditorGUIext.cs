@@ -5,16 +5,16 @@ using SettingsProvider = UnityEditor.SettingsProvider;
 
 namespace DebugxLog
 {
-	public static class GUILayoutx
-	{
-		public static bool ButtonGreen(string text, string tooltip = "")
-		{
-			GUIUtilityx.PushTint(Color.green);
-			bool press = GUILayout.Button(new GUIContent(text, tooltip));
-			GUIUtilityx.PopTint();
+    public static class GUILayoutx
+    {
+        public static bool ButtonGreen(string text, string tooltip = "")
+        {
+            GUIUtilityx.PushTint(Color.green);
+            bool press = GUILayout.Button(new GUIContent(text, tooltip));
+            GUIUtilityx.PopTint();
 
-			return press;
-		}
+            return press;
+        }
 
         public static bool ButtonYellow(string text, string tooltip = "")
         {
@@ -26,26 +26,26 @@ namespace DebugxLog
         }
 
         public static bool ButtonRed(string text, string tooltip = "")
-		{
-			GUIUtilityx.PushTint(Color.red);
-			bool press = GUILayout.Button(new GUIContent(text, tooltip));
-			GUIUtilityx.PopTint();
+        {
+            GUIUtilityx.PushTint(Color.red);
+            bool press = GUILayout.Button(new GUIContent(text, tooltip));
+            GUIUtilityx.PopTint();
 
-			return press;
-		}
+            return press;
+        }
 
         public static bool Toggle(string label, string tooltip, bool value, float width = 250f)
-		{
+        {
             EditorGUILayout.BeginHorizontal();
             EditorGUILayout.LabelField(new GUIContent(label, tooltip), GUILayout.Width(width));
             bool change = EditorGUILayout.Toggle(value);
             EditorGUILayout.EndHorizontal();
 
-			return change;
+            return change;
         }
 
         public static int IntField(string label, string tooltip, int value, float width = 250f)
-		{
+        {
             EditorGUILayout.BeginHorizontal();
             EditorGUILayout.LabelField(new GUIContent(label, tooltip), GUILayout.Width(width));
             int change = EditorGUILayout.DelayedIntField(value);
@@ -55,23 +55,23 @@ namespace DebugxLog
         }
     }
 
-	//GUI扩展工具
-	//有从AstarPathfindingProject插件拿过来的GUI绘制类
+    //GUI扩展工具
+    //有从AstarPathfindingProject插件拿过来的GUI绘制类
 
-	public static class GUIUtilityx
-	{
-		static Stack<Color> colors = new Stack<Color>();
+    public static class GUIUtilityx
+    {
+        static Stack<Color> colors = new Stack<Color>();
 
-		public static void PushTint(Color tint)
-		{
-			colors.Push(GUI.color);
-			GUI.color *= tint;
-		}
+        public static void PushTint(Color tint)
+        {
+            colors.Push(GUI.color);
+            GUI.color *= tint;
+        }
 
-		public static void PopTint()
-		{
-			GUI.color = colors.Pop();
-		}
+        public static void PopTint()
+        {
+            GUI.color = colors.Pop();
+        }
     }
 
     /// <summary>

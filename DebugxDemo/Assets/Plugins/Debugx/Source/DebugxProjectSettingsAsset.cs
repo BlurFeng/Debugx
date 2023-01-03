@@ -1,6 +1,6 @@
-﻿using UnityEngine;
+﻿using DebugxLog.Tools;
 using System;
-using DebugxLog.Tools;
+using UnityEngine;
 
 namespace DebugxLog
 {
@@ -155,7 +155,7 @@ namespace DebugxLog
         public static void OnInitializeOnLoadMethod()
         {
             //项目启动时确认配置资源是否存在
-            CheckDebugxProjectSettingsAsset(); 
+            CheckDebugxProjectSettingsAsset();
         }
 
         /// <summary>
@@ -163,7 +163,7 @@ namespace DebugxLog
         /// </summary>
         public static void CheckDebugxProjectSettingsAsset()
         {
-            if(Instance == null)
+            if (Instance == null)
             {
                 CreateDebugxProjectSettingsAsset();
             }
@@ -252,7 +252,7 @@ namespace DebugxLog
             }
         }
 
-#region Log Output
+        #region Log Output
 
         [Tooltip("普通Log配置")]
         public bool logOutput = DebugxStaticData.logOutputSet;
@@ -278,7 +278,7 @@ namespace DebugxLog
         [Tooltip("绘制Log最大数量")]
         public int maxDrawLogs = DebugxStaticData.maxDrawLogsSet;
 
-#endregion
+        #endregion
 
         //保存配置数据资源到dll中的DebugxProjectSettings，这是实际使用的配置数据
         public void ApplyTo(DebugxProjectSettings settings)
