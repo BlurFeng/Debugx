@@ -1,4 +1,12 @@
-﻿using UnityEngine;
+﻿////////////////////////////////////////////////////////////////////////////////////////////////////
+// Author: WinhooFeng
+// Time: 20230109
+// Version: 2.1.0.0
+// Description:
+// The debug log is managed according to its members.use macro "DEBUG_X" open the functional.
+// 此插件用于以成员的方式管理调试日志。使用宏"DEBUG_X"来开启功能。
+////////////////////////////////////////////////////////////////////////////////////////////////////
+using UnityEngine;
 using DebugxLog.Tools;
 using System.Diagnostics;
 
