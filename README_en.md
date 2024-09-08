@@ -10,7 +10,7 @@
 
 ## 【概要】
 This is a plugin for Unity engine.\
-The debug log is managed according to its members. Later export the log file to the local. use macro "DEBUG_X" open the functional.\
+The debug log is managed according to its members. Later export the log file to the local. use macro "DEBUG_X" open the functional.
 
 In your code, use debugx.log () to print like this.\
 Different members use different keys, you can easily print by member, and quickly find the person in charge of the corresponding code.\
