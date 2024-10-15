@@ -9,7 +9,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f390fe4aa84ca214ab6953c92ba9f61c, type: 3}
+  m_Script: {fileID: 11500000, guid: 3d325bc733982434293bf164fbd2b856, type: 3}
   m_Name: DebugxProjectSettings
   m_EditorClassIdentifier: 
   enableLogDefault: 1
@@ -23,14 +23,14 @@ MonoBehaviour:
     key: -1
     header: 
     color: {r: 1, g: 1, b: 1, a: 1}
-    fadeAreaOpenCached: 1
+    fadeAreaOpenCached: 0
   - enableDefault: 1
     signature: Master
     logSignature: 1
     key: -2
     header: 
-    color: {r: 1, g: 0.627, b: 0.627, a: 1}
-    fadeAreaOpenCached: 1
+    color: {r: 0.95, g: 0.819375, b: 0.8075, a: 1}
+    fadeAreaOpenCached: 0
   customMemberAssets:
   - enableDefault: 1
     signature: Winhoo
@@ -38,13 +38,6 @@ MonoBehaviour:
     key: 1
     header: 
     color: {r: 0.7843, g: 0.941, b: 1, a: 1}
-    fadeAreaOpenCached: 1
-  - enableDefault: 1
-    signature: Buggy
-    logSignature: 1
-    key: 2
-    header: 
-    color: {r: 0.95, g: 0.8455, b: 0.8075, a: 1}
     fadeAreaOpenCached: 1
   logOutput: 1
   enableLogStackTrace: 0
