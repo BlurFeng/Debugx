@@ -3,7 +3,8 @@ using System.Diagnostics;
 using Unity.Burst;
 
 /// <summary>
-/// 用于Burst多线程代码中的Debug工具类
+/// 用于Burst多线程代码中的Debug工具类。
+/// Debug utility class for Burst multithreaded code.
 /// </summary>
 public class DebugxBurst
 {
@@ -21,8 +22,8 @@ public class DebugxBurst
 
 
     /// <summary>
-    /// 普通打印Log
-    /// 必须在Entities.ForEach().WithoutBurst().Run()时才能工作
+    /// 普通打印Log。
+    /// 必须在Entities.ForEach().WithoutBurst().Run()时才能工作。
     /// </summary>
     /// <param name="message">打印内容</param>
     /// <param name="showTime">显示时间</param>
@@ -34,8 +35,8 @@ public class DebugxBurst
     }
 
     /// <summary>
-    /// 普通打印LogWarning
-    /// 必须在Entities.ForEach().WithoutBurst().Run()时才能工作
+    /// 普通打印LogWarning。
+    /// 必须在Entities.ForEach().WithoutBurst().Run()时才能工作。
     /// </summary>
     /// <param name="message">打印内容</param>
     /// <param name="showTime">显示时间</param>
@@ -47,8 +48,8 @@ public class DebugxBurst
     }
 
     /// <summary>
-    /// 普通打印LogError
-    /// 必须在Entities.ForEach().WithoutBurst().Run()时才能工作
+    /// 普通打印LogError。
+    /// 必须在Entities.ForEach().WithoutBurst().Run()时才能工作。
     /// </summary>
     /// <param name="message">打印内容</param>
     /// <param name="showTime">显示时间</param>
@@ -60,8 +61,8 @@ public class DebugxBurst
     }
 
     /// <summary>
-    /// 高级打印Log
-    /// 必须在Entities.ForEach().WithoutBurst().Run()时才能工作
+    /// 高级打印Log。
+    /// 必须在Entities.ForEach().WithoutBurst().Run()时才能工作。
     /// </summary>
     /// <param name="message">打印内容</param>
     /// <param name="showTime">显示时间</param>
@@ -73,8 +74,8 @@ public class DebugxBurst
     }
 
     /// <summary>
-    /// 高级打印LogWarning
-    /// 必须在Entities.ForEach().WithoutBurst().Run()时才能工作
+    /// 高级打印LogWarning。
+    /// 必须在Entities.ForEach().WithoutBurst().Run()时才能工作。
     /// </summary>
     /// <param name="message">打印内容</param>
     /// <param name="showTime">显示时间</param>
@@ -86,8 +87,8 @@ public class DebugxBurst
     }
 
     /// <summary>
-    /// 高级打印LogError
-    /// 必须在Entities.ForEach().WithoutBurst().Run()时才能工作
+    /// 高级打印LogError。
+    /// 必须在Entities.ForEach().WithoutBurst().Run()时才能工作。
     /// </summary>
     /// <param name="message">打印内容</param>
     /// <param name="showTime">显示时间</param>
@@ -99,8 +100,8 @@ public class DebugxBurst
     }
 
     /// <summary>
-    /// 成员打印Log
-    /// 必须在Entities.ForEach().WithoutBurst().Run()时才能工作
+    /// 成员打印Log。
+    /// 必须在Entities.ForEach().WithoutBurst().Run()时才能工作。
     /// </summary>
     /// <param name="key">DebugxMemberInfo中配置的key</param>
     /// <param name="message">打印内容</param>
@@ -113,8 +114,8 @@ public class DebugxBurst
     }
 
     /// <summary>
-    /// 成员打印LogWarning
-    /// 必须在Entities.ForEach().WithoutBurst().Run()时才能工作
+    /// 成员打印LogWarning。
+    /// 必须在Entities.ForEach().WithoutBurst().Run()时才能工作。
     /// </summary>
     /// <param name="key">DebugxMemberInfo中配置的key</param>
     /// <param name="message">打印内容</param>
@@ -127,8 +128,8 @@ public class DebugxBurst
     }
 
     /// <summary>
-    /// 成员打印LogError
-    /// 必须在Entities.ForEach().WithoutBurst().Run()时才能工作
+    /// 成员打印LogError。
+    /// 必须在Entities.ForEach().WithoutBurst().Run()时才能工作。
     /// </summary>
     /// <param name="key">DebugxMemberInfo中配置的key</param>
     /// <param name="message">打印内容</param>

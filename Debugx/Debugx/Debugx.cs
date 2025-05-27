@@ -1,8 +1,8 @@
 ﻿#region AuthorInfo
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-// Author: WinhooFeng
+// Author: Blur Feng
 // Time: 20230109
-// Version: 2.1.0.0
+// Version: 2.1.1.0
 // Description:
 // The debug log is managed according to its members.use macro "DEBUG_X" open the functional.
 // 此插件用于以成员的方式管理调试日志。使用宏"DEBUG_X"来开启功能。
@@ -16,7 +16,7 @@
 // 1.1.0.0 20220830
 // 1.新增类LogOutput，用于到处Log数据到本地txt文件。
 // 2.新增AdminInfo成员用于管理者打印，此成员不受开关影响。
-// 3.默认成员配置文件中增加Winhoo成员。
+// 3.默认成员配置文件中增加 Blur 成员。
 // 4.修复在Window中移除一个成员时，移除的对应FadeArea不正确的问题。
 // 5.创建新成员时，设置默认signature且设置logSignature=true。
 // 6.通过 Tools/Debugx/CreateDebugxManager 创建Manager时，配置当前debugxMemberConfig为DebugxEditorLibrary.DebugxMemberConfigDefault。
@@ -67,6 +67,9 @@
 // 1.在没有DebugxProjectSettings.asset文件时，如果编辑器启动或代码重编译，会导致Resources.Load方法报错堆栈溢出的问题修复。
 //   复现流程为在Editor启动方法中或代码编译时，新创建了DebugxProjectSettings.asset资源并保存后，直接调用Resources.Load方法加载此资源。
 // 2.修复每次代码重编译时DebugxProjectSettingsAsset资源都被重新创建的默认资源覆盖的bug。
+////////////////////
+// 2.1.1.0 20250527
+// 1.注释添加英文。
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 #endregion
 
@@ -80,77 +83,91 @@ using System.Collections.Generic;
 namespace DebugxLog
 {
     /// <summary>
-    /// Debugx设置资源接口
+    /// Debugx settings asset interface.
+    /// Debugx设置资源接口。
     /// </summary>
     public interface IDebugxProjectSettingsAsset
     {
         /// <summary>
-        /// 复制数据
+        /// Copy data.
+        /// 复制数据。
         /// </summary>
         /// <param name="settings"></param>
         void ApplyTo(DebugxProjectSettings settings);
     }
 
     /// <summary>
-    /// 运行时成员信息
+    /// Runtime member information.
+    /// 运行时成员信息。
     /// </summary>
     public class DebugxMemberInfo
     {
         /// <summary>
-        /// 是否开启
+        /// Whether enabled.
+        /// 是否开启。
         /// </summary>
         public bool enableDefault;
 
         /// <summary>
-        /// 调试成员密钥
+        /// Debug member key.
+        /// 调试成员密钥。
         /// </summary>
         public int key;
 
         /// <summary>
-        /// 使用者签名
+        /// User signature.
+        /// 使用者签名。
         /// </summary>
         public string signature;
 
         /// <summary>
-        /// 使用者签名是否打印在Log中
+        /// Whether user signature is printed in the log.
+        /// 使用者签名是否打印在Log中。
         /// </summary>
         public bool logSignature;
 
         /// <summary>
-        /// 头部信息，在打印Log会打印在头部
+        /// Header information, printed at the top of the log.
+        /// 头部信息，在打印Log会打印在头部。
         /// </summary>
         public string header;
 
         /// <summary>
-        /// 打印Log颜色的RGB十六进制数
+        /// RGB hexadecimal color code for log printing.
+        /// 打印Log颜色的RGB十六进制数。
         /// </summary>
         public string color;
 
         /// <summary>
-        /// 是否有签名
+        /// Whether there is a signature.
+        /// 是否有签名。
         /// </summary>
         public bool haveSignature;
 
         /// <summary>
-        /// 是否有头部信息
+        /// Whether there is header information.
+        /// 是否有头部信息。
         /// </summary>
         public bool haveHeader;
 
         /// <summary>
-        /// 打印签名
+        /// Print signature.
+        /// 打印签名。
         /// </summary>
         public bool LogSignature => logSignature && haveSignature;
 
         /// <summary>
-        /// 默认构造函数
+        /// Default constructor.
+        /// 默认构造函数。
         /// </summary>
         public DebugxMemberInfo() { }
 
         /// <summary>
-        /// 快速构造简单成员信息
+        /// Quick constructor for simple member info.
+        /// 快速构造简单成员信息。
         /// </summary>
-        /// <param name="key"></param>
-        /// <param name="signature">使用者签名</param>
+        /// <param name="key">Debug member key 调试成员密钥</param>
+        /// <param name="signature">User signature 使用者签名</param>
         public DebugxMemberInfo(int key, string signature)
         {
             this.key = key;
@@ -165,18 +182,21 @@ namespace DebugxLog
     }
 
     /// <summary>
-    /// Debugx设置
+    /// Debugx settings.
+    /// Debugx设置。
     /// </summary>
     public class DebugxProjectSettings
     {
         /// <summary>
-        /// Debugx项目设置Asset文件名称
+        /// Debugx project settings asset file name.
+        /// Debugx项目设置Asset文件名称。
         /// </summary>
         public const string fileName = "DebugxProjectSettings";
         private static DebugxProjectSettings instance;
 
         /// <summary>
-        /// 单例
+        /// Singleton instance.
+        /// 单例。
         /// </summary>
         public static DebugxProjectSettings Instance
         {
@@ -192,7 +212,8 @@ namespace DebugxLog
         }
 
         /// <summary>
-        /// 管理者成员
+        /// Administrator member.
+        /// 管理者成员。
         /// </summary>
         public DebugxMemberInfo AdminInfo
         {
@@ -208,80 +229,103 @@ namespace DebugxLog
         private DebugxMemberInfo m_AdminInfo;
 
         /// <summary>
-        /// 成员信息列表
+        /// List of member information.
+        /// 成员信息列表。
         /// </summary>
         public DebugxMemberInfo[] members;
 
         #region Static Data
         /// <summary>
-        /// Debugx打印的内容标识
-        /// 不允许带有任何正则表达式的特殊含义符号
-        /// 修改时需要同事修改LogOutput的正则表达式
+        /// Debugx printed content tag.
+        /// No special symbols with regex meanings are allowed.
+        /// When modifying, also update the regex in LogOutput.
+        /// Debugx打印的内容标识。
+        /// 不允许带有任何正则表达式的特殊含义符号。
+        /// 修改时需要同事修改LogOutput的正则表达式。
         /// </summary>
         public const string debugxTag = "[Debugx]";
 
         /// <summary>
-        /// 默认成员，普通成员签名
+        /// Default member normal signature.
+        /// 默认成员，普通成员签名。
         /// </summary>
         public const string normalInfoSignature = "Normal";
+
         /// <summary>
-        /// 默认成员，普通成员密钥
+        /// Default member normal key.
+        /// 默认成员，普通成员密钥。
         /// </summary>
         public const int normalInfoKey = -1;
+
         /// <summary>
-        /// 默认成员，普通成员颜色
+        /// Default member normal color.
+        /// 默认成员，普通成员颜色。
         /// </summary>
         public static Color NormalInfoColor => Color.white;
+
         /// <summary>
-        /// 默认成员，高级成员签名
+        /// Default member master signature.
+        /// 默认成员，高级成员签名。
         /// </summary>
         public const string masterInfoSignature = "Master";
+
         /// <summary>
-        /// 默认成员，高级成员密钥
+        /// Default member master key.
+        /// 默认成员，高级成员密钥。
         /// </summary>
         public const int masterInfoKey = -2;
+
         /// <summary>
-        /// 默认成员，高级成员颜色
+        /// Default member master color.
+        /// 默认成员，高级成员颜色。
         /// </summary>
         public static Color MasterInfoColor => new Color(1f, 0.627f, 0.627f, 1f);
         #endregion
 
         /// <summary>
-        /// Log总开关
+        /// Master log switch.
+        /// Log总开关。
         /// </summary>
         public bool enableLogDefault = true;
 
         /// <summary>
-        /// 成员Log总开关
+        /// Member log master switch.
+        /// 成员Log总开关。
         /// </summary>
         public bool enableLogMemberDefault = true;
 
         /// <summary>
-        /// 允许没有注册成员进行打印
+        /// Allow printing without registered members.
+        /// 允许没有注册成员进行打印。
         /// </summary>
         public bool allowUnregisteredMember = true;
 
         /// <summary>
-        /// 仅打印此Key的成员Log，0为关闭
+        /// Only print logs for this Key member, 0 to disable.
+        /// 仅打印此Key的成员Log，0为关闭。
         /// </summary>
         public int logThisKeyMemberOnlyDefault = 0;
 
         /// <summary>
-        /// Key是否合法
+        /// Whether the key is valid.
+        /// Key是否合法。
         /// </summary>
-        /// <param name="key"></param>
-        /// <returns></returns>
+        /// <param name="key">The key to validate 要验证的密钥</param>
+        /// <returns>True if valid, false otherwise 是否有效</returns>
         public static bool KeyValid(int key)
         {
             return key > 0;
         }
 
         /// <summary>
-        /// 加载配置资源
+        /// Load configuration resources.
+        /// 加载配置资源。
         /// </summary>
         private static void LoadResources()
         {
-            //Resources.Load在某些生命周期时不可用，比如[InitializeOnLoadMethod]特性方法在启动Editor时调用会导致Resources.Load报错堆栈溢出
+            // Resources.Load is not available in some lifecycle stages,
+            // for example, calling it in [InitializeOnLoadMethod] during editor startup causes stack overflow errors.
+            // Resources.Load在某些生命周期时不可用，比如[InitializeOnLoadMethod]特性方法在启动Editor时调用会导致Resources.Load报错堆栈溢出
             try
             {
                 IDebugxProjectSettingsAsset asset = (IDebugxProjectSettingsAsset)Resources.Load<ScriptableObject>(fileName);
@@ -295,9 +339,10 @@ namespace DebugxLog
         }
 
         /// <summary>
-        /// 从Asset读取数据保存到DebugxProjectSettings
+        /// Read data from asset and save to DebugxProjectSettings.
+        /// 从Asset读取数据保存到DebugxProjectSettings。
         /// </summary>
-        /// <param name="asset"></param>
+        /// <param name="asset">The settings asset  设置资源</param>
         public static void ApplyBy(IDebugxProjectSettingsAsset asset)
         {
             if (asset == null) return;
@@ -309,42 +354,50 @@ namespace DebugxLog
         #region Log Output
 
         /// <summary>
-        /// 输出Log到本地文件
+        /// Output logs to local file.
+        /// 输出Log到本地文件。
         /// </summary>
         public bool logOutput = true;
 
         /// <summary>
-        /// 输出Log类型的堆栈跟踪
+        /// Enable stack trace for Log type.
+        /// 输出Log类型的堆栈跟踪。
         /// </summary>
         public bool enableLogStackTrace = false;
 
         /// <summary>
-        /// 输出Warning类型的堆栈跟踪
+        /// Enable stack trace for Warning type.
+        /// 输出Warning类型的堆栈跟踪。
         /// </summary>
         public bool enableWarningStackTrace = false;
 
         /// <summary>
-        /// 输出Error类型的堆栈跟踪
+        /// Enable stack trace for Error type.
+        /// 输出Error类型的堆栈跟踪。
         /// </summary>
         public bool enableErrorStackTrace = true;
 
         /// <summary>
-        /// 记录所有非Debugx打印的Log
+        /// Record all logs not printed by Debugx.
+        /// 记录所有非Debugx打印的Log。
         /// </summary>
         public bool recordAllNonDebugxLogs = false;
 
         /// <summary>
-        /// 绘制Log到屏幕
+        /// Draw logs to screen.
+        /// 绘制Log到屏幕。
         /// </summary>
         public bool drawLogToScreen = false;
 
         /// <summary>
-        /// 限制绘制Log数量
+        /// Restrict the number of drawn logs.
+        /// 限制绘制Log数量。
         /// </summary>
         public bool restrictDrawLogCount = false;
 
         /// <summary>
-        /// 绘制Log最大数量
+        /// Maximum number of drawn logs.
+        /// 绘制Log最大数量。
         /// </summary>
         public int maxDrawLogs = 100;
 
@@ -353,12 +406,16 @@ namespace DebugxLog
 }
 
 /// <summary>
-/// Debugx核心工具类
+/// Debugx Core Utility Class.
+/// Debugx核心工具类。
 /// </summary>
 public class Debugx
 {
-    //Debugx，调试扩展工具类
-    //在U3D项目中添加宏“DEBUG_X”开启功能方法
+    // Debugx, debug extension utility class.
+    // Debugx，调试扩展工具类。
+
+    // Add the macro "DEBUG_X" in U3D project to enable the feature methods.
+    // 在U3D项目中添加宏“DEBUG_X”开启功能方法。
 
     private static DebugxProjectSettings Settings => DebugxProjectSettings.Instance;
     private static DebugxMemberInfo AdminInfo => Settings != null ? Settings.AdminInfo : adminInfoDefault;
@@ -370,28 +427,35 @@ public class Debugx
     private readonly static Dictionary<int, bool> memberEnables = new Dictionary<int, bool>();
 
     /// <summary>
-    /// Log总开关
+    /// Master switch for logging.
+    /// Log总开关。
     /// </summary>
     public static bool enableLog = true;
 
     /// <summary>
-    /// 成员Log总开关
+    /// Master switch for member logs.
+    /// 成员Log总开关。
     /// </summary>
     public static bool enableLogMember = true;
 
     /// <summary>
-    /// 允许没有注册成员进行打印
+    /// Allow unregistered members to print logs.
+    /// 允许没有注册成员进行打印。
     /// </summary>
     public static bool allowUnregisteredMember = true;
 
     /// <summary>
-    /// 仅打印此Key的Log
-    /// 0为关闭，设置其他Key时，只有此Key对应的成员信息确实存在，才会只打印此Key的成员Log
+    /// Only print logs for this key.
+    /// 0 means off; when set to another key, only logs for this key will be printed if the corresponding member info exists.
+    /// This value can only be set after turning off logMasterOnly.
+    /// 仅打印此Key的Log。
+    /// 0为关闭，设置其他Key时，只有此Key对应的成员信息确实存在，才会只打印此Key的成员Log。
     /// 必须关闭logMasterOnly后才能设置此值
     /// </summary>
     public static int logThisKeyMemberOnly = 0;
 
     /// <summary>
+    /// OnAwake lifecycle method.
     /// OnAwake
     /// </summary>
     public static void OnAwake()
@@ -409,6 +473,7 @@ public class Debugx
     }
 
     /// <summary>
+    /// OnDestroy lifecycle method.
     /// OnDestroy
     /// </summary>
     public static void OnDestroy()
@@ -417,7 +482,8 @@ public class Debugx
     }
 
     /// <summary>
-    /// 重置数据到Settings中Default
+    /// Reset data to defaults in Settings.
+    /// 重置数据到Settings中Default。
     /// </summary>
     public static void ResetToDefault()
     {
@@ -433,10 +499,11 @@ public class Debugx
     }
 
     /// <summary>
-    /// 在游戏运行时设置成员开关
+    /// Set member switch during game runtime.
+    /// 在游戏运行时设置成员开关。
     /// </summary>
-    /// <param name="key"></param>
-    /// <param name="enable"></param>
+    /// <param name="key">The key of the member to set. 成员的Key。</param>
+    /// <param name="enable">Whether to enable or disable the member log. 是否启用该成员的日志。</param>
     [Conditional("DEBUG_X")]
     public static void SetMemberEnable(int key, bool enable)
     {
@@ -450,12 +517,13 @@ public class Debugx
 
         memberEnables[key] = enable;
     }
-
+    
     /// <summary>
-    /// 确认成员是否打开
+    /// Confirm whether the member is enabled.
+    /// 确认成员是否打开。
     /// </summary>
-    /// <param name="key"></param>
-    /// <returns></returns>
+    /// <param name="key">The key of the member. 成员的Key。</param>
+    /// <returns>True if enabled, otherwise false. 是否启用。</returns>
     public static bool MemberIsEnable(int key)
     {
         if (memberEnables != null && memberEnables.Count > 0)
@@ -480,10 +548,14 @@ public class Debugx
     }
 
     /// <summary>
-    /// 设置确认是否是服务器的方法
-    /// 由项目调用设置，那么Logx系列方法的showNetTag参数设置为true后，才能打印网络标记
+    /// Sets the method to determine whether the current context is a server.
+    /// 设置确认是否是服务器的方法。
+    /// This should be called by the project. Only after this is set,
+    /// can the Logx series methods print network tags when showNetTag is true.
+    /// 由项目调用设置，那么Logx系列方法的showNetTag参数设置为true后，才能打印网络标记。
     /// </summary>
-    /// <param name="serverCheckFunc"></param>
+    /// <param name="serverCheckFunc">The function used to check if the current context is a server.
+    /// 用于判断当前是否服务器的方法。</param>
     [Conditional("DEBUG_X")]
     public static void SetServerCheck(Func<bool> serverCheckFunc)
     {
@@ -493,11 +565,14 @@ public class Debugx
     }
 
     /// <summary>
-    /// 确认成员Key是否包含
-    /// 在程序运行时和非运行时都可用
+    /// Checks if a member key exists.
+    /// 确认成员Key是否包含。
+    /// This method can be used both during runtime and outside of runtime.
+    /// 在程序运行时和非运行时都可用。
     /// </summary>
-    /// <param name="key"></param>
-    /// <returns></returns>
+    /// <param name="key">The member key to check. 成员的Key。</param>
+    /// <returns>Returns true if the member key exists; otherwise, false.
+    /// 如果存在该成员Key则返回true，否则返回false。</returns>
     public static bool ContainsMemberKey(int key)
     {
         if (GetMemberInfo(key, out DebugxMemberInfo memberInfo))
@@ -560,12 +635,18 @@ public class Debugx
     }
 
     /// <summary>
-    /// 管理打印Log
+    /// Administrative log printing.
+    /// For plugin developers only; generally not intended for use by others.
+    /// 管理打印Log。
     /// 插件开发者使用，所有人理论上都不可使用此方法。
     /// </summary>
-    /// <param name="message">打印内容</param>
-    /// <param name="showTime">显示时间</param>
-    /// <param name="showNetTag">显示网络标记，Server或者Client。此功能依赖项目，需要项目通过SetServerCheck方法来设置</param>
+    /// <param name="message">The content to log. 打印内容。</param>
+    /// <param name="showTime">Whether to display the timestamp. 显示时间。</param>
+    /// <param name="showNetTag">
+    /// Whether to display the network tag (Server or Client). 
+    /// This feature depends on the project and requires setting via the SetServerCheck method.
+    /// 显示网络标记，Server或者Client。此功能依赖项目，需要项目通过SetServerCheck方法来设置。
+    /// </param>
     [Conditional("DEBUG_X")]
     public static void LogAdm(object message, bool showTime = false, bool showNetTag = true)
     {
@@ -573,12 +654,18 @@ public class Debugx
     }
 
     /// <summary>
-    /// 管理打印LogWarning
+    /// Administrative log warning printing.
+    /// For plugin developers only; generally not intended for use by others.
+    /// 管理打印LogWarning。
     /// 插件开发者使用，所有人理论上都不可使用此方法。
     /// </summary>
-    /// <param name="message">打印内容</param>
-    /// <param name="showTime">显示时间</param>
-    /// <param name="showNetTag">显示网络标记，Server或者Client。此功能依赖项目，需要项目通过SetServerCheck方法来设置</param>
+    /// <param name="message">The content to log as a warning. 打印内容。</param>
+    /// <param name="showTime">Whether to display the timestamp. 显示时间。</param>
+    /// <param name="showNetTag">
+    /// Whether to display the network tag (Server or Client). 
+    /// This feature depends on the project and requires setting via the SetServerCheck method.
+    /// 显示网络标记，Server或者Client。此功能依赖项目，需要项目通过SetServerCheck方法来设置。
+    /// </param>
     [Conditional("DEBUG_X")]
     public static void LogAdmWarning(object message, bool showTime = false, bool showNetTag = true)
     {
@@ -586,12 +673,18 @@ public class Debugx
     }
 
     /// <summary>
-    /// 管理打印LogError
+    /// Administrative log error printing.
+    /// For plugin developers only; generally not intended for use by others.
+    /// 管理打印LogError。
     /// 插件开发者使用，所有人理论上都不可使用此方法。
     /// </summary>
-    /// <param name="message">打印内容</param>
-    /// <param name="showTime">显示时间</param>
-    /// <param name="showNetTag">显示网络标记，Server或者Client。此功能依赖项目，需要项目通过SetServerCheck方法来设置</param>
+    /// <param name="message">The content to log as an error. 打印内容。</param>
+    /// <param name="showTime">Whether to display the timestamp. 显示时间。</param>
+    /// <param name="showNetTag">
+    /// Whether to display the network tag (Server or Client). 
+    /// This feature depends on the project and requires setting via the SetServerCheck method.
+    /// 显示网络标记，Server或者Client。此功能依赖项目，需要项目通过SetServerCheck方法来设置。
+    /// </param>
     [Conditional("DEBUG_X")]
     public static void LogAdmError(object message, bool showTime = false, bool showNetTag = true)
     {
@@ -604,11 +697,16 @@ public class Debugx
     }
 
     /// <summary>
-    /// 普通打印Log
+    /// Regular log printing.
+    /// 普通打印Log。
     /// </summary>
-    /// <param name="message">打印内容</param>
-    /// <param name="showTime">显示时间</param>
-    /// <param name="showNetTag">显示网络标记，Server或者Client。此功能依赖项目，需要项目通过SetServerCheck方法来设置</param>
+    /// <param name="message">The content to log. 打印内容。</param>
+    /// <param name="showTime">Whether to display the timestamp. 显示时间。</param>
+    /// <param name="showNetTag">
+    /// Whether to display the network tag (Server or Client).
+    /// This feature depends on the project and requires setting via the SetServerCheck method.
+    /// 显示网络标记，Server或者Client。此功能依赖项目，需要项目通过SetServerCheck方法来设置。
+    /// </param>
     [Conditional("DEBUG_X")]
     public static void LogNom(object message, bool showTime = false, bool showNetTag = true)
     {
@@ -616,11 +714,16 @@ public class Debugx
     }
 
     /// <summary>
-    /// 普通打印LogWarning
+    /// Regular log warning printing.
+    /// 普通打印LogWarning。
     /// </summary>
-    /// <param name="message">打印内容</param>
-    /// <param name="showTime">显示时间</param>
-    /// <param name="showNetTag">显示网络标记，Server或者Client。此功能依赖项目，需要项目通过SetServerCheck方法来设置</param>
+    /// <param name="message">The content to log as a warning. 打印内容。</param>
+    /// <param name="showTime">Whether to display the timestamp. 显示时间。</param>
+    /// <param name="showNetTag">
+    /// Whether to display the network tag (Server or Client).
+    /// This feature depends on the project and requires setting via the SetServerCheck method.
+    /// 显示网络标记，Server或者Client。此功能依赖项目，需要项目通过SetServerCheck方法来设置。
+    /// </param>
     [Conditional("DEBUG_X")]
     public static void LogNomWarning(object message, bool showTime = false, bool showNetTag = true)
     {
@@ -628,11 +731,16 @@ public class Debugx
     }
 
     /// <summary>
-    /// 普通打印LogError
+    /// Regular log error printing.
+    /// 普通打印LogError。
     /// </summary>
-    /// <param name="message">打印内容</param>
-    /// <param name="showTime">显示时间</param>
-    /// <param name="showNetTag">显示网络标记，Server或者Client。此功能依赖项目，需要项目通过SetServerCheck方法来设置</param>
+    /// <param name="message">The content to log as an error. 打印内容。</param>
+    /// <param name="showTime">Whether to display the timestamp. 显示时间。</param>
+    /// <param name="showNetTag">
+    /// Whether to display the network tag (Server or Client).
+    /// This feature depends on the project and requires setting via the SetServerCheck method.
+    /// 显示网络标记，Server或者Client。此功能依赖项目，需要项目通过SetServerCheck方法来设置。
+    /// </param>
     [Conditional("DEBUG_X")]
     public static void LogNomError(object message, bool showTime = false, bool showNetTag = true)
     {
@@ -640,11 +748,16 @@ public class Debugx
     }
 
     /// <summary>
-    /// 高级打印Log
+    /// Advanced log printing.
+    /// 高级打印Log。
     /// </summary>
-    /// <param name="message">打印内容</param>
-    /// <param name="showTime">显示时间</param>
-    /// <param name="showNetTag">显示网络标记，Server或者Client。此功能依赖项目，需要项目通过SetServerCheck方法来设置</param>
+    /// <param name="message">The content to log. 打印内容。</param>
+    /// <param name="showTime">Whether to display the timestamp. 显示时间。</param>
+    /// <param name="showNetTag">
+    /// Whether to display the network tag (Server or Client).
+    /// This feature depends on the project and requires setting via the SetServerCheck method.
+    /// 显示网络标记，Server或者Client。此功能依赖项目，需要项目通过SetServerCheck方法来设置。
+    /// </param>
     [Conditional("DEBUG_X")]
     public static void LogMst(object message, bool showTime = false, bool showNetTag = true)
     {
@@ -652,11 +765,16 @@ public class Debugx
     }
 
     /// <summary>
-    /// 高级打印LogWarning
+    /// Advanced log warning printing.
+    /// 高级打印LogWarning。
     /// </summary>
-    /// <param name="message">打印内容</param>
-    /// <param name="showTime">显示时间</param>
-    /// <param name="showNetTag">显示网络标记，Server或者Client。此功能依赖项目，需要项目通过SetServerCheck方法来设置</param>
+    /// <param name="message">The content to log as a warning. 打印内容。</param>
+    /// <param name="showTime">Whether to display the timestamp. 显示时间。</param>
+    /// <param name="showNetTag">
+    /// Whether to display the network tag (Server or Client).
+    /// This feature depends on the project and requires setting via the SetServerCheck method.
+    /// 显示网络标记，Server或者Client。此功能依赖项目，需要项目通过SetServerCheck方法来设置。
+    /// </param>
     [Conditional("DEBUG_X")]
     public static void LogMstWarning(object message, bool showTime = false, bool showNetTag = true)
     {
@@ -664,11 +782,16 @@ public class Debugx
     }
 
     /// <summary>
-    /// 高级打印LogError
+    /// Advanced log error printing.
+    /// 高级打印LogError。
     /// </summary>
-    /// <param name="message">打印内容</param>
-    /// <param name="showTime">显示时间</param>
-    /// <param name="showNetTag">显示网络标记，Server或者Client。此功能依赖项目，需要项目通过SetServerCheck方法来设置</param>
+    /// <param name="message">The content to log as an error. 打印内容。</param>
+    /// <param name="showTime">Whether to display the timestamp. 显示时间。</param>
+    /// <param name="showNetTag">
+    /// Whether to display the network tag (Server or Client).
+    /// This feature depends on the project and requires setting via the SetServerCheck method.
+    /// 显示网络标记，Server或者Client。此功能依赖项目，需要项目通过SetServerCheck方法来设置。
+    /// </param>
     [Conditional("DEBUG_X")]
     public static void LogMstError(object message, bool showTime = false, bool showNetTag = true)
     {
@@ -676,12 +799,17 @@ public class Debugx
     }
 
     /// <summary>
-    /// 成员打印Log
+    /// Member log printing.
+    /// 成员打印Log。
     /// </summary>
-    /// <param name="key">成员密钥，DebugxMemberInfo中配置的key</param>
-    /// <param name="message">打印内容</param>
-    /// <param name="showTime">显示时间</param>
-    /// <param name="showNetTag">显示网络标记，Server或者Client。此功能依赖项目，需要项目通过SetServerCheck方法来设置</param>
+    /// <param name="key">Member key, configured in DebugxMemberInfo. 成员密钥，DebugxMemberInfo中配置的key。</param>
+    /// <param name="message">Content to log. 打印内容。</param>
+    /// <param name="showTime">Whether to show timestamp. 显示时间。</param>
+    /// <param name="showNetTag">
+    /// Whether to show network tag (Server or Client).
+    /// This feature depends on the project and requires setting via the SetServerCheck method.
+    /// 显示网络标记，Server或者Client。此功能依赖项目，需要项目通过SetServerCheck方法来设置。
+    /// </param>
     [Conditional("DEBUG_X")]
     public static void Log(int key, object message, bool showTime = false, bool showNetTag = true)
     {
@@ -689,12 +817,17 @@ public class Debugx
     }
 
     /// <summary>
-    /// 成员打印Log
+    /// Member log printing.
+    /// 成员打印Log。
     /// </summary>
-    /// <param name="signature">成员签名，DebugxMemberInfo中配置的Signature</param>
-    /// <param name="message">打印内容</param>
-    /// <param name="showTime">显示时间</param>
-    /// <param name="showNetTag">显示网络标记，Server或者Client。此功能依赖项目，需要项目通过SetServerCheck方法来设置</param>
+    /// <param name="signature">Member signature, configured in DebugxMemberInfo. 成员签名，DebugxMemberInfo中配置的Signature。</param>
+    /// <param name="message">Content to log. 打印内容。</param>
+    /// <param name="showTime">Whether to show timestamp. 显示时间。</param>
+    /// <param name="showNetTag">
+    /// Whether to show network tag (Server or Client).
+    /// This feature depends on the project and requires setting via the SetServerCheck method.
+    /// 显示网络标记，Server或者Client。此功能依赖项目，需要项目通过SetServerCheck方法来设置。
+    /// </param>
     [Conditional("DEBUG_X")]
     public static void Log(string signature, object message, bool showTime = false, bool showNetTag = true)
     {
@@ -702,12 +835,17 @@ public class Debugx
     }
 
     /// <summary>
-    /// 成员打印LogWarning
+    /// Member LogWarning printing.
+    /// 成员打印LogWarning。
     /// </summary>
-    /// <param name="key">成员密钥，DebugxMemberInfo中配置的key</param>
-    /// <param name="message">打印内容</param>
-    /// <param name="showTime">显示时间</param>
-    /// <param name="showNetTag">显示网络标记，Server或者Client。此功能依赖项目，需要项目通过SetServerCheck方法来设置</param>
+    /// <param name="key">Member key, configured in DebugxMemberInfo. 成员密钥，DebugxMemberInfo中配置的key。</param>
+    /// <param name="message">Content to log. 打印内容。</param>
+    /// <param name="showTime">Whether to show timestamp. 显示时间。</param>
+    /// <param name="showNetTag">
+    /// Whether to show network tag (Server or Client).
+    /// This feature depends on the project and requires setting via the SetServerCheck method.
+    /// 显示网络标记，Server或者Client。此功能依赖项目，需要项目通过SetServerCheck方法来设置。
+    /// </param>
     [Conditional("DEBUG_X")]
     public static void LogWarning(int key, object message, bool showTime = false, bool showNetTag = true)
     {
@@ -715,12 +853,17 @@ public class Debugx
     }
 
     /// <summary>
-    /// 成员打印LogWarning
+    /// Member LogWarning printing.
+    /// 成员打印LogWarning。
     /// </summary>
-    /// <param name="signature">成员签名，DebugxMemberInfo中配置的Signature</param>
-    /// <param name="message">打印内容</param>
-    /// <param name="showTime">显示时间</param>
-    /// <param name="showNetTag">显示网络标记，Server或者Client。此功能依赖项目，需要项目通过SetServerCheck方法来设置</param>
+    /// <param name="signature">Member signature, configured in DebugxMemberInfo. 成员签名，DebugxMemberInfo中配置的Signature。</param>
+    /// <param name="message">Content to log. 打印内容。</param>
+    /// <param name="showTime">Whether to show timestamp. 显示时间。</param>
+    /// <param name="showNetTag">
+    /// Whether to show network tag (Server or Client).
+    /// This feature depends on the project and requires setting via the SetServerCheck method.
+    /// 显示网络标记，Server或者Client。此功能依赖项目，需要项目通过SetServerCheck方法来设置。
+    /// </param>
     [Conditional("DEBUG_X")]
     public static void LogWarning(string signature, object message, bool showTime = false, bool showNetTag = true)
     {
@@ -728,12 +871,17 @@ public class Debugx
     }
 
     /// <summary>
-    /// 成员打印LogError
+    /// Member LogError printing.
+    /// 成员打印LogError。
     /// </summary>
-    /// <param name="key">成员密钥，DebugxMemberInfo中配置的key</param>
-    /// <param name="message">打印内容</param>
-    /// <param name="showTime">显示时间</param>
-    /// <param name="showNetTag">显示网络标记，Server或者Client。此功能依赖项目，需要项目通过SetServerCheck方法来设置</param>
+    /// <param name="key">Member key, configured in DebugxMemberInfo. 成员密钥，DebugxMemberInfo中配置的key。</param>
+    /// <param name="message">Content to log. 打印内容。</param>
+    /// <param name="showTime">Whether to show timestamp. 显示时间。</param>
+    /// <param name="showNetTag">
+    /// Whether to show network tag (Server or Client).
+    /// This feature depends on the project and requires setting via the SetServerCheck method.
+    /// 显示网络标记，Server或者Client。此功能依赖项目，需要项目通过SetServerCheck方法来设置。
+    /// </param>
     [Conditional("DEBUG_X")]
     public static void LogError(int key, object message, bool showTime = false, bool showNetTag = true)
     {
@@ -741,12 +889,17 @@ public class Debugx
     }
 
     /// <summary>
-    /// 成员打印LogError
+    /// Member LogError printing.
+    /// 成员打印LogError。
     /// </summary>
-    /// <param name="signature">成员签名，DebugxMemberInfo中配置的Signature</param>
-    /// <param name="message">打印内容</param>
-    /// <param name="showTime">显示时间</param>
-    /// <param name="showNetTag">显示网络标记，Server或者Client。此功能依赖项目，需要项目通过SetServerCheck方法来设置</param>
+    /// <param name="signature">Member signature, configured in DebugxMemberInfo. 成员签名，DebugxMemberInfo中配置的Signature。</param>
+    /// <param name="message">Content to log. 打印内容。</param>
+    /// <param name="showTime">Whether to show timestamp. 显示时间。</param>
+    /// <param name="showNetTag">
+    /// Whether to show network tag (Server or Client).
+    /// This feature depends on the project and requires setting via the SetServerCheck method.
+    /// 显示网络标记，Server或者Client。此功能依赖项目，需要项目通过SetServerCheck方法来设置。
+    /// </param>
     [Conditional("DEBUG_X")]
     public static void LogError(string signature, object message, bool showTime = false, bool showNetTag = true)
     {
@@ -766,8 +919,10 @@ public class Debugx
     }
 
     /// <summary>
-    /// 确认是否开启了仅显示某个Key的成员
-    /// true=允许通过 false=返回，不允许打印
+    /// Checks whether displaying only members with a specific key is enabled.
+    /// Returns true to allow filtering by key; false to disallow and prevent logging.
+    /// 确认是否开启了仅显示某个Key的成员。
+    /// true=允许通过 false=返回，不允许打印。
     /// </summary>
     private static bool CheckLogThisKeyMemberOnly(int key)
     {
@@ -775,18 +930,21 @@ public class Debugx
     }
 
     /// <summary>
-    /// Log扩展打印方法
+    /// Extended logging method.
     /// </summary>
-    /// <param name="type">类型</param>
-    /// <param name="key">DebugxMemberInfo中配置的key</param>
-    /// <param name="message">打印内容</param>
-    /// <param name="showTime">显示时间</param>
-    /// <param name="showNetTag">显示网络标记，Server或者Client。此功能依赖项目，需要项目通过SetServerCheck方法来设置</param>
+    /// <param name="type">Log type.</param>
+    /// <param name="key">Member key configured in DebugxMemberInfo.</param>
+    /// <param name="message">Content to log.</param>
+    /// <param name="showTime">Whether to show the timestamp.</param>
+    /// <param name="showNetTag">
+    /// Whether to show the network tag (Server or Client). 
+    /// This feature depends on the project and requires setting via the SetServerCheck method.
+    /// </param>
     private static void LogCreator(LogType type, int key, object message, bool showTime = false, bool showNetTag = true)
     {
         if (GetMemberInfo(key, out DebugxMemberInfo memberInfo))
         {
-            if (!MemberIsEnable(key)) return;//此成员未打开
+            if (!MemberIsEnable(key)) return;// 此成员未打开。This member is not enabled
         }
         else
         {
@@ -794,7 +952,7 @@ public class Debugx
             if (!allowUnregisteredMember) return;
         }
 
-        //设置了仅打印某个Key成员Log
+        // 设置了仅打印某个Key成员Log。Set to print logs only for a specific member key.
         if (!CheckLogThisKeyMemberOnly(key)) return;
 
         LogCreator(type, memberInfo, message, showTime, showNetTag);
@@ -806,7 +964,7 @@ public class Debugx
         if (GetMemberInfo(signature, out DebugxMemberInfo memberInfo))
         {
             key = memberInfo.key;
-            if (!MemberIsEnable(key)) return;//此成员未打开
+            if (!MemberIsEnable(key)) return;// 此成员未打开。This member is not enabled.
         }
         else
         {
@@ -814,7 +972,7 @@ public class Debugx
             if (!allowUnregisteredMember) return;
         }
 
-        //设置了仅打印某个Key成员Log
+        // 设置了仅打印某个Key成员Log。Logging is restricted to a specific member key only.
         if (!CheckLogThisKeyMemberOnly(key)) return;
 
         LogCreator(type, memberInfo, message, showTime, showNetTag);

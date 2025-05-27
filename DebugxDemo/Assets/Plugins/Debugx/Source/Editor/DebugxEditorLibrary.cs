@@ -9,7 +9,8 @@ namespace DebugxLog
         public static string Name { get; private set; } = "DebugxEditorLibrary";
 
         /// <summary>
-        /// Debugx文件夹根节点
+        /// Root directory of the Debugx folder.
+        /// Debugx文件夹根节点。
         /// </summary>
         public static string RootPath
         {
@@ -25,7 +26,8 @@ namespace DebugxLog
         }
 
         /// <summary>
-        /// 配置存储文件夹
+        /// Configuration storage folder.
+        /// 配置存储文件夹。
         /// </summary>
         public static string ResourcesPath
         {
@@ -41,18 +43,23 @@ namespace DebugxLog
             }
         }
 
-        //确认Debugx项目设置资源存在
+        /// <summary>
+        /// Confirm that the Debugx project settings asset exists.
+        /// 确认Debugx项目设置资源存在。
+        /// </summary>
         public static void OnInitializeOnLoadMethod()
         {
-            var resourcesPath = ResourcesPath;//确认文件夹路径
+            // Confirm the folder path. 确认文件夹路径。
+            var resourcesPath = ResourcesPath;
         }
 
         /// <summary>
-        /// 获取自身插件文件夹下某个名称资源的路径
+        /// Get the path of a resource with a given name under the plugin’s own folder.
+        /// 获取自身插件文件夹下某个名称资源的路径。
         /// </summary>
-        /// <param name="name"></param>
-        /// <param name="getDirectoryName">获取文件夹路径，false时获取到文件路径</param>
-        /// <returns></returns>
+        /// <param name="name">The name of the resource. 资源名称。</param>
+        /// <param name="getDirectoryName">If true, get the folder path; if false, get the file path. 获取文件夹路径，false时获取到文件路径。</param>
+        /// <returns>The requested path as a string. 返回路径字符串。</returns>
         public static string GetAssetsPathBySelfFolder(string name, bool getDirectoryName = true)
         {
             if (string.IsNullOrEmpty(name)) return string.Empty;
@@ -74,26 +81,28 @@ namespace DebugxLog
         }
 
         /// <summary>
-        /// 获取默认配置
+        /// Get the default configuration.
+        /// 获取默认配置。
         /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="path">全路径</param>
-        /// <param name="createOnNotFound">未找到时自动创建</param>
-        /// <param name="createNew">未找到时自动创建</param>
-        /// <returns></returns>
+        /// <typeparam name="T">Type parameter. 类型参数。</typeparam>
+        /// <param name="path">Full path. 全路径。</param>
+        /// <param name="createOnNotFound">Automatically create if not found. 未找到时自动创建。</param>
+        /// <param name="createNew">Automatically create new if not found. 未找到时自动创建新的实例。</param>
+        /// <returns>Returns the configuration object. 返回配置对象。</returns>
         public static T GetConfigDefault<T>(string path, bool createOnNotFound = true) where T : ScriptableObject
         {
             return GetConfigDefault<T>(path, out bool createNew, createOnNotFound);
         }
-
+        
         /// <summary>
-        /// 获取默认配置
+        /// Get the default configuration.
+        /// 获取默认配置。
         /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="path">全路径</param>
-        /// <param name="createOnNotFound">未找到时自动创建</param>
-        /// <param name="createNew">未找到时自动创建</param>
-        /// <returns></returns>
+        /// <typeparam name="T">Type parameter. 类型参数。</typeparam>
+        /// <param name="path">Full path. 全路径。</param>
+        /// <param name="createOnNotFound">Automatically create if not found. 未找到时自动创建。</param>
+        /// <param name="createNew">Automatically create new if not found. 未找到时自动创建。</param>
+        /// <returns>Returns the configuration object. 返回配置对象。</returns>
         public static T GetConfigDefault<T>(string path, out bool createNew, bool createOnNotFound = true) where T : ScriptableObject
         {
             createNew = false;

@@ -23,27 +23,27 @@ namespace DebugxLog
         }
 
         /// <summary>
-        /// 标题风格1级
+        /// 标题风格1级。
         /// </summary>
         public GUIStyle TitleStyle_1 { get; private set; }
 
         /// <summary>
-        /// 标题风格2级
+        /// 标题风格2级。
         /// </summary>
         public GUIStyle TitleStyle_2 { get; private set; }
 
         /// <summary>
-        /// 标题风格3级
+        /// 标题风格3级。
         /// </summary>
         public GUIStyle TitleStyle_3 { get; private set; }
 
         /// <summary>
-        /// 隐藏空间标题
+        /// 隐藏空间标题。
         /// </summary>
         public GUIStyle AreaStyle_1 { get; private set; }
 
         /// <summary>
-        /// 隐藏空间标题
+        /// 隐藏空间标题。
         /// </summary>
         public GUIStyle LabelStyle_FadeAreaHeader { get; private set; }
 
@@ -96,7 +96,7 @@ namespace DebugxLog
             Color colorDark = new(0.1f, 0.1f, 0.1f);
             Color colorLightGray = new(0.8784f, 0.8784f, 0.8784f);
 
-            //一级标题风格
+            // 一级标题风格。
             TitleStyle_1 = new GUIStyle
             {
                 fontSize = 16,
@@ -108,7 +108,7 @@ namespace DebugxLog
                 }
             };
 
-            //二级标题风格
+            // 二级标题风格。
             TitleStyle_2 = new GUIStyle
             {
                 fontSize = 14,
@@ -120,7 +120,7 @@ namespace DebugxLog
                 }
             };
 
-            //三级标题风格
+            // 三级标题风格。
             TitleStyle_3 = new GUIStyle
             {
                 fontSize = 12,

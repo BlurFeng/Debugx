@@ -8,7 +8,8 @@ using UnityEngine;
 namespace DebugxLog.Tools
 {
     /// <summary>
-    /// 输出Log到本地txt文件工具类
+    /// Utility class for outputting logs to a local .txt file.
+    /// 输出Log到本地txt文件工具类。
     /// </summary>
     public class LogOutput
     {
@@ -23,8 +24,10 @@ namespace DebugxLog.Tools
         private const string fileNameFull = "DebugxLog.log";
         private const string fileType = ".log";
         private static string directoryPath;
+        
         /// <summary>
-        /// 输出文件夹路径
+        /// Output folder path.
+        /// 输出文件夹路径。
         /// </summary>
         public static string DirectoryPath
         {
@@ -35,12 +38,14 @@ namespace DebugxLog.Tools
         private static readonly System.Object locker = new System.Object();
         private static readonly StringBuilder logBuilder = new StringBuilder();
 
-        //用于裁剪color代码的正则表达式
+        // Regular expression used to trim color code.
+        // 用于裁剪color代码的正则表达式。
         private static readonly Regex regex_messageCut = new Regex(@"<color=#([\S.]{6})>|</color>|\[Debugx\]");
         private static readonly Regex regex_RecordMessageTag = new Regex(@"\[Debugx\]");
 
         /// <summary>
-        /// 记录开始
+        /// Start of logging.
+        /// 记录开始。
         /// </summary>
         public static void RecordStart()
         {
@@ -53,7 +58,8 @@ namespace DebugxLog.Tools
 
             savePath = string.Format("{0}/{1}", DirectoryPath, fileNameFull);
 
-            //PC目录为：C:\Users\UserName\AppData\LocalLow\DefaultCompany\ProjectName
+            // PC directory: C:\Users\UserName\AppData\LocalLow\DefaultCompany\ProjectName
+            // PC目录为：C:\Users\UserName\AppData\LocalLow\DefaultCompany\ProjectName
 
             if (string.IsNullOrEmpty(savePath)) return;
 
@@ -61,13 +67,15 @@ namespace DebugxLog.Tools
 
             if (fileInfo == null) return;
 
-            //创建文件夹
+            // Create folder.
+            // 创建文件夹。
             directoryPath = fileInfo.DirectoryName;
             if (!Directory.Exists(directoryPath)) Directory.CreateDirectory(directoryPath);
 
             try
             {
-                //创建一个新文件，向其中写入指定的字符串，然后关闭文件。 如果目标文件已存在，则覆盖该文件。
+                // Create a new file, write the specified string into it, and then close the file. If the target file already exists, overwrite it.
+                // 创建一个新文件，向其中写入指定的字符串，然后关闭文件。 如果目标文件已存在，则覆盖该文件。
                 System.IO.File.WriteAllText(savePath, string.Empty, Encoding.UTF8);
             }
             catch (System.Exception ex)
@@ -79,7 +87,8 @@ namespace DebugxLog.Tools
         }
 
         /// <summary>
-        /// 记录结束
+        /// End of logging.
+        /// 记录结束。
         /// </summary>
         public static void RecordOver()
         {
@@ -94,7 +103,8 @@ namespace DebugxLog.Tools
                 }
                 else
                 {
-                    //将打印的文件重命名
+                    // Rename the printed file.
+                    // 将打印的文件重命名。
                     string filePath = $"{directoryPath}\\{fileName}-{DateTime.Now.ToString("yyyy.MM.dd-HH.mm.ss")}{fileType}";
                     Debugx.LogAdmWarning($"logOutput over, file path : {filePath}");
                     File.Move(savePath, filePath);
@@ -110,14 +120,16 @@ namespace DebugxLog.Tools
 
             lock (locker)
             {
-                //裁剪Color代码
+                // Trim color code.
+                // 裁剪Color代码。
                 message = regex_messageCut.Replace(message, "");
 
                 string strTime = System.DateTime.Now.ToString("MM-dd HH:mm:ss");
                 string log = $"[{strTime}][{Time.frameCount}]{message}";
                 logBuilder.Append(log);
 
-                //是否记录对战跟踪
+                // Whether to log battle tracking.
+                // 是否记录对战跟踪。
                 if (type == LogType.Log && LogStackTrace
                     || type == LogType.Warning && WarningStackTrace
                     || type == LogType.Error && ErrorStackTrace)
@@ -128,7 +140,8 @@ namespace DebugxLog.Tools
 
                 if (logBuilder.Length > 0)
                 {
-                    //创建一个 StreamWriter，它将 UTF-8 编码文本追加到现有文件或新文件（如果指定文件不存在）。
+                    // Create a StreamWriter that appends UTF-8 encoded text to an existing file or a new file if the specified file does not exist.
+                    // 创建一个 StreamWriter，它将 UTF-8 编码文本追加到现有文件或新文件（如果指定文件不存在）。
                     using (StreamWriter sw = File.AppendText(savePath))
                     {
                         sw.WriteLine(logBuilder.ToString());
@@ -157,16 +170,17 @@ namespace DebugxLog.Tools
 
         private static readonly List<DrawLogInfo> drawLogs = new List<DrawLogInfo>();
         private static Vector2 scrollPosition;
-        private static bool collapse;//折叠或打开整个界面
-        private static bool collapseRepetition;//折叠重复信息
+        private static bool collapse;// Collapse or expand the entire interface. 折叠或打开整个界面。
+        private static bool collapseRepetition;// Collapse duplicate information. 折叠重复信息。
 
-        //窗口设置
+        // Window settings. 窗口设置。
         private const int margin = 10;
         private static readonly Rect titleBarRect = new Rect(0, 0, 1000, 20);
         private static Rect windowRect;
 
         /// <summary>
-        /// 绘制GUI
+        /// Render GUI.
+        /// 绘制GUI。
         /// </summary>
         public static void DrawGUI()
         {
@@ -199,7 +213,8 @@ namespace DebugxLog.Tools
         }
 
         /// <summary>  
-        /// Displays a window that lists the recorded logs.  
+        /// Displays a window that lists the recorded logs.
+        /// 显示一个窗口用于展示日志。
         /// </summary>  
         /// <param name="windowID">Window ID.</param>  
         private static void DrawConsoleWindow(int windowID)
@@ -208,12 +223,14 @@ namespace DebugxLog.Tools
             if (!collapse)
                 DrawLogsList();
 
-            // Allow the window to be dragged by its title bar.  
+            // Allow the window to be dragged by its title bar.
+            // 允许拖动窗口。
             GUI.DragWindow(titleBarRect);
         }
 
         /// <summary>  
-        /// Displays a scrollable list of logs.  
+        /// Displays a scrollable list of logs.
+        /// 显示可滚动的日志列表。
         /// </summary>  
         private static void DrawLogsList()
         {
@@ -223,8 +240,8 @@ namespace DebugxLog.Tools
             for (var i = 0; i < drawLogs.Count; i++)
             {
                 var log = drawLogs[i];
-                //  Destroy(logs[i - 1]);
-                // Combine identical messages if collapse option is chosen.  
+                // Destroy(logs[i - 1]);
+                // Combine identical messages if collapse option is chosen.
                 if (collapseRepetition && i > 0)
                 {
                     var previousMessage = drawLogs[i - 1].message;
@@ -241,12 +258,13 @@ namespace DebugxLog.Tools
 
             GUILayout.EndScrollView();
 
-            // Ensure GUI colour is reset before drawing other components.  
+            // Ensure GUI colour is reset before drawing other components.
             GUI.contentColor = Color.white;
         }
 
         /// <summary>  
-        /// Displays options for filtering and changing the logs list.  
+        /// Displays options for filtering and changing the logs list.
+        /// 绘制工具栏。
         /// </summary>  
         private static void DrawToolbar()
         {
@@ -267,11 +285,12 @@ namespace DebugxLog.Tools
         }
 
         /// <summary>  
-        /// Records a log from the log callback.  
+        /// Records a log from the log callback.
+        /// 回调，记录一条日志到绘制日志列表。
         /// </summary>  
         /// <param name="message">Message.</param>  
-        /// <param name="stackTrace">Trace of where the message came from.</param>  
-        /// <param name="type">Type of message (error, exception, warning, assert).</param>  
+        /// <param name="stackTrace">Trace of where the message came from.</param>
+        /// <param name="type">Type of message (error, exception, warning, assert).</param>
         private static void HandleDrawLogs(string message, string stackTrace, LogType type)
         {
             drawLogs.Add(new DrawLogInfo
@@ -285,7 +304,8 @@ namespace DebugxLog.Tools
         }
 
         /// <summary>  
-        /// Removes old logs that exceed the maximum number allowed.  
+        /// Removes old logs that exceed the maximum number allowed.
+        /// 删除超出最大数量的旧日志。
         /// </summary>  
         private static void TrimExcessLogs()
         {

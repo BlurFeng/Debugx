@@ -5,7 +5,8 @@ namespace DebugxLog.Tools
     class DebugxTools
     {
         /// <summary>
-        /// 确认委托是否已经包含
+        /// 确认委托是否已经包含。
+        /// Confirm whether the delegate is already included.
         /// </summary>
         /// <param name="main"></param>
         /// <param name="other"></param>

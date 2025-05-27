@@ -7,6 +7,8 @@ namespace DebugxLog
     public static class DebugxStaticData
     {
 
+        public static bool IsChineseSimplified = Application.systemLanguage == SystemLanguage.ChineseSimplified;
+        
         public static string rootPath;
 
         public static string resourcesPath;
@@ -57,8 +59,10 @@ namespace DebugxLog
         #endregion
 
         #region Default Value
-        //参数的默认值，用于恢复到默认参数功能
-        //dll中的实际使用数据DebugxProjectSettings受到DebugxProjectSettingsAsset支配，其默认值不重要
+        // The default value of the parameter, used to restore to the default parameter function.
+        // The actual usage data in the DLL, namely DebugxProjectSettings, is controlled by DebugxProjectSettingsAsset. Its default value is not significant.
+        // 参数的默认值，用于恢复到默认参数功能。
+        // dll中的实际使用数据DebugxProjectSettings受到DebugxProjectSettingsAsset支配，其默认值不重要。
 
         public const bool enableLogDefaultSet = true;
         public const bool enableLogMemberDefaultSet = true;
@@ -79,7 +83,8 @@ namespace DebugxLog
         #region Preferences
 
         /// <summary>
-        /// 重置用户设置
+        /// Reset user settings.
+        /// 重置用户设置。
         /// </summary>
         public static void ResetPreferences()
         {

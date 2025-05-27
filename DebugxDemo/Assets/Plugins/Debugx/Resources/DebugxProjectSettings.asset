@@ -33,7 +33,7 @@ MonoBehaviour:
     fadeAreaOpenCached: 0
   customMemberAssets:
   - enableDefault: 1
-    signature: Winhoo
+    signature: Blur
     logSignature: 1
     key: 1
     header: 

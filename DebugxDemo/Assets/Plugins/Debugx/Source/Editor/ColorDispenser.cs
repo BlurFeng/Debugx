@@ -8,7 +8,8 @@ namespace DebugxLog
     {
         private static DebugxProjectSettingsAsset SettingsAsset => DebugxProjectSettingsAsset.Instance;
 
-        //HSV中H色调的尺度，注意0和360的颜色是一样的
+        // In the HSV color model, the Hue (H) component is measured on a circular scale, where 0 and 360 degrees represent the same color.
+        // HSV中H色调的尺度，注意0和360的颜色是一样的。
         private const int hDimension = 360;
 
         private const float s_Dark = 0.15f;
@@ -19,8 +20,8 @@ namespace DebugxLog
         private static bool isDarkSkin;
 
         /// <summary>
-        /// HSV颜色模型
-        /// 值为0-1
+        /// HSV color model. Values range from 0 to 1.
+        /// HSV颜色模型。值为0-1。
         /// </summary>
         public struct ColorHSV
         {
@@ -50,7 +51,8 @@ namespace DebugxLog
         }
 
         /// <summary>
-        /// 为成员获取一个随机颜色
+        /// Get a random color for a member.
+        /// 为成员获取一个随机颜色。
         /// </summary>
         /// <returns></returns>
         public static Color GetRandomColorForMember()
@@ -71,8 +73,12 @@ namespace DebugxLog
 
             return Color.HSVToRGB(colorHSV.h, colorHSV.s, colorHSV.v);
         }
-
-        //获取一个HSV颜色的H值，此值是和当前存在的Member的Color最不接近的值
+        
+        /// <summary>
+        /// Get an HSV color’s Hue (H) value that is the least similar (most distant) to the H values of the existing members’ colors.
+        /// 获取一个HSV颜色的H值，此值是和当前存在的Member的Color最不接近的值。
+        /// </summary>
+        /// <returns></returns>
         private static int GetColorH()
         {
             if (SettingsAsset == null) return 0;
@@ -106,8 +112,10 @@ namespace DebugxLog
                 }
             }
 
-            //定义HSV的H值为0-dimension，记录所有已经使用的Color对应的H。设定两个H之间为一个线段，找到长度最长的线段，并获取线段的中点作为新的H
-            //S和V会根据编辑器皮肤Dark或者Light自动适应
+            // Define the HSV Hue (H) value in the range 0 to dimension, and record all used colors' corresponding H values. Treat each pair of adjacent H values as a line segment, find the longest segment, and use its midpoint as the new H.
+            // Saturation (S) and Value (V) will automatically adjust based on whether the editor skin is Dark or Light.
+            // 定义HSV的H值为0-dimension，记录所有已经使用的Color对应的H。设定两个H之间为一个线段，找到长度最长的线段，并获取线段的中点作为新的H。
+            // S和V会根据编辑器皮肤Dark或者Light自动适应。
 
             List<int> colorHArray = new List<int>(useLength);
             for (int i = 0; i < useLength; i++)
@@ -131,12 +139,13 @@ namespace DebugxLog
             }
 
             int colorH;
-            //其他线段
+            // Other line segments. 其他线段。
             if (left >= 0)
             {
                 colorH = left + (int)(line * 0.5f);
             }
-            //头尾相接的线段
+            // The line segment connecting the head and tail (i.e., the segment that wraps around).
+            // 头尾相接的线段。
             else
             {
                 colorH = max + (int)(line * 0.5f);
@@ -145,8 +154,13 @@ namespace DebugxLog
 
             return colorH;
         }
-
-        //获取Color对应的HSV的H值，并映射到0-dimension区间
+        
+        /// <summary>
+        /// Get the Hue (H) value of a color in HSV and map it to the 0–dimension range.
+        /// 获取Color对应的HSV的H值，并映射到0-dimension区间。
+        /// </summary>
+        /// <param name="color"></param>
+        /// <returns></returns>
         public static int GetColorH360(Color color)
         {
             Color.RGBToHSV(color, out float h, out float s, out float v);
@@ -154,7 +168,8 @@ namespace DebugxLog
         }
 
         /// <summary>
-        /// 为自定义成员自动重分配颜色
+        /// Automatically reassign colors for custom members.
+        /// 为自定义成员自动重分配颜色。
         /// </summary>
         public static void AutomaticallyReassignColors()
         {
@@ -174,7 +189,8 @@ namespace DebugxLog
         }
 
         /// <summary>
-        /// 重置所有成员颜色，根据当前编辑器皮肤
+        /// Reset all members' colors based on the current editor skin.
+        /// 重置所有成员颜色，根据当前编辑器皮肤。
         /// </summary>
         public static bool AdaptColorByEditorSkin()
         {

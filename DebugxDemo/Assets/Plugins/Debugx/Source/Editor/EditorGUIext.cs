@@ -54,10 +54,11 @@ namespace DebugxLog
             return change;
         }
     }
-
-    //GUI扩展工具
-    //有从AstarPathfindingProject插件拿过来的GUI绘制类
-
+    
+    /// <summary>
+    /// GUI extension tool. It includes the GUI drawing class taken from the AstarPathfindingProject plugin.
+    /// GUI扩展工具。有从AstarPathfindingProject插件拿过来的GUI绘制类
+    /// </summary>
     public static class GUIUtilityx
     {
         static Stack<Color> colors = new Stack<Color>();
@@ -75,12 +76,14 @@ namespace DebugxLog
     }
 
     /// <summary>
-    /// 可开关隐藏区域GUI
+    /// Switchable hidden area GUI.
+    /// 可开关隐藏区域GUI。
+    /// Sequence of invocation:
     /// 调用顺序:
     /// - Begin
     /// - Header
     /// - if(BeginFade)
-    /// - { 自定义内容 }
+    /// - { customize content 自定义内容 }
     /// - End
     /// </summary>
     public class FadeArea
@@ -97,7 +100,8 @@ namespace DebugxLog
         bool changedCached;
 
         public float beginSpace = 1.5f;
-        public bool changedExcludeHeraderClick = true;//将点击Header排除出GUI.changed
+        // Exclude the "Header" from the "GUI.changed" list. // 将点击Header排除出GUI.changed。
+        public bool changedExcludeHeraderClick = true;
 
         /// <summary>
         /// Is this area open.
@@ -204,7 +208,7 @@ namespace DebugxLog
         }
 
         /// <summary>
-        /// 
+        /// 页眉。
         /// </summary>
         /// <param name="label"></param>
         /// <param name="open"></param>

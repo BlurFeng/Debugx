@@ -13,12 +13,13 @@ using System.Diagnostics;
 namespace DebugxLog
 {
     /// <summary>
-    /// Debugx调试功能管理器
-    /// 一般添加到启动用GameObject上
+    /// Debugx Debugging Function Manager. It is usually added to the GameObject used for startup.
+    /// Debugx调试功能管理器。一般添加到启动用GameObject上。
     /// </summary>
     public class DebugxManager : MonoBehaviour
     {
-        //在U3D项目中添加宏“DEBUG_X”开启功能
+        // Add the macro "DEBUG_X" to the U3D project to enable the function.
+        // 在U3D项目中添加宏“DEBUG_X”开启功能。
 
         private static DebugxManager instance;
         private static GameObject GameObject;
@@ -41,7 +42,8 @@ namespace DebugxLog
         }
 
 #if DEBUG_X
-        //游戏启动时自动创建
+        // It is automatically created when the game starts.
+        // 游戏启动时自动创建。
         [RuntimeInitializeOnLoadMethod]
         private static void CheckInstance()
         {
@@ -59,7 +61,8 @@ namespace DebugxLog
             Debugx.OnAwake();
 
 #if UNITY_EDITOR
-            //编辑器时重写Log输出路径到项目Logs文件夹下
+            // The editor rewrites the Log output path to the "Logs" folder of the project.
+            // 编辑器时重写Log输出路径到项目Logs文件夹下。
             string directoryPathCover = Application.dataPath;
             directoryPathCover = directoryPathCover.Replace("Assets", "Logs");
             LogOutput.DirectoryPath = directoryPathCover;
@@ -79,10 +82,11 @@ namespace DebugxLog
                 Debugx.LogAdm($"DebugxManager --- Log output to {LogOutput.DirectoryPath}");
 
 #if UNITY_EDITOR
-            //测试用
+            // test case. // 测试用。
             if (DebugxStaticData.EnableAwakeTestLog)
             {
-                //测试打印，可注释。有对应key的成员信息时才会被打印。
+                // Try to print. It can be annotated. The member information with the corresponding key will be printed.
+                // 试打印，可注释。有对应key的成员信息时才会被打印。
                 Debugx.LogNom("LogNom Print Test");
                 Debugx.LogMst("LogMst Print Test");
                 Debugx.Log(1, "Key 1 Print Test");
@@ -95,10 +99,11 @@ namespace DebugxLog
         private void Update()
         {
 #if UNITY_EDITOR
-            //测试用
+            // test case. // 测试用。
             if (DebugxStaticData.EnableUpdateTestLog)
             {
-                //测试打印，可注释。有对应key的成员信息时才会被打印。
+                // Test print, with comments. It will only be printed when there is corresponding key for the member information.
+                // 测试打印，可注释。有对应key的成员信息时才会被打印。
                 Debugx.Log(1, "MemberKey 1 Update");
                 Debugx.LogNom("LogNom Update");
                 Debugx.LogMst("LogMst Update");
@@ -118,8 +123,8 @@ namespace DebugxLog
         }
 
         /// <summary>
-        /// 设置成员开关
-        /// 运行时可通过此方法设置
+        /// Set the member switch. This method can be used to set it during operation.
+        /// 设置成员开关。运行时可通过此方法设置。
         /// </summary>
         /// <param name="key"></param>
         /// <param name="enable"></param>

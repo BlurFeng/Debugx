@@ -11,7 +11,9 @@ public static class DebugxStaticDataEditor
     }
 
     public static ActionHandler<bool> OnAutoSaveChange = new ActionHandler<bool>();
-    public static byte autoSave;//0=未设置 1=自动保存 2=不自动保存
+    // 0 = Not set 1 = Automatic saving 2 = Do not automatically save.
+    // 0=未设置 1=自动保存 2=不自动保存。
+    public static byte autoSave;
     public static bool AutoSave
     {
         get

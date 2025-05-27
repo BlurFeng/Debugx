@@ -5,8 +5,8 @@ using UnityEngine;
 namespace DebugxLog
 {
     /// <summary>
-    /// Debugx调试成员信息
-    /// 用于配置的数据
+    /// Debugx provides debugging member information. It is used for configuring data.
+    /// Debugx调试成员信息。用于配置的数据。
     /// </summary>
     [Serializable]
     public struct DebugxMemberInfoAsset
