@@ -16,7 +16,7 @@ Follow the manual to quickly install and configure the Debugx plug-in.
 
 ### 【Add plugins to your project】
 Download the Releases package and install the Debugx plugin into your releases using the.Unitypackage package.\
-Or just download the Debugx folder in the Github project and put it into your project.
+When the versions of Unity are the same (otherwise there might be issues with positions causing inaccessibility), you can also directly download the Debugx folder from the Github project and place it in your project.
 ![](Images/Debugx1.png)
 
 ### 【Add macros to your project】

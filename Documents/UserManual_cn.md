@@ -16,7 +16,7 @@ DebugxConsole用于在项目运行时操作打印开关等内容。
 
 ### 【添加插件到你的项目】
 下载Releases包，使用.unitypackage包安装Debugx插件到你的项目。
-或者直接下载Github项目中的Debugx文件夹并放入你的项目中。
+在Unity版本相同时（否则可能产生位置的问题导致不可用），你也可以直接下载Github项目中的Debugx文件夹并放入你的项目中。
 ![](Images/Debugx1.png)
 
 ### 【添加宏到你的项目】
