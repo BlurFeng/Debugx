@@ -528,19 +528,19 @@ namespace DebugxLog
         {
             // if (!EditorConfig.canResetProjectSettings) return;
 
-            SettingsAsset.enableLogDefault = DebugxStaticData.enableLogDefaultSet;
-            SettingsAsset.enableLogMemberDefault = DebugxStaticData.enableLogMemberDefaultSet;
-            SettingsAsset.allowUnregisteredMember = DebugxStaticData.allowUnregisteredMember;
-            SettingsAsset.logThisKeyMemberOnlyDefault = DebugxStaticData.logThisKeyMemberOnlyDefaultSet;
+            SettingsAsset.enableLogDefault = DebugxStaticData.EnableLogDefaultSet;
+            SettingsAsset.enableLogMemberDefault = DebugxStaticData.EnableLogMemberDefaultSet;
+            SettingsAsset.allowUnregisteredMember = DebugxStaticData.AllowUnregisteredMemberSet;
+            SettingsAsset.logThisKeyMemberOnlyDefault = DebugxStaticData.LogThisKeyMemberOnlyDefaultSet;
 
-            SettingsAsset.logOutput = DebugxStaticData.logOutputSet;
-            SettingsAsset.enableLogStackTrace = DebugxStaticData.enableLogStackTraceSet;
-            SettingsAsset.enableWarningStackTrace = DebugxStaticData.enableWarningStackTraceSet;
-            SettingsAsset.enableErrorStackTrace = DebugxStaticData.enableErrorStackTraceSet;
-            SettingsAsset.recordAllNonDebugxLogs = DebugxStaticData.recordAllNonDebugxLogsSet;
-            SettingsAsset.drawLogToScreen = DebugxStaticData.drawLogToScreenSet;
-            SettingsAsset.restrictDrawLogCount = DebugxStaticData.restrictDrawLogCountSet;
-            SettingsAsset.maxDrawLogs = DebugxStaticData.maxDrawLogsSet;
+            SettingsAsset.logOutput = DebugxStaticData.LogOutputSet;
+            SettingsAsset.enableLogStackTrace = DebugxStaticData.EnableLogStackTraceSet;
+            SettingsAsset.enableWarningStackTrace = DebugxStaticData.EnableWarningStackTraceSet;
+            SettingsAsset.enableErrorStackTrace = DebugxStaticData.EnableErrorStackTraceSet;
+            SettingsAsset.recordAllNonDebugxLogs = DebugxStaticData.RecordAllNonDebugxLogsSet;
+            SettingsAsset.drawLogToScreen = DebugxStaticData.DrawLogToScreenSet;
+            SettingsAsset.restrictDrawLogCount = DebugxStaticData.RestrictDrawLogCountSet;
+            SettingsAsset.maxDrawLogs = DebugxStaticData.MaxDrawLogsSet;
 
             ResetProjectSettingsMembers();
 

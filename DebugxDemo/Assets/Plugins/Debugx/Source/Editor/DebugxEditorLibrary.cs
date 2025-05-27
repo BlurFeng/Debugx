@@ -16,12 +16,12 @@ namespace DebugxLog
         {
             get
             {
-                if (DebugxStaticData.rootPath == null)
+                if (DebugxStaticData.RootPath == null)
                 {
-                    DebugxStaticData.rootPath = GetAssetsPathBySelfFolder(Name).Replace(("/Source/Editor"), "");
+                    DebugxStaticData.RootPath = GetAssetsPathBySelfFolder(Name).Replace(("/Source/Editor"), "");
                 }
 
-                return DebugxStaticData.rootPath;
+                return DebugxStaticData.RootPath;
             }
         }
 
@@ -33,13 +33,13 @@ namespace DebugxLog
         {
             get
             {
-                DebugxStaticData.resourcesPath ??= RootPath + "/Resources";
+                DebugxStaticData.ResourcesPath ??= RootPath + "/Resources";
 
                 //确认文件夹是否存在，否则创建
-                if (!Directory.Exists(DebugxStaticData.resourcesPath))
-                    Directory.CreateDirectory(DebugxStaticData.resourcesPath);
+                if (!Directory.Exists(DebugxStaticData.ResourcesPath))
+                    Directory.CreateDirectory(DebugxStaticData.ResourcesPath);
 
-                return DebugxStaticData.resourcesPath;
+                return DebugxStaticData.ResourcesPath;
             }
         }
 

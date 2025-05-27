@@ -192,15 +192,15 @@ namespace DebugxLog
             //调用Resources.Load加载已经存在的资源则不会有此问题，应该是Editor启动时创建的Asset资源还未成功进行保存
 
 #if UNITY_EDITOR
-            string path = $"{DebugxStaticData.resourcesPath}/{DebugxProjectSettings.fileName}.asset";
+            string path = $"{DebugxStaticData.ResourcesPath}/{DebugxProjectSettings.fileName}.asset";
 
             if (Instance) UnityEditor.AssetDatabase.DeleteAsset(path);//移除旧资源
 
             instance = ScriptableObject.CreateInstance(typeof(DebugxProjectSettingsAsset)) as DebugxProjectSettingsAsset;
 
             //确认文件夹是否存在，否则创建
-            if (!System.IO.Directory.Exists(DebugxStaticData.resourcesPath))
-                System.IO.Directory.CreateDirectory(DebugxStaticData.resourcesPath);
+            if (!System.IO.Directory.Exists(DebugxStaticData.ResourcesPath))
+                System.IO.Directory.CreateDirectory(DebugxStaticData.ResourcesPath);
 
             UnityEditor.AssetDatabase.CreateAsset(instance, path);
 
@@ -269,28 +269,28 @@ namespace DebugxLog
         #region Log Output
 
         [Tooltip("普通Log配置")]
-        public bool logOutput = DebugxStaticData.logOutputSet;
+        public bool logOutput = DebugxStaticData.LogOutputSet;
 
         [Tooltip("输出Log类型的堆栈跟踪")]
-        public bool enableLogStackTrace = DebugxStaticData.enableLogStackTraceSet;
+        public bool enableLogStackTrace = DebugxStaticData.EnableLogStackTraceSet;
 
         [Tooltip("输出Warning类型的堆栈跟踪")]
-        public bool enableWarningStackTrace = DebugxStaticData.enableWarningStackTraceSet;
+        public bool enableWarningStackTrace = DebugxStaticData.EnableWarningStackTraceSet;
 
         [Tooltip("输出Error类型的堆栈跟踪")]
-        public bool enableErrorStackTrace = DebugxStaticData.enableErrorStackTraceSet;
+        public bool enableErrorStackTrace = DebugxStaticData.EnableErrorStackTraceSet;
 
         [Tooltip("记录所有非Debugx打印的Log")]
-        public bool recordAllNonDebugxLogs = DebugxStaticData.recordAllNonDebugxLogsSet;
+        public bool recordAllNonDebugxLogs = DebugxStaticData.RecordAllNonDebugxLogsSet;
 
         [Tooltip("绘制Log到屏幕")]
-        public bool drawLogToScreen = DebugxStaticData.drawLogToScreenSet;
+        public bool drawLogToScreen = DebugxStaticData.DrawLogToScreenSet;
 
         [Tooltip("限制绘制Log数量")]
-        public bool restrictDrawLogCount = DebugxStaticData.restrictDrawLogCountSet;
+        public bool restrictDrawLogCount = DebugxStaticData.RestrictDrawLogCountSet;
 
         [Tooltip("绘制Log最大数量")]
-        public int maxDrawLogs = DebugxStaticData.maxDrawLogsSet;
+        public int maxDrawLogs = DebugxStaticData.MaxDrawLogsSet;
 
         #endregion
 

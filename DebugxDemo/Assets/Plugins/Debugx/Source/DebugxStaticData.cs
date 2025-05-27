@@ -9,9 +9,9 @@ namespace DebugxLog
 
         public static bool IsChineseSimplified = Application.systemLanguage == SystemLanguage.ChineseSimplified;
         
-        public static string rootPath;
+        public static string RootPath;
 
-        public static string resourcesPath;
+        public static string ResourcesPath;
 
         #region Tools
 
@@ -64,19 +64,19 @@ namespace DebugxLog
         // 参数的默认值，用于恢复到默认参数功能。
         // dll中的实际使用数据DebugxProjectSettings受到DebugxProjectSettingsAsset支配，其默认值不重要。
 
-        public const bool enableLogDefaultSet = true;
-        public const bool enableLogMemberDefaultSet = true;
-        public const bool allowUnregisteredMember = true;
-        public const int logThisKeyMemberOnlyDefaultSet = 0;
+        public const bool EnableLogDefaultSet = true;
+        public const bool EnableLogMemberDefaultSet = true;
+        public const bool AllowUnregisteredMemberSet = true;
+        public const int LogThisKeyMemberOnlyDefaultSet = 0;
 
-        public const bool logOutputSet = true;
-        public const bool enableLogStackTraceSet = false;
-        public const bool enableWarningStackTraceSet = false;
-        public const bool enableErrorStackTraceSet = true;
-        public const bool recordAllNonDebugxLogsSet = false;
-        public const bool drawLogToScreenSet = false;
-        public const bool restrictDrawLogCountSet = false;
-        public const int maxDrawLogsSet = 100;
+        public const bool LogOutputSet = true;
+        public const bool EnableLogStackTraceSet = false;
+        public const bool EnableWarningStackTraceSet = false;
+        public const bool EnableErrorStackTraceSet = true;
+        public const bool RecordAllNonDebugxLogsSet = false;
+        public const bool DrawLogToScreenSet = false;
+        public const bool RestrictDrawLogCountSet = false;
+        public const int MaxDrawLogsSet = 100;
 
         #endregion
 
@@ -88,19 +88,19 @@ namespace DebugxLog
         /// </summary>
         public static void ResetPreferences()
         {
-            EnableLogDefaultPrefs = DebugxStaticData.enableLogDefaultSet;
-            EnableLogMemberDefaultPrefs = DebugxStaticData.enableLogMemberDefaultSet;
-            AllowUnregisteredMember = DebugxStaticData.allowUnregisteredMember;
-            LogThisKeyMemberOnlyDefaultPrefs = DebugxStaticData.logThisKeyMemberOnlyDefaultSet;
+            EnableLogDefaultPrefs = DebugxStaticData.EnableLogDefaultSet;
+            EnableLogMemberDefaultPrefs = DebugxStaticData.EnableLogMemberDefaultSet;
+            AllowUnregisteredMember = DebugxStaticData.AllowUnregisteredMemberSet;
+            LogThisKeyMemberOnlyDefaultPrefs = DebugxStaticData.LogThisKeyMemberOnlyDefaultSet;
 
-            LogOutputPrefs = DebugxStaticData.logOutputSet;
-            EnableLogStackTracePrefs = DebugxStaticData.enableLogStackTraceSet;
-            EnableWarningStackTracePrefs = DebugxStaticData.enableWarningStackTraceSet;
-            EnableErrorStackTracePrefs = DebugxStaticData.enableErrorStackTraceSet;
-            RecordAllNonDebugxLogsPrefs = DebugxStaticData.recordAllNonDebugxLogsSet;
-            DrawLogToScreenPrefs = DebugxStaticData.drawLogToScreenSet;
-            RestrictDrawLogCountPrefs = DebugxStaticData.restrictDrawLogCountSet;
-            MaxDrawLogsPrefs = DebugxStaticData.maxDrawLogsSet;
+            LogOutputPrefs = DebugxStaticData.LogOutputSet;
+            EnableLogStackTracePrefs = DebugxStaticData.EnableLogStackTraceSet;
+            EnableWarningStackTracePrefs = DebugxStaticData.EnableWarningStackTraceSet;
+            EnableErrorStackTracePrefs = DebugxStaticData.EnableErrorStackTraceSet;
+            RecordAllNonDebugxLogsPrefs = DebugxStaticData.RecordAllNonDebugxLogsSet;
+            DrawLogToScreenPrefs = DebugxStaticData.DrawLogToScreenSet;
+            RestrictDrawLogCountPrefs = DebugxStaticData.RestrictDrawLogCountSet;
+            MaxDrawLogsPrefs = DebugxStaticData.MaxDrawLogsSet;
 
             ResetPreferencesMembers();
         }
@@ -113,25 +113,25 @@ namespace DebugxLog
 
         public static bool EnableLogDefaultPrefs
         {
-            get => PlayerPrefsGetBool("DebugxStaticData.EnableLogDefault", DebugxStaticData.enableLogDefaultSet);
+            get => PlayerPrefsGetBool("DebugxStaticData.EnableLogDefault", DebugxStaticData.EnableLogDefaultSet);
             set => PlayerPrefsSetBool("DebugxStaticData.EnableLogDefault", value);
         }
 
         public static bool EnableLogMemberDefaultPrefs
         {
-            get => PlayerPrefsGetBool("DebugxStaticData.EnableLogMemberDefault", DebugxStaticData.enableLogMemberDefaultSet);
+            get => PlayerPrefsGetBool("DebugxStaticData.EnableLogMemberDefault", DebugxStaticData.EnableLogMemberDefaultSet);
             set => PlayerPrefsSetBool("DebugxStaticData.EnableLogMemberDefault", value);
         }
 
         public static bool AllowUnregisteredMember
         {
-            get => PlayerPrefsGetBool("DebugxStaticData.AllowUnregisteredMember", DebugxStaticData.allowUnregisteredMember);
+            get => PlayerPrefsGetBool("DebugxStaticData.AllowUnregisteredMember", DebugxStaticData.AllowUnregisteredMemberSet);
             set => PlayerPrefsSetBool("DebugxStaticData.AllowUnregisteredMember", value);
         }
 
         public static int LogThisKeyMemberOnlyDefaultPrefs
         {
-            get => PlayerPrefs.GetInt("DebugxStaticData.LogThisKeyMemberOnlyDefault", DebugxStaticData.logThisKeyMemberOnlyDefaultSet);
+            get => PlayerPrefs.GetInt("DebugxStaticData.LogThisKeyMemberOnlyDefault", DebugxStaticData.LogThisKeyMemberOnlyDefaultSet);
             set => PlayerPrefs.SetInt("DebugxStaticData.LogThisKeyMemberOnlyDefault", value);
         }
 
@@ -178,49 +178,49 @@ namespace DebugxLog
 
         public static bool LogOutputPrefs
         {
-            get => PlayerPrefsGetBool("DebugxStaticData.LogOutput", DebugxStaticData.logOutputSet);
+            get => PlayerPrefsGetBool("DebugxStaticData.LogOutput", DebugxStaticData.LogOutputSet);
             set => PlayerPrefsSetBool("DebugxStaticData.LogOutput", value);
         }
 
         public static bool EnableLogStackTracePrefs
         {
-            get => PlayerPrefsGetBool("DebugxStaticData.EnableLogStackTrace", DebugxStaticData.enableLogStackTraceSet);
+            get => PlayerPrefsGetBool("DebugxStaticData.EnableLogStackTrace", DebugxStaticData.EnableLogStackTraceSet);
             set => PlayerPrefsSetBool("DebugxStaticData.EnableLogStackTrace", value);
         }
 
         public static bool EnableWarningStackTracePrefs
         {
-            get => PlayerPrefsGetBool("DebugxStaticData.EnableWarningStackTrace", DebugxStaticData.enableWarningStackTraceSet);
+            get => PlayerPrefsGetBool("DebugxStaticData.EnableWarningStackTrace", DebugxStaticData.EnableWarningStackTraceSet);
             set => PlayerPrefsSetBool("DebugxStaticData.EnableWarningStackTrace", value);
         }
 
         public static bool EnableErrorStackTracePrefs
         {
-            get => PlayerPrefsGetBool("DebugxStaticData.EnableErrorStackTrace", DebugxStaticData.enableErrorStackTraceSet);
+            get => PlayerPrefsGetBool("DebugxStaticData.EnableErrorStackTrace", DebugxStaticData.EnableErrorStackTraceSet);
             set => PlayerPrefsSetBool("DebugxStaticData.EnableErrorStackTrace", value);
         }
 
         public static bool RecordAllNonDebugxLogsPrefs
         {
-            get => PlayerPrefsGetBool("DebugxStaticData.RecordAllNonDebugxLogs", DebugxStaticData.recordAllNonDebugxLogsSet);
+            get => PlayerPrefsGetBool("DebugxStaticData.RecordAllNonDebugxLogs", DebugxStaticData.RecordAllNonDebugxLogsSet);
             set => PlayerPrefsSetBool("DebugxStaticData.RecordAllNonDebugxLogs", value);
         }
 
         public static bool DrawLogToScreenPrefs
         {
-            get => PlayerPrefsGetBool("DebugxStaticData.DrawLogToScreen", DebugxStaticData.drawLogToScreenSet);
+            get => PlayerPrefsGetBool("DebugxStaticData.DrawLogToScreen", DebugxStaticData.DrawLogToScreenSet);
             set => PlayerPrefsSetBool("DebugxStaticData.DrawLogToScreen", value);
         }
 
         public static bool RestrictDrawLogCountPrefs
         {
-            get => PlayerPrefsGetBool("DebugxStaticData.RestrictDrawLogCount", DebugxStaticData.restrictDrawLogCountSet);
+            get => PlayerPrefsGetBool("DebugxStaticData.RestrictDrawLogCount", DebugxStaticData.RestrictDrawLogCountSet);
             set => PlayerPrefsSetBool("DebugxStaticData.RestrictDrawLogCount", value);
         }
 
         public static int MaxDrawLogsPrefs
         {
-            get => PlayerPrefs.GetInt("DebugxStaticData.MaxDrawLogs", DebugxStaticData.maxDrawLogsSet);
+            get => PlayerPrefs.GetInt("DebugxStaticData.MaxDrawLogs", DebugxStaticData.MaxDrawLogsSet);
             set => PlayerPrefs.SetInt("DebugxStaticData.MaxDrawLogs", value);
         }
 
