@@ -140,7 +140,7 @@ namespace DebugxLog
 
             EditorGUILayout.Space();
             EditorGUILayout.LabelField("Log Output", GUIStylex.Get.TitleStyle_2);
-            DebugxStaticData.LogOutputPrefs = GUILayoutx.Toggle("EnbaleLogOutput", DebugxStaticData.ToolTip_LogOutput,
+            DebugxStaticData.LogOutputPrefs = GUILayoutx.Toggle("EnableLogOutput", DebugxStaticData.ToolTip_LogOutput,
                 DebugxStaticData.LogOutputPrefs);
             EditorGUI.BeginDisabledGroup(!DebugxStaticData.LogOutputPrefs);
             DebugxStaticData.EnableLogStackTracePrefs = GUILayoutx.Toggle("EnableLogStackTrace",

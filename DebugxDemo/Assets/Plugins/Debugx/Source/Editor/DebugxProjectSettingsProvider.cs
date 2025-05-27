@@ -152,7 +152,7 @@ namespace DebugxLog
             EditorGUILayout.Space();
             EditorGUILayout.LabelField("Log Output", GUIStylex.Get.TitleStyle_2);
             SettingsAsset.logOutput =
-                Toggle("EnbaleLogOutput", DebugxStaticData.ToolTip_LogOutput, SettingsAsset.logOutput);
+                Toggle("EnableLogOutput", DebugxStaticData.ToolTip_LogOutput, SettingsAsset.logOutput);
             EditorGUI.BeginDisabledGroup(!SettingsAsset.logOutput);
             SettingsAsset.enableLogStackTrace = Toggle("EnableLogStackTrace",
                 DebugxStaticData.ToolTip_EnableLogStackTrace, SettingsAsset.enableLogStackTrace);

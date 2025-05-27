@@ -29,7 +29,7 @@ namespace DebugxLog
 
         public static bool EnableAwakeTestLog
         {
-            get => PlayerPrefsGetBool("DebugxStaticData.EnableAwakeTestLog", true);
+            get => PlayerPrefsGetBool("DebugxStaticData.EnableAwakeTestLog", false);
             set => PlayerPrefsSetBool("DebugxStaticData.EnableAwakeTestLog", value);
         }
 
@@ -69,7 +69,7 @@ namespace DebugxLog
         public const bool AllowUnregisteredMemberSet = true;
         public const int LogThisKeyMemberOnlyDefaultSet = 0;
 
-        public const bool LogOutputSet = true;
+        public const bool LogOutputSet = false;
         public const bool EnableLogStackTraceSet = false;
         public const bool EnableWarningStackTraceSet = false;
         public const bool EnableErrorStackTraceSet = true;

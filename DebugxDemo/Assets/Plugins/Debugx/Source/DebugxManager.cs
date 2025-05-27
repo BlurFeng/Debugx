@@ -78,11 +78,13 @@ namespace DebugxLog
 
             Debugx.LogAdm("DebugxManager --- Awake");
 
+            // 在 菜单>Edit>Preferences>Debugx 界面的 LogOutput>EnableLogOutput 开关是否输出本地log。
             if (DebugxProjectSettings.Instance.logOutput)
                 Debugx.LogAdm($"DebugxManager --- Log output to {LogOutput.DirectoryPath}");
 
 #if UNITY_EDITOR
-            // test case. // 测试用。
+            // test case.Open the console via Menu > Window > Debugx > DebugxConsole, and toggle the setting at Test > EnableAwakeTestLog to enable or disable it.
+            // 测试用。请在 菜单>Window>Debugx>DebugxConsole 打开控制台，并设置 Test>EnableAwakeTestLog 进行开关。
             if (DebugxStaticData.EnableAwakeTestLog)
             {
                 // Try to print. It can be annotated. The member information with the corresponding key will be printed.
