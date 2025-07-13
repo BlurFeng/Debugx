@@ -253,7 +253,7 @@ namespace DebugxLog
                 {
                     new DebugxMemberInfoAsset()
                     {
-                        signature = "Winhoo",
+                        signature = "Blur",
                         logSignature = true,
                         key = 1,
                         color = new Color(0.7843f, 0.941f, 1f, 1f),
