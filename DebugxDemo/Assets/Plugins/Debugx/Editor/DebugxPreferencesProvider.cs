@@ -38,7 +38,7 @@ namespace DebugxLog
 
         private static void Enable(string searchContext, VisualElement rootElement)
         {
-            DebugxProjectSettingsAsset.CheckDebugxProjectSettingsAsset();
+            DebugxProjectSettingsAssetEditor.CheckDebugxProjectSettingsAsset();
         }
 
         private static void Disable()
