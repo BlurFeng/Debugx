@@ -1,5 +1,4 @@
 ## Custom
-*.meta
 DebugxUserManual_cn.docx
 #*.docx
 
@@ -53,7 +52,7 @@ artifacts/
 *_p.c
 *_i.h
 *.ilk
-*.meta
+# *.meta # Packages loaded via UPM require .meta files.
 *.obj
 *.pch
 *.pdb
