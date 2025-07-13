@@ -3,10 +3,17 @@
 ***日本語のドキュメントを読む >[日本語](README_ja.md)***\
 ***Read this document in >[English](README_en.md)***
 
-## 【用户手册】
+## 【User Manual】
 **阅读中文用户手册 >[中文用户手册](Documents/UserManual_cn.md)**\
 **日本語のユーザーマニュアルを読む >[日本語ユーザーマニュアル](Documents/UserManual_ja.md)**\
 **Read this User Manual in >[English User Manual](Documents/UserManual_en.md)**
+
+## 【UPM】
+允许通过 Package Manager 将插件加载到 Unity 项目中。\
+打开 Unity 菜单，进入 Window > Package Manager。\
+点击窗口左上角的 + 按钮，然后选择 Add package from git URL...\
+粘贴以下链接，即可将插件作为包安装到项目中：\
+https://github.com/BlurFeng/Debugx.git?path=DebugxDemo/Assets/Plugins/Debugx
 
 ## 【概要】
 这是一个Unity引擎的插件。\

@@ -3,10 +3,17 @@
 ***日本語のドキュメントを読む >[日本語](README_ja.md)***\
 ***Read this document in >[English](README_en.md)***
 
-## 【用户手册】
+## 【User Manual】
 **阅读中文用户手册 >[中文用户手册](Documents/UserManual_cn.md)**\
 **日本語のユーザーマニュアルを読む >[日本語ユーザーマニュアル](Documents/UserManual_ja.md)**\
 **Read this User Manual in >[English User Manual](Documents/UserManual_en.md)**
+
+## 【UPM】
+Unity プロジェクトに Package Manager 経由でプラグインを導入できます。\
+Unity メニューの Window > Package Manager を開きます。\
+ウィンドウ左上の + ボタンをクリックし、Add package from git URL... を選択します。\
+以下のリンクを貼り付けると、パッケージとしてプラグインをインストールできます：\
+https://github.com/BlurFeng/Debugx.git?path=DebugxDemo/Assets/Plugins/Debugx
 
 ## 【概要】
 こちらはUnity用プラグインです。\
