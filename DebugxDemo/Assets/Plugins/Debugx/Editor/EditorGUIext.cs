@@ -3,7 +3,7 @@ using UnityEditor;
 using UnityEngine;
 using SettingsProvider = UnityEditor.SettingsProvider;
 
-namespace DebugxLog
+namespace DebugxLog.Editor
 {
     public static class GUILayoutx
     {

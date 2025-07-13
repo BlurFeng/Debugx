@@ -5,7 +5,7 @@ using UnityEditorInternal;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-namespace DebugxLog
+namespace DebugxLog.Editor
 {
     static class DebugxPreferencesProvider
     {

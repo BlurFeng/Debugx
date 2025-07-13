@@ -1,10 +1,10 @@
 ﻿using UnityEditor;
 using UnityEngine;
 
-namespace DebugxLog
+namespace DebugxLog.Editor
 {
     [CanEditMultipleObjects, CustomEditor(typeof(DebugxProjectSettingsAsset))]
-    public class DebugxProjectSettingsAssetIns : Editor
+    public class DebugxProjectSettingsAssetIns : UnityEditor.Editor
     {
         public override void OnInspectorGUI()
         {

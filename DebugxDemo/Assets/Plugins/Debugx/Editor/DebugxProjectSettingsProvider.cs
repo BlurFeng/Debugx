@@ -5,7 +5,7 @@ using UnityEditor.Build;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-namespace DebugxLog
+namespace DebugxLog.Editor
 {
     static class DebugxProjectSettingsProvider
     {
@@ -276,8 +276,8 @@ namespace DebugxLog
                         FadeAreaHeaderIsDirty = faTemp.Header(string.IsNullOrEmpty(mInfo.signature)
                             ? $"Member {mInfo.key}"
                             : mInfo.signature);
-                        SettingsAsset.defaultMemberAssets[i].fadeAreaOpenCached = faTemp.BeginFade();
-                        if (SettingsAsset.defaultMemberAssets[i].fadeAreaOpenCached)
+                        bool fadeAreaOpenCached = DebugxMemberInfoAssetEditor.SetFadeAreaOpenCached(SettingsAsset.defaultMemberAssets[i].key,faTemp.BeginFade());
+                        if (fadeAreaOpenCached)
                             DrawMemberInfo(ref SettingsAsset.defaultMemberAssets[i], true, true);
                         faTemp.End();
                     }
@@ -357,8 +357,8 @@ namespace DebugxLog
 
                         GUILayout.EndHorizontal();
 
-                        mInfo.fadeAreaOpenCached = faTemp.BeginFade();
-                        if (mInfo.fadeAreaOpenCached)
+                        bool mInfoFadeAreaOpenCached = DebugxMemberInfoAssetEditor.SetFadeAreaOpenCached(mInfo.key, faTemp.BeginFade());
+                        if (mInfoFadeAreaOpenCached)
                         {
                             DrawMemberInfo(ref mInfo);
                         }
@@ -368,8 +368,9 @@ namespace DebugxLog
                         {
                             //The switch status of FadeArea can be changed directly without the need for confirmation and saving.
                             // FadeArea的开关状态直接改变不需要保存确认。
-                            SettingsAsset.customMemberAssets[i].fadeAreaOpenCached =
-                                mInfo.fadeAreaOpenCached;
+                            DebugxMemberInfoAssetEditor.SetFadeAreaOpenCached(
+                                SettingsAsset.customMemberAssets[i].key,
+                                mInfoFadeAreaOpenCached);
                         }
                         
                         SettingsAsset.customMemberAssets[i] = mInfo;
@@ -509,7 +510,10 @@ namespace DebugxLog
         /// <param name="info"></param>
         private static void OnAddMemberInfo(DebugxMemberInfoAsset info)
         {
-            memberInfosFadeAreaPool.Add(new FadeArea(settingsProvider, info.fadeAreaOpenCached,
+            memberInfosFadeAreaPool.Add(
+                new FadeArea(
+                    settingsProvider, 
+                    DebugxMemberInfoAssetEditor.GetFadeAreaOpenCached(info.key),
                 GUIStylex.Get.AreaStyle_1, GUIStylex.Get.LabelStyle_FadeAreaHeader));
         }
 
@@ -521,6 +525,7 @@ namespace DebugxLog
         /// <param name="info"></param>
         private static void OnRemoveMemberInfo(int index, DebugxMemberInfoAsset info)
         {
+            DebugxMemberInfoAssetEditor.DeleteFadeAreaOpenCached(info.key);
             memberInfosFadeAreaPool.RemoveAt(index + 2); //前面两个时Normal和Master用的
         }
 

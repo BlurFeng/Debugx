@@ -37,9 +37,6 @@ namespace DebugxLog
             this.key = key;
             header = String.Empty;
             color = DebugxProjectSettingsAsset.GetRandomColorForMember != null ? DebugxProjectSettingsAsset.GetRandomColorForMember.Invoke() : Color.white;
-#if UNITY_EDITOR
-            fadeAreaOpenCached = true;
-#endif
         }
 
         /// <summary>
@@ -49,9 +46,6 @@ namespace DebugxLog
         {
             enableDefault = true;
             logSignature = true;
-#if UNITY_EDITOR
-            fadeAreaOpenCached = true;
-#endif
         }
 
         public DebugxMemberInfo CreateDebugxMemberInfo()
@@ -69,24 +63,14 @@ namespace DebugxLog
                 haveHeader = !string.IsNullOrEmpty(header),
             };
 
-#if UNITY_EDITOR
             //本地用户设置覆盖
-            if (DebugxStaticData.MemberEnableDefaultDicPrefs.ContainsKey(key))
+            if (Application.isEditor && DebugxStaticData.MemberEnableDefaultDicPrefs.ContainsKey(key))
             {
                 info.enableDefault = DebugxStaticData.MemberEnableDefaultDicPrefs[key];
             }
-#endif
 
             return info;
         }
-
-#if UNITY_EDITOR
-        /// <summary>
-        /// 编辑器窗口，隐藏区域是否开启
-        /// </summary>
-        [HideInInspector]
-        public bool fadeAreaOpenCached;
-#endif
     }
 
     /// <summary>
@@ -156,6 +140,8 @@ namespace DebugxLog
         public DebugxMemberInfoAsset[] customMemberAssets;
         public int CustomMemberAssetsLength => customMemberAssets == null ? 0 : customMemberAssets.Length;
         
+
+
         public void ResetMembers(bool resetDefault = true, bool resetCustom = true)
         {
             if (resetDefault)
@@ -170,9 +156,6 @@ namespace DebugxLog
                     key = DebugxProjectSettings.normalInfoKey,
                     color = GetNormalMemberColor != null ? GetNormalMemberColor.Invoke() : Color.white,
                     enableDefault = true,
-#if UNITY_EDITOR
-                    fadeAreaOpenCached = true,
-#endif
                 };
                 defaultMemberAssets[0] = normalMember;
 
@@ -184,9 +167,6 @@ namespace DebugxLog
                     key = DebugxProjectSettings.masterInfoKey,
                     color = GetMasterMemberColor != null ? GetMasterMemberColor.Invoke() : new Color(1f, 0.627f, 0.627f, 1f),
                     enableDefault = true,
-#if UNITY_EDITOR
-                    fadeAreaOpenCached = true,
-#endif
                 };
                 defaultMemberAssets[1] = masterMember;
             }
@@ -202,9 +182,6 @@ namespace DebugxLog
                         key = 1,
                         color = new Color(0.7843f, 0.941f, 1f, 1f),
                         enableDefault = true, 
-#if UNITY_EDITOR
-                        fadeAreaOpenCached = true,
-#endif
                     }
                 };
             }
@@ -243,15 +220,20 @@ namespace DebugxLog
         {
             if (settings == null) return;
 
-#if UNITY_EDITOR
-            settings.enableLogDefault = DebugxStaticData.EnableLogDefaultPrefs;
-            settings.enableLogMemberDefault = DebugxStaticData.EnableLogMemberDefaultPrefs;
-            settings.logThisKeyMemberOnlyDefault = DebugxStaticData.LogThisKeyMemberOnlyDefaultPrefs;
-#else
-            settings.enableLogDefault = enableLogDefault;
-            settings.enableLogMemberDefault = enableLogMemberDefault;
-            settings.logThisKeyMemberOnlyDefault = logThisKeyMemberOnlyDefault;
-#endif
+
+            if (Application.isEditor)
+            {
+                settings.enableLogDefault = DebugxStaticData.EnableLogDefaultPrefs;
+                settings.enableLogMemberDefault = DebugxStaticData.EnableLogMemberDefaultPrefs;
+                settings.logThisKeyMemberOnlyDefault = DebugxStaticData.LogThisKeyMemberOnlyDefaultPrefs;
+            }
+            else
+            {
+                settings.enableLogDefault = enableLogDefault;
+                settings.enableLogMemberDefault = enableLogMemberDefault;
+                settings.logThisKeyMemberOnlyDefault = logThisKeyMemberOnlyDefault;
+            }
+
             settings.members = new DebugxMemberInfo[DefaultMemberAssetsLength + (customMemberAssets != null ? customMemberAssets.Length : 0)];
 
             //添加默认成员信息
@@ -272,27 +254,30 @@ namespace DebugxLog
                 }
             }
 
-#if UNITY_EDITOR
-            //Log输出设置
-            settings.logOutput = DebugxStaticData.LogOutputPrefs;
-            settings.enableLogStackTrace = DebugxStaticData.EnableLogStackTracePrefs;
-            settings.enableWarningStackTrace = DebugxStaticData.EnableWarningStackTracePrefs;
-            settings.enableErrorStackTrace = DebugxStaticData.EnableErrorStackTracePrefs;
-            settings.recordAllNonDebugxLogs = DebugxStaticData.RecordAllNonDebugxLogsPrefs;
-            settings.drawLogToScreen = DebugxStaticData.DrawLogToScreenPrefs;
-            settings.restrictDrawLogCount = DebugxStaticData.RestrictDrawLogCountPrefs;
-            settings.maxDrawLogs = DebugxStaticData.MaxDrawLogsPrefs;
-#else
-            //Log输出设置
-            settings.logOutput = logOutput;
-            settings.enableLogStackTrace = enableLogStackTrace;
-            settings.enableWarningStackTrace = enableWarningStackTrace;
-            settings.enableErrorStackTrace = enableErrorStackTrace;
-            settings.recordAllNonDebugxLogs = recordAllNonDebugxLogs;
-            settings.drawLogToScreen = drawLogToScreen;
-            settings.restrictDrawLogCount = restrictDrawLogCount;
-            settings.maxDrawLogs = maxDrawLogs;
-#endif
+            if (Application.isEditor)
+            {
+                //Log输出设置
+                settings.logOutput = DebugxStaticData.LogOutputPrefs;
+                settings.enableLogStackTrace = DebugxStaticData.EnableLogStackTracePrefs;
+                settings.enableWarningStackTrace = DebugxStaticData.EnableWarningStackTracePrefs;
+                settings.enableErrorStackTrace = DebugxStaticData.EnableErrorStackTracePrefs;
+                settings.recordAllNonDebugxLogs = DebugxStaticData.RecordAllNonDebugxLogsPrefs;
+                settings.drawLogToScreen = DebugxStaticData.DrawLogToScreenPrefs;
+                settings.restrictDrawLogCount = DebugxStaticData.RestrictDrawLogCountPrefs;
+                settings.maxDrawLogs = DebugxStaticData.MaxDrawLogsPrefs;
+            }
+            else
+            {
+                //Log输出设置
+                settings.logOutput = logOutput;
+                settings.enableLogStackTrace = enableLogStackTrace;
+                settings.enableWarningStackTrace = enableWarningStackTrace;
+                settings.enableErrorStackTrace = enableErrorStackTrace;
+                settings.recordAllNonDebugxLogs = recordAllNonDebugxLogs;
+                settings.drawLogToScreen = drawLogToScreen;
+                settings.restrictDrawLogCount = restrictDrawLogCount;
+                settings.maxDrawLogs = maxDrawLogs;
+            }
 
             Debugx.ResetToDefault();
 

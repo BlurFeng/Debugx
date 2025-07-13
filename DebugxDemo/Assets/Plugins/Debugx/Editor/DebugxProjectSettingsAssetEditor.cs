@@ -1,8 +1,49 @@
+using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 
-namespace DebugxLog
+namespace DebugxLog.Editor
 {
+    public static class DebugxMemberInfoAssetEditor
+    {
+        private static Dictionary<int, bool> _fadeAreaOpenCached = new Dictionary<int, bool>();
+
+        public static bool GetFadeAreaOpenCached(int key)
+        {
+            if (!_fadeAreaOpenCached.ContainsKey(key))
+            {
+                _fadeAreaOpenCached.Add(
+                    key,
+                    DebugxStaticData.PlayerPrefsGetBool($"DebugxMemberInfoAssetEditor.fadeAreaOpenCached.{key}", true));
+            }
+            
+            return _fadeAreaOpenCached[key];
+        }
+        
+        public static bool SetFadeAreaOpenCached(int key, bool value)
+        {
+            if (!_fadeAreaOpenCached.ContainsKey(key))
+            {
+                _fadeAreaOpenCached.Add(key, value);
+            }
+            else
+            {
+                _fadeAreaOpenCached[key] = value;
+            }
+            
+            return _fadeAreaOpenCached[key];
+        }
+
+        public static void DeleteFadeAreaOpenCached(int key)
+        {
+            if (!_fadeAreaOpenCached.ContainsKey(key))
+                return;
+
+            _fadeAreaOpenCached.Remove(key);
+            DebugxStaticData.PlayerPrefsDeleteKey(key.ToString());
+        }
+    }
+    
     public static class DebugxProjectSettingsAssetEditor
     {
         public static void OnInitializeOnLoadMethod()

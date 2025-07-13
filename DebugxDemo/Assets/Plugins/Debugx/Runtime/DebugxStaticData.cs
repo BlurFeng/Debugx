@@ -25,6 +25,11 @@ namespace DebugxLog
             PlayerPrefs.SetInt(key, value ? 1 : 2);
         }
 
+        public static void PlayerPrefsDeleteKey(string key)
+        {
+            PlayerPrefs.DeleteKey(key);
+        }
+
         #endregion
 
         public static bool EnableAwakeTestLog

@@ -1,6 +1,6 @@
 ﻿using UnityEditor;
 
-namespace DebugxLog
+namespace DebugxLog.Editor
 {
     [InitializeOnLoad]
     public class EditorAction

@@ -1,7 +1,7 @@
 ﻿using UnityEditor;
 using UnityEngine;
 
-namespace DebugxLog
+namespace DebugxLog.Editor
 {
     public class GUIStylex
     {
