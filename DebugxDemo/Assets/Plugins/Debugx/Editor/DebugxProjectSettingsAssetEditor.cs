@@ -83,15 +83,15 @@ namespace DebugxLog.Editor
             //在编辑器启动或代码编译时，创建Asset后直接Resources.Load此资源会导致一个堆栈溢出的Bug。所以我们使用DebugxProjectSettings.ApplyBy接口进行保存，避开会调用到Resources.Load的流程
             //调用Resources.Load加载已经存在的资源则不会有此问题，应该是Editor启动时创建的Asset资源还未成功进行保存
 
-            string path = $"{DebugxStaticData.ResourcesPath}/{DebugxProjectSettings.fileName}.asset";
+            string path = $"{DebugxStaticData.ResourcesPathRelative}/{DebugxProjectSettings.fileName}.asset";
 
             if (DebugxProjectSettingsAsset.Instance) AssetDatabase.DeleteAsset(path);//移除旧资源
 
             DebugxProjectSettingsAsset.Instance = ScriptableObject.CreateInstance(typeof(DebugxProjectSettingsAsset)) as DebugxProjectSettingsAsset;
 
             //确认文件夹是否存在，否则创建
-            if (!System.IO.Directory.Exists(DebugxStaticData.ResourcesPath))
-                System.IO.Directory.CreateDirectory(DebugxStaticData.ResourcesPath);
+            if (!System.IO.Directory.Exists(DebugxStaticData.ResourcesPathAbsolute))
+                System.IO.Directory.CreateDirectory(DebugxStaticData.ResourcesPathAbsolute);
 
             AssetDatabase.CreateAsset(DebugxProjectSettingsAsset.Instance, path);
 

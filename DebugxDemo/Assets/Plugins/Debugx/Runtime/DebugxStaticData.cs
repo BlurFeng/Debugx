@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.IO;
 using System.Text;
 using UnityEngine;
 
@@ -6,12 +7,32 @@ namespace DebugxLog
 {
     public static class DebugxStaticData
     {
+        public static readonly bool IsChineseSimplified = Application.systemLanguage == SystemLanguage.ChineseSimplified;
+        private const string FolderPath = "/Plugins/Debugx/Resources";
+        public static readonly string ResourcesPathRelative  = "Assets" + FolderPath;
+        /// <summary>
+        /// Configuration storage folder.
+        /// 配置存储文件夹。
+        /// </summary>
+        public static string ResourcesPathAbsolute
+        {
+            get
+            {
+                if (string.IsNullOrEmpty(_resourcesPath))
+                {
+                    _resourcesPath = Application.dataPath + FolderPath;
+                    Debugx.LogMst($"ResourcesPath: {_resourcesPath}");
+                }
+                
+                //确认文件夹是否存在，否则创建
+                if (!Directory.Exists(_resourcesPath))
+                    Directory.CreateDirectory(_resourcesPath);
+            
+                return _resourcesPath;
+            }
+        }
 
-        public static bool IsChineseSimplified = Application.systemLanguage == SystemLanguage.ChineseSimplified;
-        
-        public static string RootPath;
-
-        public static string ResourcesPath;
+        private static string _resourcesPath;
 
         #region Tools
 
