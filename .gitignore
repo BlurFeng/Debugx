@@ -1,5 +1,6 @@
 ## Custom
 *.meta
+DebugxUserManual_cn.docx
 #*.docx
 
 ## Ignore Visual Studio temporary files, build results, and

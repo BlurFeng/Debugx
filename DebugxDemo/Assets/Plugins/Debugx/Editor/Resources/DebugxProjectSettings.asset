@@ -1,0 +1,49 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3d325bc733982434293bf164fbd2b856, type: 3}
+  m_Name: DebugxProjectSettings
+  m_EditorClassIdentifier: 
+  enableLogDefault: 1
+  enableLogMemberDefault: 1
+  allowUnregisteredMember: 1
+  logThisKeyMemberOnlyDefault: 0
+  defaultMemberAssets:
+  - enableDefault: 1
+    signature: Normal
+    logSignature: 1
+    key: -1
+    header: 
+    color: {r: 1, g: 1, b: 1, a: 1}
+    fadeAreaOpenCached: 1
+  - enableDefault: 1
+    signature: Master
+    logSignature: 1
+    key: -2
+    header: 
+    color: {r: 1, g: 0.627, b: 0.627, a: 1}
+    fadeAreaOpenCached: 1
+  customMemberAssets:
+  - enableDefault: 1
+    signature: Winhoo
+    logSignature: 1
+    key: 1
+    header: 
+    color: {r: 0.7843, g: 0.941, b: 1, a: 1}
+    fadeAreaOpenCached: 1
+  logOutput: 0
+  enableLogStackTrace: 0
+  enableWarningStackTrace: 0
+  enableErrorStackTrace: 1
+  recordAllNonDebugxLogs: 0
+  drawLogToScreen: 0
+  restrictDrawLogCount: 0
+  maxDrawLogs: 100

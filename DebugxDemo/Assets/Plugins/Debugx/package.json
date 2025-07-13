@@ -1,0 +1,15 @@
+{
+  "name": "com.blurfeng.debugx",
+  "displayName": "Debugx",
+  "version": "2.1.1.0",
+  "unity": "2022.3",
+  "description": "A simple and handy debug utility for Unity.",
+  "keywords": ["Debugx", "debug", "log", "console", "tools"],
+  "author": {
+    "name": "BlurFeng",
+    "url": "https://github.com/BlurFeng"
+  },
+  "license": "MIT",
+  "category": "Tools",
+  "dependencies": {}
+}
